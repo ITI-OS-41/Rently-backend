@@ -3,6 +3,7 @@ const Validator = require("validator")
 module.exports = function (data) {
   let errors = {}
 
+  
   if (Validator.isEmpty(data.email)) {
     errors.email = "Email is required"
   }

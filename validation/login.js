@@ -1,21 +1,22 @@
 const Validator = require('validator');
+import { EMAIL, USERNAME, PASSWORD } from "../strings/errors"
 
 
 module.exports = function (data) {
     let errors = {}
 
     if(Validator.isEmpty(data.email)){
-        errors.email = 'Email is required'
+        errors.email = EMAIL.required
     }
     if(!Validator.isEmail(data.email)){
-        errors.email = 'Email is invalid'
+        errors.email = EMAIL.invalid
     }
 
     if(Validator.isEmpty(data.password)){
-        errors.password = 'password is required'
+        errors.password = PASSWORD.required
     }
     if(!Validator.isLength(data.password, {min: 6, max: 30})){
-        errors.password = 'password must be between 6 to 30'
+        errors.password = PASSWORD.criteria
     }
 
     return {

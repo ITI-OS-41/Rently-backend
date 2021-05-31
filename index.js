@@ -7,7 +7,8 @@ const passport = require("passport")
 /*
  ** ROUTES
  */
-const users = require("./routes/users.js")
+const auth = require("./routes/auth.js")
+const user = require("./routes/user.js")
 
 /*
  ** SETUP ENVIRONMENT
@@ -33,7 +34,11 @@ app.use(cors())
 app.use(passport.initialize())
 require("./config/passport")(passport)
 
-app.use("/api/user", users)
+
+// * Routes
+app.use("/api/auth", auth)
+app.use("/api/user", user)
+
 
 /*
  ** RUN APP
