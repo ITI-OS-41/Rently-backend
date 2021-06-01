@@ -1,5 +1,5 @@
 const Validator = require('validator');
-import { EMAIL, USERNAME, PASSWORD } from "../strings/errors"
+import { EMAIL, USERNAME, PASSWORD } from "../helpers/errors"
 
 
 module.exports = function (data) {

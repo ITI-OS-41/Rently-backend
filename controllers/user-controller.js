@@ -1,4 +1,5 @@
 const User = require("../models/User")
+import { USER } from "../helpers/errors"
 
 exports.getAll = async (req, res) => {
   let { _id, username, email } = req.query
@@ -29,12 +30,12 @@ exports.getOne = (req, res) => {
           username: user.username,
         })
       } else {
-        return res.status(404).json({ msg: "User not found!" })
+        return res.status(404).json({ msg: USER.notFound })
       }
     })
     .catch((err) => {
       console.log(err)
-      return res.status(500).json({ msg: "Invalid ID!" })
+      return res.status(500).json({ msg: USER.invalidId })
     })
 }
 

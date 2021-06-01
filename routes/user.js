@@ -14,14 +14,19 @@ const {
 
 // * GET ONE
 router.get("/:id", getOne)
+
+// * GET ALL
 router.get("/", passport.authenticate("jwt", { session: false }), getAll)
+
+// * UPDATE
 router.post("/:id", passport.authenticate("jwt", { session: false }), update)
+
+// * DELETE
 router.delete(
   "/:id",
   passport.authenticate("jwt", { session: false }),
   deleteOne,
 )
 
-// * GET ALL
 
 module.exports = router

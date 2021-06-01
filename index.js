@@ -34,11 +34,9 @@ app.use(cors())
 app.use(passport.initialize())
 require("./config/passport")(passport)
 
-
 // * Routes
 app.use("/api/auth", auth)
 app.use("/api/user", user)
-
 
 /*
  ** RUN APP
@@ -48,3 +46,6 @@ const PORT = process.env.PORT || 5000
 app.listen(PORT, () => {
   console.log(`Server is up and running on port http://localhost:${PORT}/`)
 })
+
+// ! TODO:
+// - user roles permissions by middleware

@@ -4,6 +4,8 @@ const bcrypt = require("bcryptjs")
 const passport = require("passport")
 const jwt = require("jsonwebtoken")
 
+import { EMAIL, USERNAME, PASSWORD } from "../helpers/errors"
+
 const validateRegisterInput = require("../validation/register")
 const validateLoginInput = require("../validation/login")
 
@@ -16,7 +18,7 @@ exports.register = (req, res) => {
 
   User.findOne({ email: req.body.email }).then((user) => {
     if (user) {
-      errors.email = "Email was already used before!"
+      errors.email = EMAIL.duplicate
       return res.status(404).json(errors)
     }
 
