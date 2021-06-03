@@ -9,6 +9,7 @@ const passport = require("passport")
  */
 const auth = require("./routes/auth.js")
 const user = require("./routes/user.js")
+const blog = require("./routes/blog.js")
 
 /*
  ** SETUP ENVIRONMENT
@@ -37,6 +38,7 @@ require("./config/passport")(passport)
 // * Routes
 app.use("/api/auth", auth)
 app.use("/api/user", user)
+app.use("/api/blog", blog)
 
 /*
  ** RUN APP

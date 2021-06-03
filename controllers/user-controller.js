@@ -19,7 +19,7 @@ exports.getAll = async (req, res) => {
 }
 
 exports.getOne = (req, res) => {
-  const Id = req.params.id
+  const Id = req.params.id 
 
   User.findById(Id)
     .then((user) => {
