@@ -50,3 +50,21 @@ exports.update = async (req, res) => {
 			return res.status(500).send({message: error });
 		});
 };
+
+exports.deleteOne = async (req, res) => {
+	Category.findById(req.params.id)
+		.then((category) => {
+			if (category) {
+				category.remove().then(() => {
+					return res.status(200).send(category);
+				});
+			} else {
+				return res.status(404).json({ msg:error });
+			}
+		})
+		.catch((error) => {
+			console.log(error);
+			return res.status(500).send({ msg: error });
+		});
+};
+

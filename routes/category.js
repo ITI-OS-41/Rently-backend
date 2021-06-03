@@ -6,7 +6,7 @@ const {
 	getOne,
 	getAll,
 	update,
-// 	deleteOne,
+	deleteOne,
 	create
 } = require("../controllers/category-controller");
 //  * Create New
@@ -20,7 +20,7 @@ router.get("/",getAll);
 // * UPDATE
 router.post("/:id", update);
 
-// // * DELETE
-// router.delete("/:id", Category.deleteOne);
+// * DELETE
+router.delete("/:id",deleteOne);
 
 module.exports = router;
