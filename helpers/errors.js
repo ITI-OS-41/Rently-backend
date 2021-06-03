@@ -14,4 +14,5 @@ const PASSWORD = {
   required: "Password is required!",
   criteria: "password must be between 6 to 30",
 }
+
 export { EMAIL, USERNAME, USER, PASSWORD }
