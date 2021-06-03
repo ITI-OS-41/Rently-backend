@@ -12,13 +12,13 @@ const {
 	getOne,
 	update,
 	deleteOne,
-  getBySlug
+	getBySlug,
 } = require('../controllers/blog-controller');
 // * create blog
 
 router.post('/new', upload, create);
 // * GET ONE
-router.get('/post/:id', getOne);
+// router.get('/:id', getOne);
 
 // * GET ALL
 router.get('/', getAll);
@@ -30,5 +30,5 @@ router.post('/edit/:id', update);
 router.delete('/:id', deleteOne);
 
 // * Find by slug name
-router.get('/:slug',getBySlug)
+router.get('/:slug', getBySlug);
 module.exports = router;

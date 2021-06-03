@@ -5,7 +5,7 @@ const Blog = mongoose.model('Blog');
 const multer = require('multer');
 const jimp = require('jimp');
 const uuid = require('uuid');
-const { BLOG, SLUG } = require('../helpers/errors');
+const { BLOG_POST, SLUG } = require('../helpers/errors');
 
 const multerOptions = {
 	storage: multer.memoryStorage(),
@@ -38,36 +38,35 @@ exports.resize = async (req, res, next) => {
 };
 
 exports.create = async (req, res) => {
-	const blog = await new Blog(req.body).save();
-	console.log(blog);
-	res.status(200).send(blog);
+	const blogPost = await new Blog(req.body).save();
+	console.log(blogPost);
+	res.status(200).send(blogPost);
 };
 
 exports.getOne = (req, res) => {
 	const Id = req.params.id;
-
-	Blog.findById(Id)
-		.then((blog) => {
-			if (blog) {
-				return res.json(blog);
+	Blog.findOne({ _id: req.params.id })
+		.then((blogPost) => {
+			if (blogPost) {
+				return res.json(blogPost);
 			} else {
-				return res.status(404).json({ msg: BLOG.notFound });
+				return res.status(404).json({ msg: BLOG_POST.notFound });
 			}
 		})
 		.catch((err) => {
 			console.log(err);
-			return res.status(500).json({ msg: BLOG.invalidId });
+			return res.status(500).json({ msg: POST.invalidId });
 		});
 };
 
 exports.getAll = async (req, res) => {
-	// let { _id, slug } = req.query;
-	// console.log(req.query);
-	// queryObj = {
-	// 	...(_id && { _id }),
-	// 	...(slug && { slug }),
-	// };
-	await Blog.find().then((objects) => {
+	let { _id, slug } = req.query;
+	console.log(req.query);
+	const queryObj = {
+		...(_id && { _id }),
+		...(slug && { slug }),
+	};
+	await Blog.find(queryObj).then((objects) => {
 		res.status(200).send(objects);
 	});
 };
@@ -83,36 +82,32 @@ exports.update = async (req, res) => {
 		})
 		.catch((error) => {
 			console.log(error);
-			return res.status(500).send({ msg: error.message });
+			return res.status(500).send({ msg: POST.invalidId });
 		});
 };
 
 exports.deleteOne = async (req, res) => {
 	Blog.findById(req.params.id)
-		.then((blog) => {
-			if (blog) {
-				blog.remove().then(() => {
-					return res.status(200).send(blog);
+		.then((blogPost) => {
+			if (blogPost) {
+				blogPost.remove().then(() => {
+					return res.status(200).send(blogPost);
 				});
 			} else {
-				return res.status(404).json({ msg: 'post not found!' });
+				return res.status(404).json({ msg: BLOG_POST.notFound });
 			}
 		})
 		.catch((error) => {
 			console.log(error);
-			return res.status(500).send({ msg: 'post' });
+			return res.status(500).send({ msg: BLOG_POST.invalidId });
 		});
 };
 
-
 exports.getBySlug = async (req, res, next) => {
-
-    // const slug = req.params.slug;
-    // console.log("slug ",slug);
-	Blog.findOne({slug:req.params.slug})
-		.then((blog) => {
-			if (blog) {
-				return res.status(200).json(blog);
+	Blog.findOne({ slug: req.params.slug })
+		.then((blogPost) => {
+			if (blogPost) {
+				return res.status(200).json(blogPost);
 			} else {
 				return res.status(404).json({ msg: SLUG.notFound });
 			}
@@ -121,4 +116,14 @@ exports.getBySlug = async (req, res, next) => {
 			console.log(err);
 			return res.status(500).json({ msg: SLUG.invalidSlug });
 		});
+};
+
+exports.getByTag = async (req, res) => {
+	const tag = req.params.tag;
+	const tagQuery = tag || { $exists: true, $ne: [] };
+	const tagsPromise = Blog.getTagList();
+	const storesPromise = Blog.find({ tags: tagQuery });
+	const [tags, stores] = await Promise.all([tagsPromise, storesPromise]);
+
+	res.render('tag', { tags, title: 'Tags', tag, stores });
 };
