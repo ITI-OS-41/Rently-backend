@@ -4,7 +4,7 @@ const Category = require("../models/Category");
 // Import controllers
 const {
 	getOne,
-// 	getAll,
+	getAll,
 // 	update,
 // 	deleteOne,
 	create
@@ -14,8 +14,8 @@ router.post('/new',create);
 // * GET ONE
 router.get("/:id", getOne);
 
-// // * GET ALL
-// router.get("/", Category.getAll);
+// * GET ALL
+router.get("/",getAll);
 
 // // * UPDATE
 // router.post("/:id", Category.update);

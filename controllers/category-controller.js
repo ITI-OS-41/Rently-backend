@@ -1,23 +1,15 @@
 const Category = require('../models/Category');
-// Create and Save a new Category
+// * Create and Save a new Category
 exports.create = async (req, res) => {
-    // console.log(";;;;");
 
-    // Category.name = req.body.name;
-    // Category.description = req.body.description;
     const category = await new Category(req.body).save();
-    // console.log("jjjjjjjjjj");
-    // Category.save(function (error) {
-    //     if (error)
-    //         res.send("Error", error)
-    //     res.status(201).json({ message: 'err' });
-    // })
+
     res.status(201).send(category);
 
 };
 
 
-
+//* Get One
 exports.getOne = (req, res) => {
 	const Id = req.params.id;
 	Category.findOne({ _id: req.params.id })
@@ -34,4 +26,13 @@ exports.getOne = (req, res) => {
 		});
 };
 
-
+//* Get ALL
+exports.getAll = async (req, res) => {
+	let { _id } = req.query;
+	const queryObj = {
+		...(_id && { _id }),
+	};
+	await Category.find(queryObj).then((objects) => {
+		res.status(200).send(objects);
+	});
+};
