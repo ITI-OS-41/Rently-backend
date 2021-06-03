@@ -122,8 +122,9 @@ exports.getByTag = async (req, res) => {
 	const tag = req.params.tag;
 	const tagQuery = tag || { $exists: true, $ne: [] };
 	const tagsPromise = Blog.getTagList();
-	const storesPromise = Blog.find({ tags: tagQuery });
-	const [tags, stores] = await Promise.all([tagsPromise, storesPromise]);
+	const postsPromise = Blog.find({ tags: tagQuery });
+	const [tags, posts] = await Promise.all([tagsPromise, postsPromise]);
+	console.log("tags ",tags)
 
-	res.render('tag', { tags, title: 'Tags', tag, stores });
+	res.status(200).send([tags,posts]);
 };
