@@ -21,7 +21,6 @@ exports.getOne = (req, res) => {
 			}
 		})
 		.catch((err) => {
-			console.log(err);
 			return res.status(500).json({ msg: err});
 		});
 };
@@ -63,7 +62,7 @@ exports.deleteOne = async (req, res) => {
 			}
 		})
 		.catch((error) => {
-			console.log(error);
+	
 			return res.status(500).send({ msg: error });
 		});
 };

@@ -12,6 +12,7 @@ const passport = require('passport');
 const auth = require('./routes/auth.js');
 const user = require('./routes/user.js');
 const category = require('./routes/category.js');
+const subcategory = require('./routes/subCategory.js');
 
 /*
  ** SETUP ENVIRONMENT
@@ -41,6 +42,7 @@ require('./config/passport')(passport);
 app.use('/api/auth', auth);
 app.use('/api/user', user);
 app.use('/api/category', category);
+app.use('/api/subcategory', subcategory);
 
 /*
  ** RUN APP
