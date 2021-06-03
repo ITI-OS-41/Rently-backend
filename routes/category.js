@@ -5,7 +5,7 @@ const Category = require("../models/Category");
 const {
 	getOne,
 	getAll,
-// 	update,
+	update,
 // 	deleteOne,
 	create
 } = require("../controllers/category-controller");
@@ -17,8 +17,8 @@ router.get("/:id", getOne);
 // * GET ALL
 router.get("/",getAll);
 
-// // * UPDATE
-// router.post("/:id", Category.update);
+// * UPDATE
+router.post("/:id", update);
 
 // // * DELETE
 // router.delete("/:id", Category.deleteOne);

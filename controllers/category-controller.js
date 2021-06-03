@@ -36,3 +36,17 @@ exports.getAll = async (req, res) => {
 		res.status(200).send(objects);
 	});
 };
+
+exports.update = async (req, res) => {
+	await Category.findOneAndUpdate({ _id: req.params.id }, req.body, {
+		new: true,
+		runValidators: true,
+		useFindAndModify: false,
+	})
+		.then((response) => {
+			res.status(200).send(response);
+		})
+		.catch((error) => {
+			return res.status(500).send({message: error });
+		});
+};
