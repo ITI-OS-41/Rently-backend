@@ -9,9 +9,6 @@ exports.getAll = async (req, res) => {
 
 
   let { _id, receiver, sender } = req.query
-  console.log({ _id });
-  console.log({ receiver });
-  console.log({ sender });
   const queryObj = {
     ...(_id && { _id }),
     ...(receiver && { receiver }),

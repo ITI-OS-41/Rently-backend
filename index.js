@@ -3,7 +3,6 @@ const dotenv = require("dotenv")
 const mongoose = require("mongoose")
 const cors = require("cors")
 const passport = require("passport")
-const Pusher = require("pusher");
 
 
 
@@ -33,13 +32,15 @@ mongoose.connect(process.env.MONGODB_URL, {
 /*
 ** ! Pusher
 */
-const pusher = new Pusher({
-  appId: process.env.APP_ID,
-  key: process.env.KEY,
-  secret: process.env.SECRET,
-  cluster: "eu",
-  useTLS: true
-});
+// const Pusher = require("pusher");
+
+// const pusher = new Pusher({
+//   appId: process.env.PUSHER_APP_ID,
+//   key: process.env.PUSHER_APP_KEY,
+//   secret: process.env.PUSHER_APP_SECRET,
+//   cluster: process.env.PUSHER_APP_CLUSTER,
+//   useTLS: true
+// });
 
 // pusher.trigger("my-channel", "my-event", {
 //   message: "hello world"
