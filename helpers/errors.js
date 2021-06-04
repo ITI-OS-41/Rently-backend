@@ -14,12 +14,29 @@ const PASSWORD = {
   required: "Password is required!",
   criteria: "password must be between 6 to 30",
 }
-const BLOG_POST= {
-  notFound:"Post not found",
-  invalidId:"Invalid ID"
+
+const NOTIFICATION = {
+  invalid: "Notification ID is required!",
+  notFound: "Notification not found!",
 }
-const SLUG={
-  notFound:"title not found",
-  "invalidSlug":"invalid slug"
+const QUESTION={
+  notFound:"question not found",
+  invalidId:"page not found"
 }
-export { EMAIL, USERNAME, USER, PASSWORD,BLOG_POST,SLUG }
+const ID = {
+  invalid: "Invalid ID!",
+}
+
+const BLOG_POST = {
+  notFound: "Post not found",
+  invalidId: "Invalid ID"
+}
+const SLUG = {
+  notFound: "title not found",
+  "invalidSlug": "invalid slug"
+}
+const RENT = {
+  invalid: "Rent ID is required!",
+  notFound: "Rent not found!",
+}
+export { EMAIL, USERNAME, USER, PASSWORD, BLOG_POST, SLUG, NOTIFICATION, ID, RENT,QUESTION }
