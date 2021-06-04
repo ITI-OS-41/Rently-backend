@@ -3,6 +3,9 @@ const dotenv = require("dotenv")
 const mongoose = require("mongoose")
 const cors = require("cors")
 const passport = require("passport")
+const Pusher = require("pusher");
+
+
 
 /*
  ** ROUTES
@@ -25,6 +28,24 @@ mongoose.connect(process.env.MONGODB_URL, {
   useCreateIndex: true,
 })
 
+
+
+/*
+** ! Pusher
+*/
+const pusher = new Pusher({
+  appId: process.env.APP_ID,
+  key: process.env.KEY,
+  secret: process.env.SECRET,
+  cluster: "eu",
+  useTLS: true
+});
+
+
+
+
+
+
 const app = express()
 app.use("/uploads", express.static("uploads"))
 
@@ -40,6 +61,14 @@ app.use("/api/auth", auth)
 app.use("/api/user", user)
 app.use("/api/notification", notification)
 
+
+
+
+
+
+
+
+
 /*
  ** RUN APP
  */
@@ -48,3 +77,8 @@ const PORT = process.env.PORT || 5000
 app.listen(PORT, () => {
   console.log(`Server is up and running on port http://localhost:${PORT}/`)
 })
+
+
+// pusher.trigger("my-channel", "my-event", {
+//   message: "hello world"
+// });

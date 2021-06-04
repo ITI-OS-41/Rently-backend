@@ -1,8 +1,17 @@
 const Notification = require("../models/Notification")
-import { USER } from "../helpers/errors"
+import { NOTIFICATION, ID } from "../helpers/errors"
+const ObjectId = require('mongoose').Types.ObjectId;
+
+
+const validateNotification = require("../validation/notification")
 
 exports.getAll = async (req, res) => {
+
+
   let { _id, receiver, sender } = req.query
+  console.log({ _id });
+  console.log({ receiver });
+  console.log({ sender });
   const queryObj = {
     ...(_id && { _id }),
     ...(receiver && { receiver }),
@@ -18,23 +27,37 @@ exports.getAll = async (req, res) => {
 }
 
 exports.getOne = (req, res) => {
-  const Id = req.params.id
 
-  Notification.findById(Id)
+  const id = req.params.id
+
+  if (!ObjectId.isValid(id)) {
+    return res.status(404).json({
+      id: ID.invalid
+    })
+  }
+
+  Notification.findById(id)
     .then((notification) => {
       if (notification) {
         return res.json(notification)
       } else {
-        return res.status(404).json({ msg: USER.notFound })
+        return res.status(404).json({ msg: NOTIFICATION.notFound })
       }
     })
     .catch((err) => {
-      console.log(err)
-      return res.status(500).json({ msg: USER.invalidId })
+      console.log({ err })
+      return res.status(500).json({ msg: ID.invalid })
     })
 }
 
 exports.create = async (req, res) => {
+  const { isValid, errors } = validateNotification(req.body)
+
+  if (!isValid) {
+    return res.status(404).json(errors)
+  }
+
+
   const notification = new Notification({
     receiver: req.body.receiver,
     sender: req.body.sender,
@@ -47,13 +70,26 @@ exports.create = async (req, res) => {
       res.json({ notification })
     })
     .catch((err) => {
-      console.log(error)
-      return res.status(500).send({ msg: error.message })
+      return res.status(500).send({ msg: err.message })
     })
 }
 
 
 exports.update = async (req, res) => {
+  const id = req.params.id
+
+  if (!ObjectId.isValid(id)) {
+    return res.status(404).json({
+      id: ID.invalid
+    })
+  }
+
+  const { isValid, errors } = validateNotification(req.body)
+
+  if (!isValid) {
+    return res.status(404).json(errors)
+  }
+
   await Notification.findOneAndUpdate({ _id: req.params.id }, req.body, {
     new: true,
     runValidators: true,
@@ -69,6 +105,14 @@ exports.update = async (req, res) => {
 }
 
 exports.deleteOne = async (req, res) => {
+  const id = req.params.id
+
+  if (!ObjectId.isValid(id)) {
+    return res.status(404).json({
+      id: ID.invalid
+    })
+  }
+
   Notification.findById(req.params.id)
     .then((notification) => {
       if (notification) {
@@ -78,7 +122,7 @@ exports.deleteOne = async (req, res) => {
             return res.status(200).send(notification)
           })
       } else {
-        return res.status(404).json({ msg: "Notification not found!" })
+        return res.status(404).json({ msg: NOTIFICATION.notFound })
       }
     })
     .catch((error) => {

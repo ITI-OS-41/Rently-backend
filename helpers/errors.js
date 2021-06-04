@@ -14,5 +14,12 @@ const PASSWORD = {
   required: "Password is required!",
   criteria: "password must be between 6 to 30",
 }
+const NOTIFICATION = {
+  invalid: "Notification ID is required!",
+  notFound: "Notification not found!",
+}
+const ID = {
+  invalid: "Invalid ID!",
+}
 
-export { EMAIL, USERNAME, USER, PASSWORD }
+export { EMAIL, USERNAME, USER, PASSWORD, NOTIFICATION, ID }

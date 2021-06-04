@@ -9,11 +9,14 @@ const {
   deleteOne,
 } = require("../controllers/notification-controller")
 
-// * GET ONE
-router.get("/:id", getOne)
 
 // * GET ALL
 router.get("/", getAll)
+
+
+// * GET ONE
+router.get("/:id", getOne)
+
 
 // * UPDATE
 router.post("/", create)
