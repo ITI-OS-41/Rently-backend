@@ -3,7 +3,7 @@ import { USER } from "../helpers/errors"
 
 exports.getAll = async (req, res) => {
   let { _id, username, email } = req.query
-  queryObj = {
+  const queryObj = {
     ...(_id && { _id }),
     ...(username && { username }),
     ...(email && { email }),
