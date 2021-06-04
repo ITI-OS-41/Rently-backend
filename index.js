@@ -14,8 +14,6 @@ const passport = require('passport');
 const auth = require("./routes/auth.js")
 const user = require("./routes/user.js")
 const notification = require("./routes/notification.js")
-const auth = require('./routes/auth.js');
-const user = require('./routes/user.js');
 const blog = require('./routes/blog.js');
 
 /*
@@ -27,9 +25,9 @@ dotenv.config();
  ** MONGO DB CONNECT
  */
 mongoose.connect(process.env.MONGODB_URL, {
-	useNewUrlParser: true,
-	useUnifiedTopology: true,
-	useCreateIndex: true,
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true,
 });
 
 
@@ -38,7 +36,7 @@ mongoose.connect(process.env.MONGODB_URL, {
 */
 // const Pusher = require("pusher");
 
-// const pusher = new Pusher({
+// const pusher = new Pusher({ 
 //   appId: process.env.PUSHER_APP_ID,
 //   key: process.env.PUSHER_APP_KEY,
 //   secret: process.env.PUSHER_APP_SECRET,
@@ -74,6 +72,6 @@ app.use("/api/notification", notification)
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-	console.log(`Server is up and running on port http://localhost:${PORT}/`);
+  console.log(`Server is up and running on port http://localhost:${PORT}/`);
 });
 
