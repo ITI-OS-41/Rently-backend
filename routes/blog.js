@@ -17,7 +17,7 @@ const {
 } = require('../controllers/blog-controller');
 // * create blog
 
-router.post('/new', upload, create);
+router.post('/', upload, create);
 // * GET ONE
 // router.get('/:id', getOne);
 
@@ -25,7 +25,7 @@ router.post('/new', upload, create);
 router.get('/', getAll);
 
 // * UPDATE
-router.post('/edit/:id', update);
+router.post('/:id', update);
 
 // * DELETE
 router.delete('/:id', deleteOne);

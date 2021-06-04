@@ -14,7 +14,7 @@ const {
 } = require("../controllers/rate-controller")
 
 // * GET ONE
-router.post("/add", add)
+router.post("/", add)
 
 // * GET ONE
 router.get("/:id", getOne)
@@ -23,7 +23,7 @@ router.get("/:id", getOne)
 router.get("/", getAll)
 
 // * UPDATE
-router.post("/:id",  update)
+router.post("/:id", update)
 
 // * DELETE
 router.delete(

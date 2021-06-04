@@ -13,7 +13,7 @@ const {
 } = require('../controllers/faq-controller');
 // * create blog
 
-router.post('/new', create);
+router.post('/', create);
 // * GET ONE
 router.get('/:id', getOne);
 
@@ -21,7 +21,7 @@ router.get('/:id', getOne);
 router.get('/', getAll);
 
 // * UPDATE
-router.post('/edit/:id', update);
+router.post('/:id', update);
 
 // * DELETE
 router.delete('/:id', deleteOne);

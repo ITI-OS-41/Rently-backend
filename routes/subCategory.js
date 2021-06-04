@@ -9,7 +9,7 @@ const {
 	create
 } = require("../controllers/subCategory-controller");
 //  * Create New
-router.post('/new',create);
+router.post('/',create);
 // * GET ONE
 router.get("/:id", getOne);
 

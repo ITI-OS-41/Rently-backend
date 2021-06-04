@@ -1,5 +1,7 @@
 const mongoose = require("mongoose")
 const Schema = mongoose.Schema
+const ObjectId = mongoose.Types.ObjectId;
+
 //module.exports = mongoose.model('Item', itemSchema);
 const rateSchema = new Schema({
   item_id: {
@@ -7,22 +9,27 @@ const rateSchema = new Schema({
     required: true,
     unique: true,
   },
-    // item_id: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: 'Item',
-    //     required: true,
-    //   },
+  rater: {
+    type: ObjectId,
+    ref: "User",
+    required: true,
+  },
+  content: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  // item_id: {
+  //     type: mongoose.Schema.Types.ObjectId,
+  //     ref: 'Item',
+  //     required: true,
+  //   },
   ratingNumber: {
     type: Number,
     required: true,
     min: 1,
     max: 5,
   },
-  // totalPoints: {
-  //   type: Number,
-  //   min: 5,
-  //   max: 5,
-  // },
-})
+}, { timestamps: true })
 
 module.exports = mongoose.model("Rate", rateSchema)
