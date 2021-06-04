@@ -32,7 +32,7 @@ exports.getOne = (req, res) => {
       id: ID.invalid
     })
   }
-
+  
   Rent.findById(id)
     .then((rent) => {
       if (rent) {

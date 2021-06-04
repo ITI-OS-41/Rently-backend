@@ -10,29 +10,26 @@ module.exports = async function (data) {
   if (Validator.isEmpty(data.receiver)) {
     errors.receiver = "receiver is required"
   }
-  if (!Validator.isMongoId(data.receiver)) {
-    errors.receiver = "receiver is not valid id"
-  }
-  const receiver = await User.findById(data.receiver)
 
-  if (!receiver) {
-    errors.receiver = "receiver is not valid user"
+  if (data.receiver) {
+    const receiver = await User.findById(data.receiver)
+    if (!receiver) {
+      errors.receiver = "receiver is not valid user"
+    }
   }
 
-  
 
   if (Validator.isEmpty(data.sender)) {
     errors.sender = "sender is required"
   }
-  if (!Validator.isMongoId(data.sender)) {
-    errors.sender = "sender is not valid id"
-  }
-  
-  const sender = await User.findById(data.sender)
 
-  if (!sender) {
-    errors.sender = "sender is not valid user"
+  if (data.sender) {
+    const sender = await User.findById(data.sender)
+    if (!sender) {
+      errors.sender = "sender is not valid user"
+    }
   }
+
 
   if (Validator.isEmpty(data.content)) {
     errors.content = "content is required"
