@@ -41,6 +41,9 @@ const pusher = new Pusher({
   useTLS: true
 });
 
+// pusher.trigger("my-channel", "my-event", {
+//   message: "hello world"
+// });
 
 
 
@@ -78,7 +81,3 @@ app.listen(PORT, () => {
   console.log(`Server is up and running on port http://localhost:${PORT}/`)
 })
 
-
-// pusher.trigger("my-channel", "my-event", {
-//   message: "hello world"
-// });
