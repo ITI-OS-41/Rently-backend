@@ -15,7 +15,9 @@ const auth = require("./routes/auth.js")
 const user = require("./routes/user.js")
 const notification = require("./routes/notification.js")
 const blog = require('./routes/blog.js');
+const faq = require('./routes/faq.js');
 const rent = require('./routes/rent.js');
+
 
 /*
  ** SETUP ENVIRONMENT
@@ -66,6 +68,7 @@ app.use('/api/auth', auth);
 app.use('/api/user', user);
 app.use("/api/notification", notification)
 app.use('/api/blog', blog);
+app.use('/api/faq', faq);
 app.use("/api/rent", rent)
 
 /*
