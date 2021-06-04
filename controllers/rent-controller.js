@@ -1,9 +1,9 @@
-const Notification = require("../models/Notification")
-import { NOTIFICATION, ID } from "../helpers/errors"
+const Rent = require("../models/Rent")
+import { RENT, ID } from "../helpers/errors"
 const ObjectId = require('mongoose').Types.ObjectId;
 
 
-const validateNotification = require("../validation/notification")
+const validateRent = require("../validation/rent")
 
 exports.getAll = async (req, res) => {
 
@@ -17,7 +17,7 @@ exports.getAll = async (req, res) => {
 
   // * ...(email && { email: /regex here/ }),
 
-  await Notification.find(queryObj)
+  await Rent.find(queryObj)
     .then((objects) => {
       res.status(200).send(objects)
     })
@@ -33,12 +33,12 @@ exports.getOne = (req, res) => {
     })
   }
 
-  Notification.findById(id)
-    .then((notification) => {
-      if (notification) {
-        return res.json(notification)
+  Rent.findById(id)
+    .then((rent) => {
+      if (rent) {
+        return res.json(rent)
       } else {
-        return res.status(404).json({ msg: NOTIFICATION.notFound })
+        return res.status(404).json({ msg: RENT.notFound })
       }
     })
     .catch((err) => {
@@ -48,23 +48,21 @@ exports.getOne = (req, res) => {
 }
 
 exports.create = async (req, res) => {
-  const { isValid, errors } = await validateNotification(req.body)
+  const { isValid, errors } = await validateRent(req.body)
 
   if (!isValid) {
     return res.status(404).json(errors)
   }
 
 
-  const notification = new Notification({
-    receiver: req.body.receiver,
-    sender: req.body.sender,
-    content: req.body.content,
+  const rent = new Rent({
+    ...req.body
   })
 
-  await notification
+  await rent
     .save()
     .then((result) => {
-      res.json({ notification })
+      res.json({ rent })
     })
     .catch((err) => {
       return res.status(500).send({ msg: err.message })
@@ -81,13 +79,13 @@ exports.update = async (req, res) => {
     })
   }
 
-  const { isValid, errors } = validateNotification(req.body)
+  const { isValid, errors } = validateRent(req.body)
 
   if (!isValid) {
     return res.status(404).json(errors)
   }
 
-  await Notification.findOneAndUpdate({ _id: req.params.id }, req.body, {
+  await Rent.findOneAndUpdate({ _id: req.params.id }, req.body, {
     new: true,
     runValidators: true,
     useFindAndModify: false,
@@ -110,16 +108,16 @@ exports.deleteOne = async (req, res) => {
     })
   }
 
-  Notification.findById(req.params.id)
-    .then((notification) => {
-      if (notification) {
-        notification
+  Rent.findById(req.params.id)
+    .then((rent) => {
+      if (rent) {
+        rent
           .remove()
           .then(() => {
-            return res.status(200).send(notification)
+            return res.status(200).send(rent)
           })
       } else {
-        return res.status(404).json({ msg: NOTIFICATION.notFound })
+        return res.status(404).json({ msg: RENT.notFound })
       }
     })
     .catch((error) => {
