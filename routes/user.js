@@ -12,11 +12,11 @@ const {
   deleteOne,
 } = require("../controllers/user-controller")
 
-// * GET ONE
-router.get("/:id", getOne)
-
 // * GET ALL
 router.get("/", passport.authenticate("jwt", { session: false }), getAll)
+
+// * GET ONE
+router.get("/:id", getOne)
 
 // * UPDATE
 router.post("/:id", passport.authenticate("jwt", { session: false }), update)

@@ -6,9 +6,14 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const passport = require('passport');
 
+
+
 /*
  ** ROUTES
  */
+const auth = require("./routes/auth.js")
+const user = require("./routes/user.js")
+const notification = require("./routes/notification.js")
 const auth = require('./routes/auth.js');
 const user = require('./routes/user.js');
 const blog = require('./routes/blog.js');
@@ -27,6 +32,26 @@ mongoose.connect(process.env.MONGODB_URL, {
 	useCreateIndex: true,
 });
 
+
+/*
+** ! Pusher
+*/
+// const Pusher = require("pusher");
+
+// const pusher = new Pusher({
+//   appId: process.env.PUSHER_APP_ID,
+//   key: process.env.PUSHER_APP_KEY,
+//   secret: process.env.PUSHER_APP_SECRET,
+//   cluster: process.env.PUSHER_APP_CLUSTER,
+//   useTLS: true
+// });
+
+// pusher.trigger("my-channel", "my-event", {
+//   message: "hello world"
+// });
+
+
+
 const app = express();
 app.use('/uploads', express.static('uploads'));
 
@@ -37,10 +62,11 @@ app.use(cors());
 app.use(passport.initialize());
 require('./config/passport')(passport);
 
-// * Routes
+
 app.use('/api/auth', auth);
 app.use('/api/user', user);
 app.use('/api/blog', blog);
+app.use("/api/notification", notification)
 
 /*
  ** RUN APP
@@ -51,5 +77,3 @@ app.listen(PORT, () => {
 	console.log(`Server is up and running on port http://localhost:${PORT}/`);
 });
 
-// ! TODO:
-// - user roles permissions by middleware
