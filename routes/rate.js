@@ -1,32 +1,34 @@
 const router = require("express").Router()
-const User = require("../models/User")
+const Rate = require("../models/Rate")
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const passport = require("passport")
 
 // Import controllers
 const {
+  add,
   getOne,
   getAll,
   update,
   deleteOne,
-} = require("../controllers/user-controller")
+} = require("../controllers/rate-controller")
+
+// * GET ONE
+router.post("/add", add)
 
 // * GET ONE
 router.get("/:id", getOne)
 
 // * GET ALL
-router.get("/", passport.authenticate("jwt", { session: false }), getAll)
+router.get("/", getAll)
 
 // * UPDATE
-router.post("/:id", passport.authenticate("jwt", { session: false }), update)
+router.post("/:id",  update)
 
 // * DELETE
 router.delete(
   "/:id",
-  passport.authenticate("jwt", { session: false }),
   deleteOne,
 )
-
 
 module.exports = router
