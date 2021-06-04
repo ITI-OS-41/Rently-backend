@@ -23,12 +23,16 @@ const ID = {
   invalid: "Invalid ID!",
 }
 
-const BLOG_POST= {
-  notFound:"Post not found",
-  invalidId:"Invalid ID"
+const BLOG_POST = {
+  notFound: "Post not found",
+  invalidId: "Invalid ID"
 }
-const SLUG={
-  notFound:"title not found",
-  "invalidSlug":"invalid slug"
+const SLUG = {
+  notFound: "title not found",
+  "invalidSlug": "invalid slug"
 }
-export { EMAIL, USERNAME, USER, PASSWORD,BLOG_POST,SLUG ,NOTIFICATION, ID }
+const RENT = {
+  invalid: "Rent ID is required!",
+  notFound: "Rent not found!",
+}
+export { EMAIL, USERNAME, USER, PASSWORD, BLOG_POST, SLUG, NOTIFICATION, ID, RENT }
