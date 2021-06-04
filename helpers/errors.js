@@ -20,6 +20,10 @@ const BLOG_POST= {
 }
 const SLUG={
   notFound:"title not found",
-  "invalidSlug":"invalid slug"
+  invalidSlug:"invalid slug"
 }
-export { EMAIL, USERNAME, USER, PASSWORD,BLOG_POST,SLUG }
+const QUESTION={
+  notFound:"question not found",
+  invalidId:"page not found"
+}
+export { EMAIL, USERNAME, USER, PASSWORD,BLOG_POST,SLUG,QUESTION }

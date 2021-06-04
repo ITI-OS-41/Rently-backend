@@ -12,6 +12,7 @@ const passport = require('passport');
 const auth = require('./routes/auth.js');
 const user = require('./routes/user.js');
 const blog = require('./routes/blog.js');
+const faq = require('./routes/faq.js');
 
 /*
  ** SETUP ENVIRONMENT
@@ -41,6 +42,7 @@ require('./config/passport')(passport);
 app.use('/api/auth', auth);
 app.use('/api/user', user);
 app.use('/api/blog', blog);
+app.use('/api/faq', faq);
 
 /*
  ** RUN APP
