@@ -19,9 +19,9 @@ const NOTIFICATION = {
   invalid: "Notification ID is required!",
   notFound: "Notification not found!",
 }
-const QUESTION={
-  notFound:"question not found",
-  invalidId:"page not found"
+const QUESTION = {
+  notFound: "question not found",
+  invalidId: "page not found"
 }
 const ID = {
   invalid: "Invalid ID!",
@@ -39,4 +39,10 @@ const RENT = {
   invalid: "Rent ID is required!",
   notFound: "Rent not found!",
 }
-export { EMAIL, USERNAME, USER, PASSWORD, BLOG_POST, SLUG, NOTIFICATION, ID, RENT,QUESTION }
+
+const RATE = {
+  notFound: "Rate not found!",
+  invalidId: "Invalid ID!",
+}
+
+export { EMAIL, USERNAME, USER, PASSWORD, BLOG_POST, SLUG, NOTIFICATION, ID, RENT, QUESTION, RATE }

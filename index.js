@@ -7,7 +7,6 @@ const cors = require('cors');
 const passport = require('passport');
 
 
-
 /*
  ** ROUTES
  */
@@ -20,12 +19,12 @@ const faq = require('./routes/faq.js');
 const rent = require('./routes/rent.js');
 const category = require('./routes/category.js');
 const subcategory = require('./routes/subCategory.js');
-
+const rate = require("./routes/rate.js")
 
 /*
  ** SETUP ENVIRONMENT
  */
-dotenv.config();
+dotenv.config()
 
 /*
  ** MONGO DB CONNECT
@@ -75,7 +74,7 @@ app.use("/api/notification", notification)
 app.use('/api/blog', blog);
 app.use('/api/faq', faq);
 app.use("/api/rent", rent)
-
+app.use("/api/rate", rate)
 
 /*
  ** RUN APP
@@ -86,3 +85,5 @@ app.listen(PORT, () => {
   console.log(`Server is up and running on port http://localhost:${PORT}/`);
 });
 
+// ! TODO:
+// - user roles permissions by middleware
