@@ -1,39 +1,37 @@
 const Rate = require("../models/Rate")
 import { RATE } from "../helpers/errors"
+const ObjectId = require('mongoose').Types.ObjectId;
 
 const validateRate = require("../validation/rate")
 
+// exports.add = async (req, res) => {
+// 	const rate = await new Rate(req.body).save();
+// 	console.log(rate);
+// 	res.status(200).send(rate);
+// };
+
 
 exports.add = async (req, res) => {
-	const rate = await new Rate(req.body).save();
-	console.log(rate);
-	res.status(200).send(rate);
-};
-// exports.add = async (req, res) => {
-//   const { isValid, errors } = await validateRate(req.body)
+  const { isValid, errors } = await validateRate(req.body)
 
-//   if (!isValid) {
-//     return res.status(404).json(errors)
-//   }
+  if (!isValid) {
+    return res.status(404).json(errors)
+  }
 
+  const rate = new Rate({
+    ...req.body
+  })
 
-//   const rate = new Rate({
-//     item: req.body.item,
-//     rater: req.body.rater,
-//     comment: req.body.comment,
-//     rating: req.body.rating,
+  await rate
+    .save()
+    .then((result) => {
+      res.json({ rate })
+    })
+    .catch((err) => {
+      return res.status(500).send({ msg: err.message })
+    })
+}
 
-//   })
-
-//   await rate
-//     .save()
-//     .then((result) => {
-//       res.json({ rate })
-//     })
-//     .catch((err) => {
-//       return res.status(500).send({ msg: err.message })
-//     })
-// }
 
 exports.getAll = async (req, res) => {
   let { _id, item, rater } = req.query

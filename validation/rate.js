@@ -1,6 +1,6 @@
 const Validator = require("validator")
-// import User from "../models/User"
-// import Item from "../models/Item"
+import User from "../models/User"
+// // import Item from "../models/Item"
 
 module.exports = async function (data) {
   let errors = {}
@@ -9,16 +9,17 @@ module.exports = async function (data) {
     errors.rater = "rater is required"
   }
 
-  // if (data.rater) {
-  //   const rater = await User.findById(data.rater)
-  //   if (!rater) {
-  //     errors.rater = "rater is not valid user"
-  //   }
-  // }
+  
+  const rater = await User.findById(data.rater)
+
+  if (!rater) {
+    errors.rater = "rater is not valid user"
+  }
 
   if (Validator.isEmpty(data.item)) {
     errors.item = "item is required"
   }
+
 
   // if (data.item) {
   //   const item = await Item.findById(data.item)
@@ -43,4 +44,4 @@ module.exports = async function (data) {
     errors,
     isValid: Object.keys(errors).length === 0,
   }
-}
+  }

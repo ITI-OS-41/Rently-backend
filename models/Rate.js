@@ -7,13 +7,13 @@ const rateSchema = new Schema({
   item: {
     type: String,
     required: true,
-    unique: true,
   },
 // item: {
-//     type: mongoose.Schema.Types.ObjectId,
+//     type: ObjectId,
 //     ref: 'Item',
 //     required: true,
 //   },
+
   rater: {
     type: ObjectId,
     ref: "User",
