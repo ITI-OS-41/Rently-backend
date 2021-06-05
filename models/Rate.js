@@ -1,30 +1,30 @@
 const mongoose = require("mongoose")
 const Schema = mongoose.Schema
-const ObjectId = mongoose.Types.ObjectId;
-
+const { ObjectId } = mongoose.Schema.Types;
 //module.exports = mongoose.model('Item', itemSchema);
+
 const rateSchema = new Schema({
-  item_id: {
+  item: {
     type: String,
     required: true,
     unique: true,
   },
+// item: {
+//     type: mongoose.Schema.Types.ObjectId,
+//     ref: 'Item',
+//     required: true,
+//   },
   rater: {
     type: ObjectId,
     ref: "User",
     required: true,
   },
-  content: {
+  comment: {
     type: String,
     required: true,
     trim: true
   },
-  // item_id: {
-  //     type: mongoose.Schema.Types.ObjectId,
-  //     ref: 'Item',
-  //     required: true,
-  //   },
-  ratingNumber: {
+  rating: {
     type: Number,
     required: true,
     min: 1,

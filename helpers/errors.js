@@ -41,7 +41,7 @@ const RENT = {
 }
 
 const RATE = {
-  notFound: "Rate not found!",
+  notFound: "Rate ID is required!",
   invalidId: "Invalid ID!",
 }
 

@@ -1,8 +1,4 @@
 const router = require("express").Router()
-const Rate = require("../models/Rate")
-const bcrypt = require("bcryptjs")
-const jwt = require("jsonwebtoken")
-const passport = require("passport")
 
 // Import controllers
 const {

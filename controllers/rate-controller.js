@@ -1,10 +1,7 @@
 const Rate = require("../models/Rate")
-const bcrypt = require("bcryptjs")
-const jwt = require("jsonwebtoken")
-const validateRate = require("../validation/rate")
 import { RATE } from "../helpers/errors"
 
-
+const validateRate = require("../validation/rate")
 
 
 exports.add = async (req, res) => {
@@ -12,13 +9,38 @@ exports.add = async (req, res) => {
 	console.log(rate);
 	res.status(200).send(rate);
 };
+// exports.add = async (req, res) => {
+//   const { isValid, errors } = await validateRate(req.body)
+
+//   if (!isValid) {
+//     return res.status(404).json(errors)
+//   }
+
+
+//   const rate = new Rate({
+//     item: req.body.item,
+//     rater: req.body.rater,
+//     comment: req.body.comment,
+//     rating: req.body.rating,
+
+//   })
+
+//   await rate
+//     .save()
+//     .then((result) => {
+//       res.json({ rate })
+//     })
+//     .catch((err) => {
+//       return res.status(500).send({ msg: err.message })
+//     })
+// }
 
 exports.getAll = async (req, res) => {
-  let { _id, item_id, ratingNumber,totalPoints } = req.query
+  let { _id, item, rater } = req.query
  const queryObj = {
     ...(_id && { _id }),
-    ...(item_id && { item_id }),
-    ...(ratingNumber && { ratingNumber }),
+    ...(item && { item }),
+    ...(rater && { rater }),
   }
 
 
@@ -36,9 +58,10 @@ exports.getOne = (req, res) => {
       if (rate) {
         return res.json({
           _id: rate._id,
-          item_id: rate.item_id,
-          ratingNumber: rate.ratingNumber,
-          totalPoints: rate.totalPoints,
+          item: rate.item,
+          rater: rate.rater,
+          rating: rate.rating,
+          comment: rate.comment,
         })
       } else {
         return res.status(404).json({ msg: RATE.notFound })
@@ -56,7 +79,7 @@ exports.update = async (req, res) => {
     runValidators: true,
     useFindAndModify: false,
   })
-    .select({ item_id: 0 })
+    .select({ item: 0 ,rater:0})
     .then((response) => {
       res.status(200).send(response)
     })
@@ -65,6 +88,7 @@ exports.update = async (req, res) => {
       return res.status(500).send({ msg: error.message })
     })
 }
+
 
 exports.deleteOne = async (req, res) => {
   Rate.findById(req.params.id)
