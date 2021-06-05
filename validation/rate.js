@@ -8,7 +8,8 @@ module.exports = async function (data) {
   if (Validator.isEmpty(data.rater)) {
     errors.rater = "rater is required"
   }
-
+// rater validation 
+// rater must rate the item once
   
   const rater = await User.findById(data.rater)
 

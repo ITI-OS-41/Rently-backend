@@ -1,8 +1,9 @@
-const Rate = require("../models/Rate")
-import { RATE } from "../helpers/errors"
-const ObjectId = require('mongoose').Types.ObjectId;
+const Rate = require("../models/Rate");
+const mongoose = require("mongoose");
+import { RATE } from "../helpers/errors";
+const ObjectId = require("mongoose").Types.ObjectId;
 
-const validateRate = require("../validation/rate")
+const validateRate = require("../validation/rate");
 
 // exports.add = async (req, res) => {
 // 	const rate = await new Rate(req.body).save();
@@ -10,46 +11,44 @@ const validateRate = require("../validation/rate")
 // 	res.status(200).send(rate);
 // };
 
-
 exports.add = async (req, res) => {
-  const { isValid, errors } = await validateRate(req.body)
+  if (mongoose.isValidObjectId(req.body.rater)) {
+    const { isValid, errors } = await validateRate(req.body);
+    if (!isValid) {
+      return res.status(404).json(errors);
+    }
+    const rate = new Rate({
+      ...req.body,
+    });
 
-  if (!isValid) {
-    return res.status(404).json(errors)
+    await rate
+      .save()
+      .then((result) => {
+        res.json({ rate });
+      })
+      .catch((err) => {
+        return res.status(500).send({ msg: err.message });
+      });
+  } else {
+    res.status(404).send({ msg: RATE.isValid});
   }
-
-  const rate = new Rate({
-    ...req.body
-  })
-
-  await rate
-    .save()
-    .then((result) => {
-      res.json({ rate })
-    })
-    .catch((err) => {
-      return res.status(500).send({ msg: err.message })
-    })
-}
-
+};
 
 exports.getAll = async (req, res) => {
-  let { _id, item, rater } = req.query
- const queryObj = {
+  let { _id, item, rater } = req.query;
+  const queryObj = {
     ...(_id && { _id }),
     ...(item && { item }),
     ...(rater && { rater }),
-  }
+  };
 
-
-  await Rate.find(queryObj)
-    .then((objects) => {
-      res.status(200).send(objects)
-    })
-}
+  await Rate.find(queryObj).then((objects) => {
+    res.status(200).send(objects);
+  });
+};
 
 exports.getOne = (req, res) => {
-  const Id = req.params.id
+  const Id = req.params.id;
 
   Rate.findById(Id)
     .then((rate) => {
@@ -60,16 +59,16 @@ exports.getOne = (req, res) => {
           rater: rate.rater,
           rating: rate.rating,
           comment: rate.comment,
-        })
+        });
       } else {
-        return res.status(404).json({ msg: RATE.notFound })
+        return res.status(404).json({ msg: RATE.notFound });
       }
     })
     .catch((err) => {
-      console.log(err)
-      return res.status(500).json({ msg: RATE.invalidId })
-    })
-}
+      console.log(err);
+      return res.status(500).json({ msg: RATE.invalidId });
+    });
+};
 
 exports.update = async (req, res) => {
   await Rate.findOneAndUpdate({ _id: req.params.id }, req.body, {
@@ -77,32 +76,29 @@ exports.update = async (req, res) => {
     runValidators: true,
     useFindAndModify: false,
   })
-    .select({ item: 0 ,rater:0})
+    .select({ item: 0, rater: 0 })
     .then((response) => {
-      res.status(200).send(response)
+      res.status(200).send(response);
     })
     .catch((error) => {
-      console.log(error)
-      return res.status(500).send({ msg: error.message })
-    })
-}
-
+      console.log(error);
+      return res.status(500).send({ msg: error.message });
+    });
+};
 
 exports.deleteOne = async (req, res) => {
   Rate.findById(req.params.id)
     .then((rate) => {
       if (rate) {
-        rate
-          .remove()
-          .then(() => {
-            return res.status(200).send(rate)
-          })
+        rate.remove().then(() => {
+          return res.status(200).send(rate);
+        });
       } else {
-        return res.status(404).json({ msg: RATE.notFound })
+        return res.status(404).json({ msg: RATE.notFound });
       }
     })
     .catch((error) => {
-      console.log(error)
-      return res.status(500).send({ msg: RATE.notFound })
-    })
-}
+      console.log(error);
+      return res.status(500).send({ msg: RATE.notFound });
+    });
+};

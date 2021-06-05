@@ -43,6 +43,7 @@ const RENT = {
 const RATE = {
   notFound: "Rate ID is required!",
   invalidId: "Invalid ID!",
+  isValid: "invalid user ID"
 }
 
 export { EMAIL, USERNAME, USER, PASSWORD, BLOG_POST, SLUG, NOTIFICATION, ID, RENT, QUESTION, RATE }
