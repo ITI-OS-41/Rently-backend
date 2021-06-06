@@ -47,7 +47,7 @@ exports.getOne = (req, res) => {
 }
 
 exports.create = async (req, res) => {
-  const { isValid, errors } =  validateItem(req.body)
+  const { isValid, errors } =  await validateItem(req.body)
 
   if (!isValid) {
     return res.status(404).json(errors)
@@ -78,7 +78,7 @@ exports.update = async (req, res) => {
     })
   }
 
-  const { isValid, errors } = validateItem(req.body)
+  const { isValid, errors } = await validateItem(req.body)
 
   if (!isValid) {
     return res.status(404).json(errors)

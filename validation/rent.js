@@ -11,9 +11,7 @@ module.exports = async function (data) {
   if (Validator.isEmpty(data.owner)) {
     errors.owner = "owner is required"
   }
-  if (!Validator.isMongoId(data.owner)) {
-    errors.owner = "owner is not valid id"
-  }
+ 
 
   const owner = await User.findById(data.owner)
 
@@ -24,15 +22,14 @@ module.exports = async function (data) {
   if (Validator.isEmpty(data.renter)) {
     errors.renter = "renter is required"
   }
-  if (!Validator.isMongoId(data.renter)) {
-    errors.renter = "renter is not valid id"
-  }
+
   const renter = await User.findById(data.renter)
 
   if (!renter) {
     errors.renter = "renter is not valid user"
   }
 
+  // populate item to check the stock
 
   if (data.renter === data.owner) {
     errors.renter = "you can't be the owner and the renter at the same operation"
