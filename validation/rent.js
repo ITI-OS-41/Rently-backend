@@ -1,4 +1,5 @@
 import User from "../models/User"
+import Item from "../models/Item"
 const Validator = require("validator")
 const ObjectId = require('mongoose').Types.ObjectId;
 
@@ -38,12 +39,14 @@ module.exports = async function (data) {
     errors.renter = "you can't be the owner and the renter at the same operation"
   }
 
-  // if (Validator.isEmpty(data.item)) {
-  //   errors.item = "item is required"
-  // }
-  // if (!ObjectId.isValid(data.item)) {
-  //   errors.item = "item is not valid id" 
-  // }
+  if (Validator.isEmpty(data.item)) {
+    errors.item = "item is required"
+  }
+
+  const item = await Item.findById(data.item);
+  if (!item) {
+    errors.item = "item is not valid ";
+  }
 
   if (Validator.isEmpty(data.from)) {
     errors.from = "start rental date is required"

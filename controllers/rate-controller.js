@@ -82,7 +82,6 @@ exports.update = async (req, res) => {
     })
 }
 
-
 exports.deleteOne = async (req, res) => {
   Rate.findById(req.params.id)
     .then((rate) => {

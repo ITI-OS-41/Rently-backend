@@ -5,7 +5,8 @@ const { ObjectId } = mongoose.Schema.Types;
 
 const rateSchema = new Schema({
   item: {
-    type: String,
+    type: ObjectId,
+    ref: "Item",
     required: true,
     index:true
   },
