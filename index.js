@@ -20,6 +20,7 @@ const rent = require('./routes/rent.js');
 const category = require('./routes/category.js');
 const subcategory = require('./routes/subCategory.js');
 const rate = require("./routes/rate.js")
+const item = require("./routes/item.js")
 
 /*
  ** SETUP ENVIRONMENT
@@ -75,6 +76,8 @@ app.use('/api/blog', blog);
 app.use('/api/faq', faq);
 app.use("/api/rent", rent)
 app.use("/api/rate", rate)
+app.use("/api/item", item)
+
 
 /*
  ** RUN APP
