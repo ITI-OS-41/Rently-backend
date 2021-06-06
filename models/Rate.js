@@ -7,17 +7,14 @@ const rateSchema = new Schema({
   item: {
     type: String,
     required: true,
+    index:true
   },
-// item: {
-//     type: ObjectId,
-//     ref: 'Item',
-//     required: true,
-//   },
-
+  
   rater: {
     type: ObjectId,
     ref: "User",
     required: true,
+    index:true
   },
   comment: {
     type: String,
@@ -32,4 +29,6 @@ const rateSchema = new Schema({
   },
 }, { timestamps: true })
 
-module.exports = mongoose.model("Rate", rateSchema)
+rateSchema.index({ rater: 1, item: 1 }, { unique: true });
+
+module.exports = mongoose.model(" Rate", rateSchema)

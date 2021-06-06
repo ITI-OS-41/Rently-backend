@@ -4,23 +4,7 @@ const ObjectId = require('mongoose').Types.ObjectId;
 
 const validateRate = require("../validation/rate")
 
-// exports.create = async (req, res) => {
-// 	const rate = await new Rate(req.body).save();
-// 	console.log(rate);
-// 	res.status(200).send(rate);
-// };
 
-// exports.create = async (req, res) => {
-// 	const ratedBefore = await Rate.find({
-// 		item: req.params.item,
-// 		rater: req.params.rater,
-// 	})
-// 		console.log('v ', ratedBefore);
-	
-	// const rate = await new Rate(req.body).save();
-	// console.log(rate);
-// 	res.status(200).send(ratedBefore);
-// };
 
 exports.create = async (req, res) => {
   const { isValid, errors } = await validateRate(req.body)
@@ -39,7 +23,7 @@ exports.create = async (req, res) => {
       res.json({ rate })
     })
     .catch((err) => {
-      return res.status(500).send({ msg: err.message })
+      return res.status(500).send({ msg: RATE.duplication })
     })
 }
 

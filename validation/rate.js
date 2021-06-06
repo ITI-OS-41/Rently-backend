@@ -10,7 +10,7 @@ module.exports = async function (data) {
   }
 
   // refactor, usercheck middleware
-  
+
   const rater = await User.findById(data.rater)
 
   if (!rater) {
@@ -18,10 +18,7 @@ module.exports = async function (data) {
   }
   
   // rater is a renter user
-
-  // rater can't rate the same item twice
-
-
+  
 
   if (Validator.isEmpty(data.item)) {
     errors.item = "item is required"

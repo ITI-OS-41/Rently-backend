@@ -8,11 +8,11 @@ const validateRent = require("../validation/rent")
 exports.getAll = async (req, res) => {
 
 
-  let { _id, receiver, sender } = req.query
+  let { _id, owner, renter } = req.query
   const queryObj = {
     ...(_id && { _id }),
-    ...(receiver && { receiver }),
-    ...(sender && { sender }),
+    ...(owner && { owner }),
+    ...(renter && { renter }),
   }
 
   // * ...(email && { email: /regex here/ }),
