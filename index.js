@@ -19,6 +19,7 @@ const rent = require('./routes/rent.js');
 const category = require('./routes/category.js');
 const subcategory = require('./routes/subCategory.js');
 const itemRate = require("./routes/itemRate.js")
+const appRate = require("./routes/appRate.js")
 const item = require("./routes/item.js")
 
 /*
@@ -75,6 +76,7 @@ app.use('/api/blog', blog);
 app.use('/api/faq', faq);
 app.use("/api/rent", rent)
 app.use("/api/itemrate", itemRate)
+app.use("/api/apprate", appRate)
 app.use("/api/item", item)
 
 

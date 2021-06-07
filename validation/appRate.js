@@ -1,7 +1,6 @@
 const Validator = require("validator");
 import User from "../models/User";
-import Item from "../models/Item";
-import ItemRate from "../models/ItemRate";
+import AppRate from "../models/AppRate";
 
 module.exports = async function (data) {
   let errors = {};
@@ -21,26 +20,20 @@ module.exports = async function (data) {
     }
   }
 
-  if (Validator.isEmpty(data.item)) {
-    errors.item = "item is required";
-  }
-
-  if (!Validator.isMongoId(data.item)) {
-    errors.item = "this is not valid item id";
+  if (Validator.isEmpty(data.site)) {
+    errors.site = "application name to be rated is required";
   } else {
-    const item = await Item.findById(data.item);
-    if (!item) {
-      errors.item = "this item is not found in our database ";
-    }
+    errors.site = "you are in Rently application, seems like you are lost"
   }
 
-  const duplicationCheck = await ItemRate.find({
-    item: data.item,
+
+  const duplicationCheck = await AppRate.find({
+    site: data.site,
     rater: data.rater,
   });
   if (duplicationCheck.length > 0) {
     errors.duplication =
-      "you can't rate the same item more than one time, please update your review instead";
+      "you can't rate our application more than one time, please update your review instead";
   }
 
   if (Validator.isEmpty(data.rating)) {

@@ -1,19 +1,22 @@
 const mongoose = require("mongoose")
 const Schema = mongoose.Schema
 const { ObjectId } = mongoose.Schema.Types;
-//module.exports = mongoose.model('Item', itemSchema);
 
-const itemRateSchema = new Schema({
-  item: {
+const appRateSchema = new Schema({
+  rater: {
     type: ObjectId,
-    ref: "Item",
+    ref: "User",
     required: true,
     index:true
   },
   
-  rater: {
-    type: ObjectId,
-    ref: "User",
+  site: {
+    type: String,
+    enum: {
+      values: ["Rently"],
+      message: '{VALUE} is not supported',
+    },
+    default: "Rently",
     required: true,
     index:true
   },
@@ -24,12 +27,13 @@ const itemRateSchema = new Schema({
   },
   rating: {
     type: Number,
-    required: true,
+    required: true, 
     min: 1,
     max: 5,
   },
+ 
 }, { timestamps: true })
 
-itemRateSchema.index({ rater: 1, item: 1 }, { unique: true });
+appRateSchema.index({ rater: 1, site: 1 }, { unique: true });
 
-module.exports = mongoose.model("ItemRate", itemRateSchema)
+module.exports = mongoose.model("AppRate", appRateSchema)

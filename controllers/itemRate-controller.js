@@ -1,5 +1,5 @@
 const ItemRate = require("../models/ItemRate")
-import { ITEMRATE } from "../helpers/errors"
+import { ITEMRATE, ID } from "../helpers/errors"
 const ObjectId = require('mongoose').Types.ObjectId;
 
 const validateItemRate = require("../validation/itemRate")
@@ -29,7 +29,7 @@ exports.create = async (req, res) => {
     })
     .catch((err) => {
      
-      return res.status(500).send({ msg: ITEMRATE.duplication })
+      return res.status(500).send({ msg: ITEMRATE.badRequest })
     })
 }
 
@@ -73,6 +73,13 @@ exports.getOne = (req, res) => {
 }
 
 exports.update = async (req, res) => {
+  const id = req.params.id
+
+  const { isValid, errors } = await validateItemRate(req.body)
+
+  if (!isValid) {
+    return res.status(404).json(errors)
+  }
   await ItemRate.findOneAndUpdate({ _id: req.params.id }, req.body, {
     new: true,
     runValidators: true,
@@ -89,6 +96,14 @@ exports.update = async (req, res) => {
 }
 
 exports.deleteOne = async (req, res) => {
+  const id = req.params.id
+
+  if (!ObjectId.isValid(id)) {
+    return res.status(404).json({
+      id: ID.invalid
+    })
+  }
+
   ItemRate.findById(req.params.id)
     .then((itemRate) => {
       if (itemRate) {

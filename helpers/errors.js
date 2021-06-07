@@ -43,7 +43,13 @@ const RENT = {
 const ITEMRATE = {
   notFound: "itemRate ID is required!",
   invalidId: "Invalid ID!",
-  duplication: "you can't rate the same item more than one time, please update your review instead"
+  badRequest: "I have made a bad request"
 }
 
-export { EMAIL, USERNAME, USER, PASSWORD, BLOG_POST, SLUG, NOTIFICATION, ID, RENT, QUESTION, ITEMRATE }
+const APPRATE = {
+  notFound: "appRate ID is required!",
+  invalidId: "Invalid ID!",
+  badRequest: "I have made a bad request"
+}
+
+export { EMAIL, USERNAME, USER, PASSWORD, BLOG_POST, SLUG, NOTIFICATION, ID, RENT, QUESTION, ITEMRATE, APPRATE }
