@@ -38,7 +38,7 @@ module.exports = async function (data) {
     item: data.item,
     rater: data.rater,
   });
-  if (duplicationCheck.length > 0) {
+  if (duplicationCheck.length) {
     errors.duplication =
       "you can't rate the same item more than one time, please update your review instead";
   }

@@ -7,7 +7,7 @@ const {
   create,
   update,
   deleteOne,
-} = require("../controllers/itemRate-controller")
+} = require("../controllers/userRate-controller")
 
 // * GET ALL
 router.get("/", getAll)

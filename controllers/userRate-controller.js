@@ -64,7 +64,7 @@ exports.getOne = (req, res) => {
     })
     .catch((err) => {
       console.log(err)
-      return res.status(500).json({ msg: ITEMRATE.invalidId })
+      return res.status(500).json({ msg: USERRATE.invalidId })
     })
 }
 

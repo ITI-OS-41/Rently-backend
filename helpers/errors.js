@@ -53,7 +53,7 @@ const APPRATE = {
 }
 
 const USERRATE = {
-  notFound: "appRate ID is required!",
+  notFound: "userRate ID is required!",
   invalidId: "Invalid ID!",
   badRequest: "I have made a bad request"
 }
