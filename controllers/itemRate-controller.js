@@ -9,6 +9,11 @@ const validateItemRate = require("../validation/itemRate")
 exports.create = async (req, res) => {
   const { isValid, errors } = await validateItemRate(req.body)
 
+//   ItemRate.collection.getIndexes({key: rater_1_item_1}).then(indexes => {
+//     console.log("indexes:", indexes);
+// }).catch(console.error);
+  
+
   if (!isValid) {
     return res.status(404).json(errors)
   }
@@ -19,10 +24,11 @@ exports.create = async (req, res) => {
 
   await itemRate
     .save()
-    .then((result) => {
+    .then((itemRate) => {
       res.json({ itemRate })
     })
     .catch((err) => {
+     
       return res.status(500).send({ msg: ITEMRATE.duplication })
     })
 }
