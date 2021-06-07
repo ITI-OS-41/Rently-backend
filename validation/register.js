@@ -1,21 +1,28 @@
+import User from '../models/User'
 const Validator = require("validator")
 
-module.exports = function (data) {
+module.exports = async function (data) {
   let errors = {}
 
   if (Validator.isEmpty(data.email)) {
     errors.email = "Email is required"
   }
-  if (!Validator.isEmail(data.email)) {
-    errors.email = "Email is invalid"
+
+  const email = await User.findOne({ email: data.email })
+  if (email) {
+    errors.email = "email already taken"
   }
+
 
   if (Validator.isEmpty(data.username)) {
     errors.username = "username is required"
   }
-  if (!Validator.isLength(data.username, { min: 3, max: 30 })) {
-    errors.username = "username must be between 3 to 30"
+
+  const username = await User.findOne({ username: data.username })
+  if (username) {
+    errors.username = "username already taken"
   }
+
 
   if (Validator.isEmpty(data.password)) {
     errors.password = "password is required"
