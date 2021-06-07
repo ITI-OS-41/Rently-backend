@@ -23,6 +23,7 @@ module.exports = async function (data) {
   if (Validator.isEmpty(data.site)) {
     errors.site = "application name to be rated is required";
   } else {
+    if (data.site !== "Rently")
     errors.site = "you are in Rently application, seems like you are lost"
   }
 
