@@ -3,7 +3,7 @@ const Schema = mongoose.Schema
 const { ObjectId } = mongoose.Schema.Types;
 //module.exports = mongoose.model('Item', itemSchema);
 
-const rateSchema = new Schema({
+const itemRateSchema = new Schema({
   item: {
     type: ObjectId,
     ref: "Item",
@@ -30,6 +30,6 @@ const rateSchema = new Schema({
   },
 }, { timestamps: true })
 
-rateSchema.index({ rater: 1, item: 1 }, { unique: true });
+itemRateSchema.index({ rater: 1, item: 1 }, { unique: true });
 
-module.exports = mongoose.model(" Rate", rateSchema)
+module.exports = mongoose.model(" ItemRate", itemRateSchema)

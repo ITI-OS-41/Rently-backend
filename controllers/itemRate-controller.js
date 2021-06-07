@@ -1,29 +1,29 @@
-const Rate = require("../models/Rate")
-import { RATE } from "../helpers/errors"
+const ItemRate = require("../models/ItemRate")
+import { ITEMRATE } from "../helpers/errors"
 const ObjectId = require('mongoose').Types.ObjectId;
 
-const validateRate = require("../validation/rate")
+const validateItemRate = require("../validation/itemRate")
 
 
 
 exports.create = async (req, res) => {
-  const { isValid, errors } = await validateRate(req.body)
+  const { isValid, errors } = await validateItemRate(req.body)
 
   if (!isValid) {
     return res.status(404).json(errors)
   }
 
-  const rate = new Rate({
+  const itemRate = new ItemRate({
     ...req.body
   })
 
-  await rate
+  await itemRate
     .save()
     .then((result) => {
-      res.json({ rate })
+      res.json({ itemRate })
     })
     .catch((err) => {
-      return res.status(500).send({ msg: RATE.duplication })
+      return res.status(500).send({ msg: ITEMRATE.duplication })
     })
 }
 
@@ -36,7 +36,7 @@ exports.getAll = async (req, res) => {
   }
 
 
-  await Rate.find(queryObj)
+  await ItemRate.find(queryObj)
     .then((objects) => {
       res.status(200).send(objects)
     })
@@ -46,28 +46,28 @@ exports.getOne = (req, res) => {
   
   const Id = req.params.id
 
-  Rate.findById(Id)
-    .then((rate) => {
-      if (rate) {
+  ItemRate.findById(Id)
+    .then((itemRate) => {
+      if (itemRate) {
         return res.json({
-          _id: rate._id,
-          item: rate.item,
-          rater: rate.rater,
-          rating: rate.rating,
-          comment: rate.comment,
+          _id: itemRate._id,
+          item: itemRate.item,
+          rater: itemRate.rater,
+          rating: itemRate.rating,
+          comment: itemRate.comment,
         })
       } else {
-        return res.status(404).json({ msg: RATE.notFound })
+        return res.status(404).json({ msg: ITEMRATE.notFound })
       }
     })
     .catch((err) => {
       console.log(err)
-      return res.status(500).json({ msg: RATE.invalidId })
+      return res.status(500).json({ msg: ITEMRATE.invalidId })
     })
 }
 
 exports.update = async (req, res) => {
-  await Rate.findOneAndUpdate({ _id: req.params.id }, req.body, {
+  await ItemRate.findOneAndUpdate({ _id: req.params.id }, req.body, {
     new: true,
     runValidators: true,
     useFindAndModify: false,
@@ -83,20 +83,20 @@ exports.update = async (req, res) => {
 }
 
 exports.deleteOne = async (req, res) => {
-  Rate.findById(req.params.id)
-    .then((rate) => {
-      if (rate) {
-        rate
+  ItemRate.findById(req.params.id)
+    .then((itemRate) => {
+      if (itemRate) {
+        itemRate
           .remove()
           .then(() => {
-            return res.status(200).send(rate)
+            return res.status(200).send(itemRate)
           })
       } else {
-        return res.status(404).json({ msg: RATE.notFound })
+        return res.status(404).json({ msg: ITEMRATE.notFound })
       }
     })
     .catch((error) => {
       console.log(error)
-      return res.status(500).send({ msg: RATE.notFound })
+      return res.status(500).send({ msg: ITEMRATE.notFound })
     })
 }

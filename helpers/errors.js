@@ -40,10 +40,10 @@ const RENT = {
   notFound: "Rent not found!",
 }
 
-const RATE = {
-  notFound: "Rate ID is required!",
+const ITEMRATE = {
+  notFound: "itemRate ID is required!",
   invalidId: "Invalid ID!",
   duplication: "you can't rate the same item more than one time, please update your review instead"
 }
 
-export { EMAIL, USERNAME, USER, PASSWORD, BLOG_POST, SLUG, NOTIFICATION, ID, RENT, QUESTION, RATE }
+export { EMAIL, USERNAME, USER, PASSWORD, BLOG_POST, SLUG, NOTIFICATION, ID, RENT, QUESTION, ITEMRATE }

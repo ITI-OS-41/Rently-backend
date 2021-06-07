@@ -1,6 +1,6 @@
 const Validator = require("validator");
 import User from "../models/User";
-// // import Item from "../models/Item"
+import Item from "../models/Item"
 
 module.exports = async function (data) {
   let errors = {};
@@ -21,10 +21,17 @@ module.exports = async function (data) {
     errors.item = "item is required";
   }
 
-  const item = await Item.findById(data.item);
-  if (!item) {
-    errors.item = "item is not valid ";
+  if (!Validator.isMongoId(data.item)) {
+    errors.item = "this is not valid item id"
   }
+    else {
+      const item = await Item.findById(data.item);
+  if (!item) {
+    errors.item = "this item is not found in our database ";
+  }
+    }
+
+  
 
   if (Validator.isEmpty(data.rating)) {
     errors.rating = "rating is required";

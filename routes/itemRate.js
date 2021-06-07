@@ -7,7 +7,7 @@ const {
   create,
   update,
   deleteOne,
-} = require("../controllers/rate-controller")
+} = require("../controllers/itemRate-controller")
 
 // * GET ALL
 router.get("/", getAll)
@@ -24,7 +24,7 @@ router.post("/", create)
 router.post("/:id", update)
 
 // * DELETE
-router.delete("/:id", deleteOne,)
+router.delete("/:id", deleteOne)
 
 
 module.exports = router
