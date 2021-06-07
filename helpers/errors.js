@@ -52,4 +52,10 @@ const APPRATE = {
   badRequest: "I have made a bad request"
 }
 
-export { EMAIL, USERNAME, USER, PASSWORD, BLOG_POST, SLUG, NOTIFICATION, ID, RENT, QUESTION, ITEMRATE, APPRATE }
+const USERRATE = {
+  notFound: "appRate ID is required!",
+  invalidId: "Invalid ID!",
+  badRequest: "I have made a bad request"
+}
+
+export { EMAIL, USERNAME, USER, PASSWORD, BLOG_POST, SLUG, NOTIFICATION, ID, RENT, QUESTION, ITEMRATE, APPRATE, USERRATE }

@@ -1,0 +1,35 @@
+const mongoose = require("mongoose")
+const Schema = mongoose.Schema
+const { ObjectId } = mongoose.Schema.Types;
+
+const userRateSchema = new Schema({
+  renter: {
+    type: ObjectId,
+    ref: "User",
+    required: true,
+    index:true
+  },
+
+  owner: {
+    type: ObjectId,
+    ref: "User",
+    required: true,
+    index:true
+  },
+  comment: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  rating: {
+    type: Number,
+    required: true, 
+    min: 1,
+    max: 5,
+  },
+ 
+}, { timestamps: true })
+
+userRateSchema.index({ rater: 1, site: 1 }, { unique: true });
+
+module.exports = mongoose.model("UserRate", userRateSchema)

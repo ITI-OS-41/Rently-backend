@@ -16,11 +16,12 @@ const notification = require("./routes/notification.js")
 const blog = require('./routes/blog.js');
 const faq = require('./routes/faq.js');
 const rent = require('./routes/rent.js');
+const item = require("./routes/item.js")
 const category = require('./routes/category.js');
 const subcategory = require('./routes/subCategory.js');
-const itemRate = require("./routes/itemRate.js")
 const appRate = require("./routes/appRate.js")
-const item = require("./routes/item.js")
+const itemRate = require("./routes/itemRate.js")
+const userRate = require("./routes/userRate.js")
 
 /*
  ** SETUP ENVIRONMENT
@@ -75,9 +76,10 @@ app.use("/api/notification", notification)
 app.use('/api/blog', blog);
 app.use('/api/faq', faq);
 app.use("/api/rent", rent)
-app.use("/api/itemrate", itemRate)
-app.use("/api/apprate", appRate)
 app.use("/api/item", item)
+app.use("/api/apprate", appRate)
+app.use("/api/itemrate", itemRate)
+app.use("/api/userrate", userRate)
 
 
 /*
