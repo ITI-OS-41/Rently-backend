@@ -7,11 +7,22 @@ const validateItem = require("../validation/item")
 exports.getAll = async (req, res) => {
 
 
-  let { _id, name, description } = req.query
+  let { _id, name, owner, category, subcategory, status, condition,stock, cancellation, deliverable, deposit,price, location  } = req.query
   const queryObj = {
     ...(_id && { _id }),
     ...(name && { name }),
-    ...(description && { description }),
+    ...(owner && { owner }),
+    ...(category && { category }),
+    ...(subcategory && { subcategory }),
+    ...(status && { status }),
+    ...(condition && { condition }),
+    ...(stock && { stock }),
+    ...(cancellation && { cancellation }),
+    ...(deliverable && { deliverable }),
+    ...(deposit && { deposit }),
+    ...(price && { price }),
+    ...(location && { location })
+
   }
 
   // * ...(email && { email: /regex here/ }),

@@ -36,6 +36,15 @@ const rentSchema = new Schema({
     required: true
   },
 
+  status: {
+    type: String,
+      enum: {
+        values: ["pending", "approved", "delivered", "returned"],
+        message: '{VALUE} is not supported'     
+       },
+       default: "pending"    
+  }
+
 }, { timestamps: true })
 
 module.exports = mongoose.model("Rent", rentSchema)
