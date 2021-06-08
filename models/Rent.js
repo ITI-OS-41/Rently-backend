@@ -15,8 +15,7 @@ const rentSchema = new Schema({
   },
   item: {
     type: ObjectId,
-    // todo: remvoe comment after assem submit 
-    // ref: "Item",
+    ref: "Item",
     required: true,
   },
   from: {
