@@ -9,23 +9,32 @@ module.exports = async function (data) {
     if (Validator.isEmpty(data.category)) {
         errors.category = "Category is required"
     }
-    const category = await Category.findById(data.category)
 
-    if (!category) {
-      errors.category = "category is not valid category"
+    if (!Validator.isMongoId(data.category)) {
+      errors.category = "this is not a valid category id";
+    } else {
+      const category = await Category.findById(data.category);
+      if (!category) {
+        errors.category = "this category is not found in our database ";
+      }
     }
-
+ 
 
     if (Validator.isEmpty(data.subcategory)) {
-        errors.subcategory = "SubCategory is required"
+      errors.subcategory = "SubCategory is required"
+  } 
+    
+    if (!Validator.isMongoId(data.subcategory)) {
+      errors.subcategory = "this is not a valid subcategory id";
+    } else {
+      const subcategory = await SubCategory.findById(data.subcategory);
+      if (!subcategory) {
+        errors.subcategory = "this subcategory is not found in our database ";
+      }
     }
-    const subcategory = await SubCategory.findById(data.subcategory)
+   
 
-    if (!subcategory) {
-      errors.subcategory = "subcategory is not valid subcategory"
-    }
-
-    if (Validator.isEmpty(data.condition)) {
+     if (Validator.isEmpty(data.condition)) {
         errors.condition = "item Condition is required"
     }
     const condition=["perfect", "very good", "descent", "good", "fair"]
@@ -72,7 +81,11 @@ module.exports = async function (data) {
 
     }
     if (Validator.isEmpty(data.deliverable)) {
-        errors.deliverable = "item delivery should bedetermined"
+        errors.deliverable = "item delivery should be determined"
+    }
+
+    if (data.deliverable !== true && data.deliverable !== false) {
+      errors.deliverable = "item delivery should be a true false statement"
     }
 
 
@@ -100,6 +113,11 @@ module.exports = async function (data) {
       if (Validator.isEmpty(data.status)) {
         errors.status = "status is required"
       }
+
+      if (data.status !== true && data.status !== false) {
+        errors.status = "item status should be a true false statement"
+      }
+  
     
 
 
