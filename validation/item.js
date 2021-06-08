@@ -28,6 +28,11 @@ module.exports = async function (data) {
     if (Validator.isEmpty(data.condition)) {
         errors.condition = "item Condition is required"
     }
+    const condition=["perfect", "very good", "descent", "good", "fair"]
+      if (data.condition && !condition.includes(data.condition) ) {
+        errors.condition=`${data.condition} is not an accepted value for condition`
+      }
+
 
     if (Validator.isEmpty(data.stock)) {
         errors.condition = "item Condition is required"
@@ -56,6 +61,11 @@ module.exports = async function (data) {
     if (Validator.isEmpty(data.cancellation)) {
         errors.cancellation = "item cancellation type is required"
     }
+    
+      const cancellation=["Easygoing", "Reasonable", "Strict"]
+      if (data.cancellation && !cancellation.includes(data.cancellation) ) {
+        errors.cancellation=`${data.cancellation} is not an accepted value for cancellation`
+      }
 
     if(data.price <=0  ) {
         errors.price ="item price should be bigger than 1"
@@ -78,10 +88,13 @@ module.exports = async function (data) {
         errors.owner = "owner is required"
       }
       
-      const owner = await User.findById(data.owner)
-    
-      if (!owner) {
-        errors.owner = "owner is not valid user"
+      if (!Validator.isMongoId(data.owner)) {
+        errors.owner = "this is not a valid owner id";
+      } else {
+        const owner = await User.findById(data.owner);
+        if (!owner) {
+          errors.owner = "this user is not found in our database ";
+        }
       }
 
       if (Validator.isEmpty(data.status)) {

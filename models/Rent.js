@@ -15,8 +15,7 @@ const rentSchema = new Schema({
   },
   item: {
     type: ObjectId,
-    // todo: remvoe comment after assem submit 
-    // ref: "Item",
+    ref: "Item",
     required: true,
   },
   from: {
@@ -35,6 +34,15 @@ const rentSchema = new Schema({
     type: Number,
     required: true
   },
+
+  status: {
+    type: String,
+      enum: {
+        values: ["pending", "approved", "delivered", "returned"],
+        message: '{VALUE} is not supported'     
+       },
+       default: "pending"    
+  }
 
 }, { timestamps: true })
 

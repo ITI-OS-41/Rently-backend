@@ -74,7 +74,12 @@ exports.create = async (req, res) => {
 
 exports.update = async (req, res) => {
   const id = req.params.id
-
+  
+  if (!ObjectId.isValid(id)) {
+    return res.status(404).json({
+      id: ID.invalid
+    })
+  }
   const { isValid, errors } = await validateNotification(req.body)
 
   if (!isValid) {

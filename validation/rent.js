@@ -12,26 +12,28 @@ module.exports = async function (data) {
   if (Validator.isEmpty(data.owner)) {
     errors.owner = "owner is required"
   }
+  
+
   if (!Validator.isMongoId(data.owner)) {
-    errors.owner = "owner is not valid id"
+    errors.owner = "this is not a valid owner id";
+  } else {
+    const owner = await User.findById(data.owner);
+    if (!owner) {
+      errors.owner = "this user is not found in our database ";
+    }
   }
 
-  const owner = await User.findById(data.owner)
-
-  if (!owner) {
-    errors.owner = "owner is not valid user"
-  }
 
   if (Validator.isEmpty(data.renter)) {
     errors.renter = "renter is required"
   }
   if (!Validator.isMongoId(data.renter)) {
-    errors.renter = "renter is not valid id"
-  }
-  const renter = await User.findById(data.renter)
-
-  if (!renter) {
-    errors.renter = "renter is not valid user"
+    errors.renter = "this is not valid user id";
+  } else {
+    const renter = await User.findById(data.renter);
+    if (!renter) {
+      errors.renter = "this user is not found in our database ";
+    }
   }
 
 
@@ -43,9 +45,13 @@ module.exports = async function (data) {
     errors.item = "item is required"
   }
 
-  const item = await Item.findById(data.item);
-  if (!item) {
-    errors.item = "item is not valid ";
+  if (!Validator.isMongoId(data.item)) {
+    errors.item = "this is not valid item id";
+  } else {
+    const item = await Item.findById(data.item);
+    if (!item) {
+      errors.item = "this item is not found in our database ";
+    }
   }
 
   if (Validator.isEmpty(data.from)) {
@@ -54,6 +60,17 @@ module.exports = async function (data) {
 
   if (Validator.isEmpty(data.to)) {
     errors.to = "end rental date is required"
+  }
+
+
+  const from= new Date(data.from).getTime()
+  const to= new Date(data.to).getTime()
+
+  console.log(from, to)
+
+  // from should be before to
+  if (from > to ){
+    errors.time= "start date should be before end date"
   }
 
   if (Validator.isEmpty(data.insurance)) {
@@ -69,6 +86,16 @@ module.exports = async function (data) {
   if (data.price && data.price < 1) {
     errors.price = "price must be greater than 1"
   }
+
+  //Status check validation and controller
+  if (Validator.isEmpty(data.status)) {
+    errors.status = "rent status is required"
+  }
+  const status=["pending","approved","delivered","returned"]
+  if (data.status && !status.includes(data.status) ) {
+    errors.satus=`${data.status} is not an accepted value for status`
+  }
+
 
   return {
     errors,

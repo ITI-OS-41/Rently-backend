@@ -11,22 +11,27 @@ module.exports = async function (data) {
     errors.receiver = "receiver is required"
   }
 
-  if (data.receiver) {
-    const receiver = await User.findById(data.receiver)
+  if (!Validator.isMongoId(data.receiver)) {
+    errors.receiver = "this is not valid user id";
+  } else {
+    const rater = await User.findById(data.receiver);
     if (!receiver) {
-      errors.receiver = "receiver is not valid user"
+      errors.receiver = "this user is not found in our database ";
     }
   }
+
 
 
   if (Validator.isEmpty(data.sender)) {
     errors.sender = "sender is required"
   }
 
-  if (data.sender) {
-    const sender = await User.findById(data.sender)
+  if (!Validator.isMongoId(data.sender)) {
+    errors.sender = "this is not valid user id";
+  } else {
+    const rater = await User.findById(data.sender);
     if (!sender) {
-      errors.sender = "sender is not valid user"
+      errors.sender = "this user is not found in our database ";
     }
   }
 
