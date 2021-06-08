@@ -9,8 +9,9 @@ import { EMAIL, USERNAME, PASSWORD } from "../helpers/errors"
 const validateRegisterInput = require("../validation/register")
 const validateLoginInput = require("../validation/login")
 
-exports.register = async (req, res) =>  {
-  const { isValid, errors } =await validateRegisterInput(req.body)
+
+exports.register = async (req, res) => {
+  const { isValid, errors } = await validateRegisterInput(req.body)
 
   if (!isValid) {
     return res.status(404).json(errors)
@@ -25,8 +26,7 @@ exports.register = async (req, res) =>  {
     bcrypt.genSalt(10, function (err, salt) {
       bcrypt.hash(req.body.password, salt, function (err, hash) {
         const newUser = new User({
-          email: req.body.email,
-          username: req.body.username,
+          ...req.body,
           password: hash,
         })
 
