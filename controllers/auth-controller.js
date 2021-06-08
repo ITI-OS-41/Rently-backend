@@ -9,8 +9,8 @@ import { EMAIL, USERNAME, PASSWORD } from "../helpers/errors"
 const validateRegisterInput = require("../validation/register")
 const validateLoginInput = require("../validation/login")
 
-exports.register = (req, res) => {
-  const { isValid, errors } = validateRegisterInput(req.body)
+exports.register = async (req, res) =>  {
+  const { isValid, errors } =await validateRegisterInput(req.body)
 
   if (!isValid) {
     return res.status(404).json(errors)

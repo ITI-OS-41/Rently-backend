@@ -8,11 +8,15 @@ const validateRent = require("../validation/rent")
 exports.getAll = async (req, res) => {
 
 
-  let { _id, owner, renter } = req.query
+  let { _id, owner, renter, status, rating } = req.query
   const queryObj = {
     ...(_id && { _id }),
     ...(owner && { owner }),
     ...(renter && { renter }),
+    ...(status && { status }),
+    ...(rating && { rating }),
+
+
   }
 
   // * ...(email && { email: /regex here/ }),
@@ -79,7 +83,7 @@ exports.update = async (req, res) => {
     })
   }
 
-  const { isValid, errors } = validateRent(req.body)
+  const { isValid, errors } = await validateRent(req.body)
 
   if (!isValid) {
     return res.status(404).json(errors)

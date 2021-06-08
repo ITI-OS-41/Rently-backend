@@ -34,11 +34,13 @@ exports.create = async (req, res) => {
 }
 
 exports.getAll = async (req, res) => {
-  let { _id, item, rater } = req.query
+  let { _id, item, rater,rating } = req.query
  const queryObj = {
     ...(_id && { _id }),
     ...(item && { item }),
     ...(rater && { rater }),
+    ...(rating && { rating }),
+
   }
 
 
@@ -51,6 +53,12 @@ exports.getAll = async (req, res) => {
 exports.getOne = (req, res) => {
   
   const Id = req.params.id
+  if (!ObjectId.isValid(id)) {
+    return res.status(404).json({
+      id: ID.invalid
+    })
+  }
+
 
   ItemRate.findById(Id)
     .then((itemRate) => {
@@ -74,6 +82,11 @@ exports.getOne = (req, res) => {
 
 exports.update = async (req, res) => {
   const id = req.params.id
+  if (!ObjectId.isValid(id)) {
+    return res.status(404).json({
+      id: ID.invalid
+    })
+  }
 
   const { isValid, errors } = await validateItemRate(req.body)
 

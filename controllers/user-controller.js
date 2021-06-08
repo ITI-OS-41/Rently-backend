@@ -1,6 +1,9 @@
 const User = require("../models/User")
 import { USER } from "../helpers/errors"
 
+const validateRegisterInput = require("../validation/register")
+
+
 exports.getAll = async (req, res) => {
   let { _id, username, email } = req.query
   const queryObj = {
@@ -21,6 +24,13 @@ exports.getAll = async (req, res) => {
 exports.getOne = (req, res) => {
   const Id = req.params.id 
 
+  if (!ObjectId.isValid(id)) {
+    return res.status(404).json({
+      id: ID.invalid
+    })
+  }
+
+
   User.findById(Id)
     .then((user) => {
       if (user) {
@@ -40,6 +50,23 @@ exports.getOne = (req, res) => {
 }
 
 exports.update = async (req, res) => {
+
+  const id = req.params.id
+  
+  if (!ObjectId.isValid(id)) {
+    return res.status(404).json({
+      id: ID.invalid
+    })
+  }
+
+  // ADD USER VALIDATION
+
+  const { isValid, errors } = await validateRegisterInput(req.body)
+
+  if (!isValid) {
+    return res.status(404).json(errors)
+  }
+
   await User.findOneAndUpdate({ _id: req.params.id }, req.body, {
     new: true,
     runValidators: true,
@@ -56,6 +83,15 @@ exports.update = async (req, res) => {
 }
 
 exports.deleteOne = async (req, res) => {
+
+  const id = req.params.id
+
+  if (!ObjectId.isValid(id)) {
+    return res.status(404).json({
+      id: ID.invalid
+    })
+  }
+
   User.findById(req.params.id)
     .then((user) => {
       if (user) {

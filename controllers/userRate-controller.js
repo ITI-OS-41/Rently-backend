@@ -71,11 +71,18 @@ exports.getOne = (req, res) => {
 exports.update = async (req, res) => {
   const id = req.params.id
 
+  if (!ObjectId.isValid(id)) {
+    return res.status(404).json({
+      id: ID.invalid
+    })
+  }
+
   const { isValid, errors } = await validateUserRate(req.body)
 
   if (!isValid) {
     return res.status(404).json(errors)
   }
+  
   await UserRate.findOneAndUpdate({ _id: req.params.id }, req.body, {
     new: true,
     runValidators: true,
