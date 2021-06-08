@@ -50,7 +50,10 @@ exports.login = (req, res) => {
       bcrypt.compare(req.body.password, user.password).then((isMatch) => {
         if (isMatch) {
           const token = jwt.sign(
-            { id: user._id },
+            {
+              id: user._id,
+              role: user.role || 'user'
+            },
             process.env.SECRET,
             { expiresIn: "1d" },
             function (err, token) {
@@ -61,8 +64,7 @@ exports.login = (req, res) => {
                   _id: user._id,
                   email: user.email,
                   username: user.username,
-                  followers: user.followers,
-                  following: user.following,
+                  role: user.role || 'user'
                 },
               })
             },
