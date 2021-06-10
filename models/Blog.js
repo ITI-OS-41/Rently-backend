@@ -4,32 +4,46 @@ const mongoose = require('mongoose');
 const slug = require('slugs');
 const { ObjectId } = mongoose.Schema.Types;
 
+const blogSchema = new mongoose.Schema(
+	{
+		author: {
+			type: ObjectId,
+			ref: 'User',
+			required: 'author is required',
+		},
+		title: {
+			type: String,
+			trim: true,
+			required: 'title is required',
+		},
+		slug: String,
+		description: {
+			type: String,
+			trim: true,
+			required: true,
+		},
+		tags: [String],
 
-const blogSchema = new mongoose.Schema({
-	author:{
-		type:ObjectId,
-		ref: "User",
-		required: true
+		photo: {
+			data: Buffer,
+			type: String,
+			// required: true
+		},
 	},
-	title: {
-		type: String,
-		trim: true,
-		required: 'Please enter a store name!',
-	},
-	slug: String,
-	description: {
-		type: String,
-		trim: true,
-		required: true
-	},
-	tags: [String],
+	{ timestamps: true }
+);
 
-	photo: {
-		data: Buffer,
-		type:String,
-		// required: true
-	  } ,
-}, { timestamps: true });
+// loop 3la el required fields and send them as an array
+
+blogSchema.statics.requiredFields = function () {
+	let arr = [];
+	for (let required in blogSchema.obj) {
+		if (blogSchema.obj[required].required) {
+			arr.push(required);
+		}
+	}
+	return arr;
+};
 
 blogSchema.pre('save', async function (next) {
 	if (!this.isModified('title')) {
@@ -41,7 +55,7 @@ blogSchema.pre('save', async function (next) {
 	const slugRegEx = new RegExp(`^(${this.slug})((-[0-9]*$)?)$`, 'i');
 	console.log(slugRegEx);
 	const postWithSlug = await this.constructor.find({ slug: slugRegEx });
-	console.log(postWithSlug)
+	console.log(postWithSlug);
 	if (postWithSlug.length) {
 		this.slug = `${this.slug}-${postWithSlug.length + 1}`;
 	}
@@ -52,7 +66,7 @@ blogSchema.pre('save', async function (next) {
 blogSchema.statics.getTagList = function () {
 	return this.aggregate([
 		{ $unwind: '$tags' },
-		 { $group: { _id: '$tags', count: { $sum: 1 } } },
+		{ $group: { _id: '$tags', count: { $sum: 1 } } },
 		{ $sort: { count: -1 } },
 	]);
 };

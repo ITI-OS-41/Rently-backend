@@ -1,12 +1,18 @@
 const catchErrors = (fn) => {
   return function(req, res, next) {
     return fn(req, res, next).catch((next) => {
-        console.log(next)
+        console.log("fd",next)
         return res.status(500).send({ msg: next.message })
       })
   };
 };
+const isEmpty = value => {
+  value === undefined ||
+  value === null ||
+  (typeof value === "Object" && Object.keys(value).length === 0) ||
+  (typeof value === "string" && value.trim().length === 0)
 
+}
 const Validator = require("validator")
 
 function validateId (id,res) {
@@ -77,4 +83,4 @@ const USERRATE = {
   badRequest: "I have made a bad request"
 }
 
-export { catchErrors,validateId, EMAIL, USERNAME, USER, PASSWORD, BLOG_POST, SLUG, NOTIFICATION, ID, RENT, QUESTION, ITEMRATE, APPRATE, USERRATE }
+export {isEmpty, catchErrors,validateId, EMAIL, USERNAME, USER, PASSWORD, BLOG_POST, SLUG, NOTIFICATION, ID, RENT, QUESTION, ITEMRATE, APPRATE, USERRATE }

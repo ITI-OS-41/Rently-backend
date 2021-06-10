@@ -41,15 +41,7 @@ exports.create = async (req, res) => {
   const rent = await new Rent(req.body).save();
   res.status(200).send(rent);
 
-  // await rent
-  //   .save()
-  // .then((result) => {
-  //   res.json({ rent })
-  // })
-  // .catch((err) => {
-  //   console.log(err)
-  //   return res.status(500).send({ msg: err.message })
-  // })
+ 
 };
 
 exports.update = async (req, res) => {
