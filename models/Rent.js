@@ -38,7 +38,7 @@ const rentSchema = new Schema({
   status: {
     type: String,
       enum: {
-        values: ["pending", "approved", "delivered", "returned"],
+        values: ["pending", "approved", "delivered", "returned","declined"],
         message: '{VALUE} is not supported'     
        },
        default: "pending"    

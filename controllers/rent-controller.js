@@ -1,10 +1,9 @@
 const Rent = require("../models/Rent")
 import { RENT, ID } from "../helpers/errors"
-const ObjectId = require('mongoose').Types.ObjectId;
+import {validateId} from "../helpers/errors"
 
 
-const validateRent = require("../validation/rent")
-
+ 
 exports.getAll = async (req, res) => {
 
 
@@ -15,8 +14,6 @@ exports.getAll = async (req, res) => {
     ...(renter && { renter }),
     ...(status && { status }),
     ...(rating && { rating }),
-
-
   }
 
   // * ...(email && { email: /regex here/ }),
@@ -28,14 +25,8 @@ exports.getAll = async (req, res) => {
 }
 
 exports.getOne = (req, res) => {
-
   const id = req.params.id
-
-  if (!ObjectId.isValid(id)) {
-    return res.status(404).json({
-      id: ID.invalid
-    })
-  }
+  validateId(id,res)
   
   Rent.findById(id)
     .then((rent) => {
@@ -52,43 +43,25 @@ exports.getOne = (req, res) => {
 }
 
 exports.create = async (req, res) => {
-  const { isValid, errors } = await validateRent(req.body)
 
-  if (!isValid) {
-    return res.status(404).json(errors)
-  }
+  const rent = await new Rent(req.body).save();
+	res.status(200).send(rent);
 
-
-  const rent = new Rent({
-    ...req.body
-  })
-
-  await rent
-    .save()
-    .then((result) => {
-      res.json({ rent })
-    })
-    .catch((err) => {
-      return res.status(500).send({ msg: err.message })
-    })
+  
+  // await rent
+  //   .save()
+    // .then((result) => {
+    //   res.json({ rent })
+    // })
+    // .catch((err) => {
+    //   console.log(err)
+    //   return res.status(500).send({ msg: err.message })
+    // })
 }
 
 
 exports.update = async (req, res) => {
-  const id = req.params.id
-
-  if (!ObjectId.isValid(id)) {
-    return res.status(404).json({
-      id: ID.invalid
-    })
-  }
-
-  const { isValid, errors } = await validateRent(req.body)
-
-  if (!isValid) {
-    return res.status(404).json(errors)
-  }
-
+  
   await Rent.findOneAndUpdate({ _id: req.params.id }, req.body, {
     new: true,
     runValidators: true,
@@ -105,14 +78,9 @@ exports.update = async (req, res) => {
 
 exports.deleteOne = async (req, res) => {
   const id = req.params.id
+  validateId(id,res)
 
-  if (!ObjectId.isValid(id)) {
-    return res.status(404).json({
-      id: ID.invalid
-    })
-  }
-
-  Rent.findById(req.params.id)
+  Rent.findById(id)
     .then((rent) => {
       if (rent) {
         rent
