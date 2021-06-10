@@ -47,6 +47,33 @@ const userSchema = new Schema({
   isVerified: {
     type: Boolean,
   },
-})
+}, { timestamps: true })
+
+// Duplicate the ID field.
+userSchema.virtual('id').get(function () {
+  return this._id.toHexString();
+});
+userSchema.virtual('name').get(function () {
+  if (this.firstname || this.lastname) {
+    return this.firstname || '' + ' ' + this.lastname || '';
+  }
+  return this.username;
+});
+
+
+
+const removePropertyFromResponse = function (next) {
+  this.select({ password: 0 })
+  next();
+};
+
+userSchema.
+  pre('findOne', removePropertyFromResponse).
+  pre('find', removePropertyFromResponse);
+
+// Ensure virtual fields are serialised.
+userSchema.set('toJSON', {
+  virtuals: true,
+});
 
 module.exports = mongoose.model("User", userSchema)
