@@ -1,32 +1,30 @@
-
-const express = require('express');
-const dotenv = require('dotenv');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const passport = require('passport');
-
+const express = require("express");
+const dotenv = require("dotenv");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const passport = require("passport");
 
 /*
  ** ROUTES
  */
 
-const auth = require("./routes/auth.js")
-const user = require("./routes/user.js")
-const notification = require("./routes/notification.js")
-const blog = require('./routes/blog.js');
-const faq = require('./routes/faq.js');
-const rent = require('./routes/rent.js');
-const item = require("./routes/item.js")
-const category = require('./routes/category.js');
-const subcategory = require('./routes/subCategory.js');
-const appRate = require("./routes/appRate.js")
-const itemRate = require("./routes/itemRate.js")
-const userRate = require("./routes/userRate.js")
+const auth = require("./routes/auth.js");
+const user = require("./routes/user.js");
+const notification = require("./routes/notification.js");
+const blog = require("./routes/blog.js");
+const faq = require("./routes/faq.js");
+const rent = require("./routes/rent.js");
+const item = require("./routes/item.js");
+const category = require("./routes/category.js");
+const subcategory = require("./routes/subCategory.js");
+const appRate = require("./routes/appRate.js");
+const itemRate = require("./routes/itemRate.js");
+const userRate = require("./routes/userRate.js");
 
 /*
  ** SETUP ENVIRONMENT
  */
-dotenv.config()
+dotenv.config();
 
 /*
  ** MONGO DB CONNECT
@@ -37,13 +35,12 @@ mongoose.connect(process.env.MONGODB_URL, {
   useCreateIndex: true,
 });
 
-
 /*
-** ! Pusher
-*/
+ ** ! Pusher
+ */
 // const Pusher = require("pusher");
 
-// const pusher = new Pusher({ 
+// const pusher = new Pusher({
 //   appId: process.env.PUSHER_APP_ID,
 //   key: process.env.PUSHER_APP_KEY,
 //   secret: process.env.PUSHER_APP_SECRET,
@@ -55,32 +52,42 @@ mongoose.connect(process.env.MONGODB_URL, {
 //   message: "hello world"
 // });
 
-
-
 const app = express();
-app.use('/uploads', express.static('uploads'));
+app.use("/uploads", express.static("uploads"));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cors());
+app.use(
+  cors({
+    exposedHeaders: ["X-Total-Count", "Content-Range"],
+  })
+);
+
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  res.header("Access-Control-Expose-Headers", "X-Total-Count, Content-Range");
+  next();
+});
 
 app.use(passport.initialize());
-require('./config/passport')(passport);
+require("./config/passport")(passport);
 
-
-app.use('/api/auth', auth);
-app.use('/api/user', user);
-app.use('/api/category', category);
-app.use('/api/subcategory', subcategory);
-app.use("/api/notification", notification)
-app.use('/api/blog', blog);
-app.use('/api/faq', faq);
-app.use("/api/rent", rent)
-app.use("/api/item", item)
-app.use("/api/apprate", appRate)
-app.use("/api/itemrate", itemRate)
-app.use("/api/userrate", userRate)
-
+app.use("/api/auth", auth);
+app.use("/api/user", user);
+app.use("/api/category", category);
+app.use("/api/subcategory", subcategory);
+app.use("/api/notification", notification);
+app.use("/api/blog", blog);
+app.use("/api/faq", faq);
+app.use("/api/rent", rent);
+app.use("/api/item", item);
+app.use("/api/apprate", appRate);
+app.use("/api/itemrate", itemRate);
+app.use("/api/userrate", userRate);
 
 /*
  ** RUN APP

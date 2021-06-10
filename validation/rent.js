@@ -1,12 +1,16 @@
 import User from "../models/User"
 import Item from "../models/Item"
+import { ID } from "../helpers/errors"
 const Validator = require("validator")
-const ObjectId = require('mongoose').Types.ObjectId;
+
 
 //joi library for validation 
 
-module.exports = async function (data) {
+module.exports = async (req,res,next)=> {
   let errors = {}
+let data= req.body;
+const id = req.params.id
+const status=["pending","approved","delivered","returned","declined"]
 
 
   if (Validator.isEmpty(data.owner)) {
@@ -52,6 +56,9 @@ module.exports = async function (data) {
     if (!item) {
       errors.item = "this item is not found in our database ";
     }
+    else if (item.stock === 0){ 
+      errors.item= "this item is out of stock"
+    }
   }
 
   if (Validator.isEmpty(data.from)) {
@@ -65,8 +72,6 @@ module.exports = async function (data) {
 
   const from= new Date(data.from).getTime()
   const to= new Date(data.to).getTime()
-
-  console.log(from, to)
 
   // from should be before to
   if (from > to ){
@@ -87,18 +92,37 @@ module.exports = async function (data) {
     errors.price = "price must be greater than 1"
   }
 
-  //Status check validation and controller
+  
+
+  // Status check validation and controller
   if (Validator.isEmpty(data.status)) {
     errors.status = "rent status is required"
   }
-  const status=["pending","approved","delivered","returned"]
-  if (data.status && !status.includes(data.status) ) {
-    errors.satus=`${data.status} is not an accepted value for status`
+  
+  if (id ) {
+    if (!Validator.isMongoId(id)) {
+      return res.status(404).json({
+        id: ID.invalid
+      })
+    }
+    else if(data.status && !status.includes(data.status)){
+      errors.satus=`${data.status} is not an accepted value for status`
+    }
   }
+  else{
+    if(data.status!== "pending"){
+      errors.satus=`${data.status} is not an accepted value for making a rent`
 
+    }
 
-  return {
-    errors,
-    isValid: Object.keys(errors).length === 0,
   }
+  
+
+  if (Object.keys(errors).length> 0){
+    console.log(data,errors, id)
+    return res.status(404).json(errors)
+  }
+else{
+  return next();
+}
 }
