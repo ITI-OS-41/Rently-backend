@@ -34,7 +34,6 @@ const rentSchema = new Schema({
     type: Number,
     required: true
   },
-
   status: {
     type: String,
       enum: {
@@ -45,5 +44,18 @@ const rentSchema = new Schema({
   }
 
 }, { timestamps: true })
+
+
+// Duplicate the ID field.
+rentSchema.virtual('id').get(function(){
+  return this._id.toHexString();
+});
+
+// Ensure virtual fields are serialised.
+rentSchema.set('toJSON', {
+  virtuals: true,
+
+});
+
 
 module.exports = mongoose.model("Rent", rentSchema)
