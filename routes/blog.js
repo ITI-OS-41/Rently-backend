@@ -3,6 +3,7 @@
 const router = require('express').Router();
 const Blog = require('../models/Blog');
 const passport = require('passport');
+const { catchErrors } = require('../helpers/errors');
 
 // Import controllers
 const {
@@ -22,7 +23,7 @@ router.post('/', upload, create);
 // router.get('/:id', getOne);
 
 // * GET ALL
-router.get('/', getAll);
+router.get('/', catchErrors(getAll));
 
 // * UPDATE
 router.post('/:id', update);

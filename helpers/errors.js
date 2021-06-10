@@ -1,3 +1,9 @@
+exports.catchErrors = (fn) => {
+  return function(req, res, next) {
+    return fn(req, res, next).catch(next);
+  };
+};
+
 const EMAIL = {
   required: "Email Address is required!",
   invalid: "Invalid Email Address",
