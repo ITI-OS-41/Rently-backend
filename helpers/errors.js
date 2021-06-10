@@ -1,8 +1,21 @@
-exports.catchErrors = (fn) => {
+const catchErrors = (fn) => {
   return function(req, res, next) {
-    return fn(req, res, next).catch(next);
+    return fn(req, res, next).catch((next) => {
+        console.log(next)
+        return res.status(500).send({ msg: next.message })
+      })
   };
 };
+
+const Validator = require("validator")
+
+function validateId (id,res) {
+  if (!Validator.isMongoId(id)) {
+    return res.status(404).json({
+      id: ID.invalid
+    })
+  }
+} 
 
 const EMAIL = {
   required: "Email Address is required!",
@@ -64,4 +77,4 @@ const USERRATE = {
   badRequest: "I have made a bad request"
 }
 
-export { EMAIL, USERNAME, USER, PASSWORD, BLOG_POST, SLUG, NOTIFICATION, ID, RENT, QUESTION, ITEMRATE, APPRATE, USERRATE }
+export { catchErrors,validateId, EMAIL, USERNAME, USER, PASSWORD, BLOG_POST, SLUG, NOTIFICATION, ID, RENT, QUESTION, ITEMRATE, APPRATE, USERRATE }

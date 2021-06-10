@@ -32,10 +32,10 @@ router.post('/:id', update);
 router.delete('/:id', deleteOne);
 
 // * Find by slug name
-// router.get('/:slug', getBySlug);
+router.get('/:slug', getBySlug);
 
 // * Find by  tag
-router.get('/tags', getByTag);
-router.get('/tags/:tag', getByTag);
+// router.get('/tags', getByTag);
+// router.get('/tags/:tag', getByTag);
 
 module.exports = router;
