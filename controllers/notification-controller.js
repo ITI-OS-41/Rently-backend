@@ -8,18 +8,18 @@ const validateNotification = require("../validation/notification")
 exports.getAll = async (req, res) => {
 
 
-  let { _id, receiver, sender } = req.query
+  let { _id, receiver, sender, content } = req.query
   const queryObj = {
     ...(_id && { _id }),
     ...(receiver && { receiver }),
     ...(sender && { sender }),
+    ...(content && { content: new RegExp(`${content}`) }),
   }
-
   // * ...(email && { email: /regex here/ }),
 
   await Notification.find(queryObj)
     .then((objects) => {
-      res.status(200).send(objects)
+      res.status(200).set("X-Total-Count", objects.length).json(objects)
     })
 }
 
@@ -74,7 +74,7 @@ exports.create = async (req, res) => {
 
 exports.update = async (req, res) => {
   const id = req.params.id
-  
+
   if (!ObjectId.isValid(id)) {
     return res.status(404).json({
       id: ID.invalid
