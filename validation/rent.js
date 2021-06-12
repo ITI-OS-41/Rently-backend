@@ -19,7 +19,7 @@ module.exports = async (req, res, next) => {
 		errors.owner = 'owner is required';
 	}
 
-	if (!Validator.isMongoId(data.owner)) {
+	else if (!Validator.isMongoId(data.owner)) {
 		errors.owner = 'this is not a valid owner id';
 	} else {
 		const owner = await User.findById(data.owner);
@@ -31,7 +31,7 @@ module.exports = async (req, res, next) => {
 	if (Validator.isEmpty(data.renter)) {
 		errors.renter = 'renter is required';
 	}
-	if (!Validator.isMongoId(data.renter)) {
+	else if (!Validator.isMongoId(data.renter)) {
 		errors.renter = 'this is not valid user id';
 	} else {
 		const renter = await User.findById(data.renter);
@@ -49,7 +49,7 @@ module.exports = async (req, res, next) => {
 		errors.item = 'item is required';
 	}
 
-	if (!Validator.isMongoId(data.item)) {
+	else if (!Validator.isMongoId(data.item)) {
 		errors.item = 'this is not valid item id';
 	} else {
 		const item = await Item.findById(data.item);
@@ -98,11 +98,11 @@ module.exports = async (req, res, next) => {
 				id: ID.invalid,
 			});
 		} else if (data.status && !status.includes(data.status)) {
-			errors.satus = `${data.status} is not an accepted value for status`;
+			errors.status = `${data.status} is not an accepted value for status`;
 		}
 	} else {
 		if (data.status !== 'pending') {
-			errors.satus = `${data.status} is not an accepted value for making a rent`;
+			errors.status = `${data.status} is not an accepted value for making a rent`;
 		}
 	}
 

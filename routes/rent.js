@@ -19,7 +19,7 @@ router.get("/", getAll)
 router.get("/:id", getOne)
 
 
-// * UPDATE
+// * create
 router.post("/",validateRent,catchErrors(create))
 
 // * UPDATE

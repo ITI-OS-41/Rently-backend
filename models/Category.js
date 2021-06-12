@@ -1,5 +1,7 @@
 const mongoose = require("mongoose")
 const Schema = mongoose.Schema
+const ObjectId = require('mongoose').Types.ObjectId;
+
 
 const categorySchema = new Schema({
   name: {
@@ -7,15 +9,18 @@ const categorySchema = new Schema({
     required: true,
     unique: true,
   },
+  subcategory:{
+    type:ObjectId,
+    ref:"SubCategory"
+  },
   description: {
     type: String,
     required: true,
   },
-  created: {
-		type: Date,
-		default: Date.now,
-	},
+  
   photo: String,
-})
+}, { timestamps: true })
+
+
 
 module.exports = mongoose.model("Category", categorySchema)
