@@ -76,7 +76,14 @@ exports.update = async (req, res) => {
 		new: true,
 		runValidators: true,
 		useFindAndModify: false,
-	});
+	})
+		.then((response) => {
+			res.status(200).send(response)
+		})
+		.catch((error) => {
+			console.log(error)
+			return res.status(500).send({ msg: error.message })
+		})
 
 };
 
