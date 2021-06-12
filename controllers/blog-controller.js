@@ -62,7 +62,6 @@ exports.getOne = async (req, res) => {
 
 exports.getAll = async (req, res) => {
 	let { _id, slug } = req.query;
-	console.log(req.query);
 	const queryObj = {
 		...(_id && { _id }),
 		...(slug && { slug }),
