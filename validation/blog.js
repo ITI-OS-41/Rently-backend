@@ -37,7 +37,6 @@ module.exports = async (req, res, next) => {
 			errors.author = 'this author is not found';
 		}
 	}
-
 	if (Object.keys(errors).length > 0) {
 		// console.log(data, errors);
 		return res.status(404).json(errors);
