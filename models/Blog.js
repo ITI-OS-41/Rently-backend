@@ -33,6 +33,8 @@ const blogSchema = new mongoose.Schema(
 	{ timestamps: true }
 );
 
+
+
 // loop 3la el required fields and send them as an array
 
 blogSchema.statics.requiredFields = function () {
@@ -60,6 +62,28 @@ blogSchema.pre('save', async function (next) {
 	next();
 	// TODO make more resiliant so slugs are unique
 });
+
+
+
+var autoPopulateLead = function (next) {
+	this.populate('author');
+	next();
+};
+
+blogSchema.
+	pre('findOne', autoPopulateLead).
+	pre('find', autoPopulateLead);
+
+
+// Duplicate the ID field.
+blogSchema.virtual('id').get(function () {
+	return this._id.toHexString();
+});
+// Ensure virtual fields are serialised.
+blogSchema.set('toJSON', {
+	virtuals: true,
+});
+
 
 blogSchema.statics.getTagList = function () {
 	return this.aggregate([

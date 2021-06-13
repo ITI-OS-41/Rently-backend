@@ -60,17 +60,6 @@ userSchema.virtual('name').get(function () {
   return this.username;
 });
 
-
-
-const removePropertyFromResponse = function (next) {
-  this.select({ password: 0 })
-  next();
-};
-
-userSchema.
-  pre('findOne', removePropertyFromResponse).
-  pre('find', removePropertyFromResponse);
-
 // Ensure virtual fields are serialised.
 userSchema.set('toJSON', {
   virtuals: true,
