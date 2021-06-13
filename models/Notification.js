@@ -20,4 +20,25 @@ const notificationSchema = new Schema({
   }
 }, { timestamps: true })
 
+
+var autoPopulateLead = function (next) {
+  this.populate('sender');
+  this.populate('receiver');
+  next();
+};
+
+notificationSchema.
+  pre('findOne', autoPopulateLead).
+  pre('find', autoPopulateLead);
+
+// Duplicate the ID field.
+notificationSchema.virtual('id').get(function () {
+  return this._id.toHexString();
+});
+
+// Ensure virtual fields are serialised.
+notificationSchema.set('toJSON', {
+  virtuals: true,
+});
+
 module.exports = mongoose.model("Notification", notificationSchema)

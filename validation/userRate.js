@@ -15,7 +15,7 @@ module.exports = async function (data) {
   if (!Validator.isMongoId(data.item)) {
     errors.item = "this is not valid item id";
   } else {
-    const item = await Item.findById(data.item);
+    const item = await Itemgit .findById(data.item);
     if (!item) {
       errors.item = "this item is not found in our database ";
     }
@@ -58,7 +58,7 @@ module.exports = async function (data) {
     renter: data.renter,
     item: data.item
   });
-  if (duplicationCheck.length > 0) {
+  if (duplicationCheck.length) {
     errors.duplication =
       "you can't rate the same user more than one time for the same item, please update your review instead";
   }

@@ -18,11 +18,11 @@ router.get("/", getAll)
 router.get("/:id", getOne)
 
 
-// * UPDATE
+// * create
 router.post("/", create)
 
 // * UPDATE
-router.post("/:id", update)
+router.put("/:id", update)
 
 // * DELETE
 router.delete("/:id", deleteOne,)

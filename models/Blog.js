@@ -2,25 +2,50 @@
 
 const mongoose = require('mongoose');
 const slug = require('slugs');
+const { ObjectId } = mongoose.Schema.Types;
 
-const blogSchema = new mongoose.Schema({
-	title: {
-		type: String,
-		trim: true,
-		required: 'Please enter a store name!',
+const blogSchema = new mongoose.Schema(
+	{
+		author: {
+			type: ObjectId,
+			ref: 'User',
+			required: 'author is required',
+		},
+		title: {
+			type: String,
+			trim: true,
+			required: 'title is required',
+		},
+		slug: String,
+		description: {
+			type: String,
+			trim: true,
+			required: true,
+		},
+		tags: [String],
+
+		photo: {
+			data: Buffer,
+			type: String,
+			// required: true
+		},
 	},
-	slug: String,
-	description: {
-		type: String,
-		trim: true,
-	},
-	tags: [String],
-	created: {
-		type: Date,
-		default: Date.now,
-	},
-	photo: String,
-});
+	{ timestamps: true }
+);
+
+
+
+// loop 3la el required fields and send them as an array
+
+blogSchema.statics.requiredFields = function () {
+	let arr = [];
+	for (let required in blogSchema.obj) {
+		if (blogSchema.obj[required].required) {
+			arr.push(required);
+		}
+	}
+	return arr;
+};
 
 blogSchema.pre('save', async function (next) {
 	if (!this.isModified('title')) {
@@ -37,6 +62,28 @@ blogSchema.pre('save', async function (next) {
 	next();
 	// TODO make more resiliant so slugs are unique
 });
+
+
+
+var autoPopulateLead = function (next) {
+	this.populate('author');
+	next();
+};
+
+blogSchema.
+	pre('findOne', autoPopulateLead).
+	pre('find', autoPopulateLead);
+
+
+// Duplicate the ID field.
+blogSchema.virtual('id').get(function () {
+	return this._id.toHexString();
+});
+// Ensure virtual fields are serialised.
+blogSchema.set('toJSON', {
+	virtuals: true,
+});
+
 
 blogSchema.statics.getTagList = function () {
 	return this.aggregate([
