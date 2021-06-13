@@ -6,6 +6,7 @@ const catchErrors = (fn) => {
       })
   };
 };
+
 const isEmpty = value => {
   value === undefined ||
   value === null ||
@@ -83,4 +84,4 @@ const USERRATE = {
   badRequest: "I have made a bad request"
 }
 
-export {isEmpty, catchErrors,validateId, EMAIL, USERNAME, USER, PASSWORD, BLOG_POST, SLUG, NOTIFICATION, ID, RENT, QUESTION, ITEMRATE, APPRATE, USERRATE }
+export { isEmpty, catchErrors,validateId, EMAIL, USERNAME, USER, PASSWORD, BLOG_POST, SLUG, NOTIFICATION, ID, RENT, QUESTION, ITEMRATE, APPRATE, USERRATE }

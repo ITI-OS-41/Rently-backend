@@ -33,6 +33,8 @@ const blogSchema = new mongoose.Schema(
 	{ timestamps: true }
 );
 
+
+
 // loop 3la el required fields and send them as an array
 
 blogSchema.statics.requiredFields = function () {
@@ -53,15 +55,35 @@ blogSchema.pre('save', async function (next) {
 	this.slug = slug(this.title);
 	// find other stores that have a slug of wes, wes-1, wes-2
 	const slugRegEx = new RegExp(`^(${this.slug})((-[0-9]*$)?)$`, 'i');
-	console.log(slugRegEx);
 	const postWithSlug = await this.constructor.find({ slug: slugRegEx });
-	console.log(postWithSlug);
 	if (postWithSlug.length) {
 		this.slug = `${this.slug}-${postWithSlug.length + 1}`;
 	}
 	next();
 	// TODO make more resiliant so slugs are unique
 });
+
+
+
+var autoPopulateLead = function (next) {
+	this.populate('author');
+	next();
+};
+
+blogSchema.
+	pre('findOne', autoPopulateLead).
+	pre('find', autoPopulateLead);
+
+
+// Duplicate the ID field.
+blogSchema.virtual('id').get(function () {
+	return this._id.toHexString();
+});
+// Ensure virtual fields are serialised.
+blogSchema.set('toJSON', {
+	virtuals: true,
+});
+
 
 blogSchema.statics.getTagList = function () {
 	return this.aggregate([
