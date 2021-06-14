@@ -34,16 +34,28 @@ const rentSchema = new Schema({
     type: Number,
     required: true
   },
-
   status: {
     type: String,
       enum: {
-        values: ["pending", "approved", "delivered", "returned"],
+        values: ["pending", "approved", "delivered", "returned","declined"],
         message: '{VALUE} is not supported'     
        },
        default: "pending"    
   }
 
 }, { timestamps: true })
+
+
+// Duplicate the ID field.
+rentSchema.virtual('id').get(function(){
+  return this._id.toHexString();
+});
+
+// Ensure virtual fields are serialised.
+rentSchema.set('toJSON', {
+  virtuals: true,
+
+});
+
 
 module.exports = mongoose.model("Rent", rentSchema)

@@ -1,10 +1,11 @@
 /** @format */
-
+const { validateId } = require('../helpers/errors');
 const mongoose = require('mongoose');
 const Blog = mongoose.model('Blog');
 const multer = require('multer');
 const jimp = require('jimp');
 const uuid = require('uuid');
+
 const { BLOG_POST, SLUG } = require('../helpers/errors');
 
 const multerOptions = {
@@ -39,13 +40,13 @@ exports.resize = async (req, res, next) => {
 
 exports.create = async (req, res) => {
 	const blogPost = await new Blog(req.body).save();
-	console.log(blogPost);
 	res.status(200).send(blogPost);
 };
 
-exports.getOne = (req, res) => {
-	const Id = req.params.id;
-	Blog.findOne({ _id: req.params.id })
+exports.getOne = async (req, res) => {
+	const id = req.params.id;
+	validateId(id, res);
+	await Blog.findById(id)
 		.then((blogPost) => {
 			if (blogPost) {
 				return res.json(blogPost);
@@ -60,13 +61,19 @@ exports.getOne = (req, res) => {
 };
 
 exports.getAll = async (req, res) => {
+  const page = parseInt(req.query.page);
+  const limit = parseInt(req.query.limit); 
+  const skip = (page * limit) -limit;       
+
 	let { _id, slug } = req.query;
-	console.log(req.query);
 	const queryObj = {
 		...(_id && { _id }),
 		...(slug && { slug }),
 	};
-	await Blog.find(queryObj).then((objects) => {
+	await Blog.find(queryObj)
+  .skip(skip)
+  .limit(limit)
+  .then((objects) => {
 		res.status(200).send(objects);
 	});
 };
@@ -82,11 +89,14 @@ exports.update = async (req, res) => {
 		})
 		.catch((error) => {
 			console.log(error);
-			return res.status(500).send({ msg: POST.invalidId });
+			return res.status(500).send({ msg: error.message });
 		});
 };
 
 exports.deleteOne = async (req, res) => {
+	const id = req.params.id;
+	validateId(id, res);
+
 	Blog.findById(req.params.id)
 		.then((blogPost) => {
 			if (blogPost) {
@@ -124,7 +134,7 @@ exports.getByTag = async (req, res) => {
 	const tagsPromise = Blog.getTagList();
 	const postsPromise = Blog.find({ tags: tagQuery });
 	const [tags, posts] = await Promise.all([tagsPromise, postsPromise]);
-	console.log("tags ",tags)
+	console.log('tags ', tags);
 
-	res.status(200).send([tags,posts]);
+	res.status(200).send([tags, posts]);
 };

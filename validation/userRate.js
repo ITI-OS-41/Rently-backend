@@ -1,8 +1,8 @@
 const Validator = require("validator");
-import User from "../models/User";
-import UserRate from "../models/UserRate";
-import Item from "../models/Item";
-import Rent from "../models/Rent";
+const User = require("../models/User") ;
+const UserRate = require("../models/UserRate");
+const Item = require("../models/Item") ;
+const Rent = require("../models/Rent") ;
 
 module.exports = async function (data) {
   let errors = {};
@@ -58,7 +58,7 @@ module.exports = async function (data) {
     renter: data.renter,
     item: data.item
   });
-  if (duplicationCheck.length > 0) {
+  if (duplicationCheck.length) {
     errors.duplication =
       "you can't rate the same user more than one time for the same item, please update your review instead";
   }
