@@ -24,6 +24,29 @@ const subcategorySchema = new Schema(
   { timestamps: true }
 );
 
+
+
+var autoPopulateLead = function (next) {
+  this.populate('category');
+  next();
+};
+
+subcategorySchema.
+  pre('findOne', autoPopulateLead).
+  pre('find', autoPopulateLead);
+
+
+// Duplicate the ID field.
+subcategorySchema.virtual('id').get(function () {
+  return this._id.toHexString();
+});
+// Ensure virtual fields are serialised.
+subcategorySchema.set('toJSON', {
+  virtuals: true,
+});
+
+
+
 subcategorySchema.index({ name: 1, category: 1 }, { unique: true });
 
 module.exports = mongoose.model("SubCategory", subcategorySchema);
