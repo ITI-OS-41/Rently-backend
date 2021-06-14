@@ -61,9 +61,9 @@ exports.getOne = async (req, res) => {
 };
 
 exports.getAll = async (req, res) => {
-  const page = parseInt(req.query.page);
-  const limit = parseInt(req.query.limit); 
-  const skip = (page * limit) -limit;       
+	const page = parseInt(req.query.page);
+	const limit = parseInt(req.query.limit);
+	const skip = page * limit - limit;
 
 	let { _id, slug } = req.query;
 	const queryObj = {
@@ -71,11 +71,11 @@ exports.getAll = async (req, res) => {
 		...(slug && { slug }),
 	};
 	await Blog.find(queryObj)
-  .skip(skip)
-  .limit(limit)
-  .then((objects) => {
-		res.status(200).send(objects);
-	});
+		.skip(skip)
+		.limit(limit)
+		.then((objects) => {
+			res.status(200).send(objects);
+		});
 };
 
 exports.update = async (req, res) => {
