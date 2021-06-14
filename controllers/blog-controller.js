@@ -135,6 +135,5 @@ exports.getByTag = async (req, res) => {
 	const postsPromise = Blog.find({ tags: tagQuery });
 	const [tags, posts] = await Promise.all([tagsPromise, postsPromise]);
 	console.log('tags ', tags);
-
 	res.status(200).send([tags, posts]);
 };
