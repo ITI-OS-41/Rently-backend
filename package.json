@@ -5,11 +5,14 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node babel-node ./index.js",
+    "start": "node --exec babel-node ./index.js",
     "nodemon": "nodemon --exec babel-node ./index.js "
   },
   "keywords": [],
   "author": "",
+  "engines": {
+    "node": "14.17.0"
+  },
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",

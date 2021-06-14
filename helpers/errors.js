@@ -135,5 +135,5 @@ export {
   QUESTION,
   ITEMRATE,
   APPRATE,
-  USERRATE,
+  USERRATEgit add .
 };
