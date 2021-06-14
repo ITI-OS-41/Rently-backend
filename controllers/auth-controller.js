@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const mail = require('../helpers/mail');
 
 import { EMAIL, USERNAME, PASSWORD } from '../helpers/errors';
 
@@ -86,15 +87,23 @@ exports.login = (req, res) => {
 
 exports.forgetPassword = async (req, res) => {
 	const user = await User.findOne({ email: req.body.email });
-	console.log(user);
+	// console.log(user);
 	if (!user) {
-		res.status(303).send({ msg: 'mail has been sent' });
+		res.status(404).send({ msg: 'mail has been sent' });
+		return;
 	}
 	user.resetPasswordToken = crypto.randomBytes(20).toString('hex');
 	user.resetPasswordExpires = Date.now() + 3600000;
 	await user.save();
 	const resetURL = `http://${req.headers.host}/api/auth/reset/${user.resetPasswordToken}`;
 	console.log(resetURL);
+	// await mail.send({
+	// 	user,
+	// 	subject: 'Password Reset',
+	// 	text:'reset password',
+	// 	resetURL,
+	// 	filename:'mail'
+	// });
 	res.status(303).send({ msg: 'redirect to change password' });
 };
 
@@ -105,6 +114,7 @@ exports.resetPassword = async (req, res) => {
 	});
 	if (!user) {
 		res.status(404).send({ msg: 'token has expired' });
+		return;
 	}
 	res.status(303).send({ msg: 'redirect to reset password' });
 };
@@ -123,6 +133,7 @@ exports.updatePassword = async (req, res, next) => {
 	});
 	if (!user) {
 		res.status(404).send({ msg: 'token has expired' });
+		return;
 	}
 	user.password = req.body.password;
 	user.resetPasswordToken = undefined;
