@@ -1,6 +1,5 @@
 const Rent = require("../models/Rent");
-import { RENT, ID } from "../helpers/errors";
-import { validateId } from "../helpers/errors";
+const { validateId,RENT, ID } = require("../helpers/errors"); ;
 
 exports.getAll = async (req, res) => {
   let { id, owner, renter, status, rating } = req.query;

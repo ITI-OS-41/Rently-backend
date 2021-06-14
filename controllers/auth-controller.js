@@ -8,7 +8,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const mail = require('../helpers/mail');
 
-import { EMAIL, USERNAME, PASSWORD } from '../helpers/errors';
+const { EMAIL, USERNAME, PASSWORD } = require("../helpers/errors"); 
 
 const validateRegisterInput = require('../validation/register');
 const validateLoginInput = require('../validation/login');

@@ -1,7 +1,7 @@
 
 const Validator = require("validator")
 const ObjectId = require('mongoose').Types.ObjectId;
-import User from "../models/User"
+const User = require("../models/User"); 
 
 module.exports = async function (data) {
   let errors = {}

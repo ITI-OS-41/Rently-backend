@@ -1,8 +1,8 @@
 const Validator = require("validator");
-import User from "../models/User";
-import UserRate from "../models/UserRate";
-import Item from "../models/Item";
-import Rent from "../models/Rent";
+const User = require("../models/User") ;
+const UserRate = require("../models/UserRate");
+const Item = require("../models/Item") ;
+const Rent = require("../models/Rent") ;
 
 module.exports = async function (data) {
   let errors = {};

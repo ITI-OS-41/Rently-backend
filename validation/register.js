@@ -1,4 +1,4 @@
-import User from '../models/User'
+const User = require("../models/User");
 const Validator = require("validator")
 
 module.exports = async function (data) {
