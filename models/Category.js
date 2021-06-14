@@ -14,7 +14,9 @@ const categorySchema = new Schema(
       type: String,
       required: true,
     },
-    photo: String,
+    photo: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
