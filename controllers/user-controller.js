@@ -22,7 +22,7 @@ exports.getAll = async (req, res) => {
 };
 
 exports.getOne = (req, res) => {
-  const Id = req.params.id;
+  const id = req.params.id;
 
   if (!ObjectId.isValid(id)) {
     return res.status(404).json({
@@ -30,7 +30,7 @@ exports.getOne = (req, res) => {
     });
   }
 
-  User.findById(Id)
+  User.findById(id)
     .then((user) => {
       if (user) {
         return res.select({ password: 0 }).json({ ...user });
