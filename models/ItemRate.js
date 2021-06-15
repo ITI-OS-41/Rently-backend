@@ -33,6 +33,7 @@ const itemRateSchema = new Schema({
 
 var autoPopulateLead = function (next) {
   this.populate('rater');
+  this.populate('item');
   next();
 };
 
