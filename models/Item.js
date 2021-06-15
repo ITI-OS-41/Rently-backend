@@ -46,7 +46,7 @@ const itemSchema = new Schema(
       required: true,
     },
     photo: {
-      data: Buffer,
+      // data: Buffer,
       type:String,
       required: true
     },

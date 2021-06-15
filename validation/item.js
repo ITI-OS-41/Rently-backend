@@ -80,7 +80,7 @@ module.exports = async function (data) {
     errors.deliverable = "item delivery should be determined";
   }
 
-  if (data.deliverable !== true && data.deliverable !== false) {
+  if (data.deliverable !== "true" && data.deliverable !== "false") {
     errors.deliverable = "item delivery should be a true false statement";
   }
 
@@ -109,7 +109,7 @@ module.exports = async function (data) {
     errors.status = "status is required";
   }
 
-  if (data.status !== true && data.status !== false) {
+  if (data.status !== "true" && data.status !== "false") {
     errors.status = "item status should be a true false statement";
   }
 
