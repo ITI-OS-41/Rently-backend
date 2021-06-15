@@ -4,10 +4,10 @@ const { ObjectId } = mongoose.Schema.Types;
 
 const itemSchema = new Schema(
   {
-    owner:{
-      type:ObjectId,
+    owner: {
+      type: ObjectId,
       ref: "User",
-      required:true
+      required: true
     },
     category: {
       type: ObjectId,
@@ -18,14 +18,14 @@ const itemSchema = new Schema(
       type: String,
       enum: {
         values: ["perfect", "very good", "descent", "good", "fair"],
-        message: '{VALUE} is not supported'     
-       },
-       default: "descent"
+        message: '{VALUE} is not supported'
+      },
+      default: "descent"
 
     },
-    status:{
-      type:Boolean,
-      required:true
+    status: {
+      type: Boolean,
+      required: true
     },
     subcategory: {
       type: ObjectId,
@@ -47,7 +47,7 @@ const itemSchema = new Schema(
     },
     photo: {
       // data: Buffer,
-      type:String,
+      type: String,
       required: true
     },
     instructionalVideo: {
@@ -81,7 +81,7 @@ const itemSchema = new Schema(
         message: '{VALUE} is not supported'
       },
       default: "Reasonable"
-      
+
     },
     price: {
       hour: {
@@ -107,5 +107,18 @@ const itemSchema = new Schema(
   },
   { timestamps: true }
 );
+
+
+
+var autoPopulateLead = function (next) {
+  this.populate('owner');
+  this.populate('category');
+  this.populate('subcategory');
+  next();
+};
+
+itemSchema.
+  pre('findOne', autoPopulateLead).
+  pre('find', autoPopulateLead);
 
 module.exports = mongoose.model("Item", itemSchema);
