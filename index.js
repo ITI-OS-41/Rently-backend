@@ -20,7 +20,8 @@ const subcategory = require("./routes/subCategory.js");
 const appRate = require("./routes/appRate.js");
 const itemRate = require("./routes/itemRate.js");
 const userRate = require("./routes/userRate.js");
-
+const conversation = require("./routes/conversation");
+const message = require("./routes/message");
 /*
  ** SETUP ENVIRONMENT
  */
@@ -88,6 +89,8 @@ app.use("/api/item", item);
 app.use("/api/apprate", appRate);
 app.use("/api/itemrate", itemRate);
 app.use("/api/userrate", userRate);
+app.use("/api/conversation", conversation);
+app.use("/api/message", message);
 
 /*
  ** RUN APP

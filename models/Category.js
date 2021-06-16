@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const ObjectId = require("mongoose").Types.ObjectId;
+import SubCategory from "./SubCategory";
 
 const categorySchema = new Schema(
   {
@@ -18,5 +19,10 @@ const categorySchema = new Schema(
   },
   { timestamps: true }
 );
+
+categorySchema.pre("remove", function (next) {
+  SubCategory.deleteMany({ category: this._id }).exec();
+  next();
+});
 
 module.exports = mongoose.model("Category", categorySchema);
