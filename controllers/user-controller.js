@@ -40,9 +40,8 @@ const user = {
 
       const activation_token = createActivationToken(newUser);
 
-      const url = `${CLIENT_URL}/user/activate/${activation_token}`;
-      const sendMailResponse= sendMail(email, url, "Verify your email address",res);
-      console.log(sendMailResponse)
+      const url = `${req.headers.host}/user/activate/${activation_token}`;
+      sendMail(email, url, "Verify your email address", res);
       res.json({
         msg: "Register Success! Please activate your email to start.",
       });
@@ -56,7 +55,7 @@ const user = {
       const user = jwt.verify(
         activation_token,
         process.env.ACTIVATION_TOKEN_SECRET
-      );``
+      );
 
       const { email, password } = user;
 
@@ -87,7 +86,7 @@ const user = {
       if (!isMatch)
         return res.status(400).json({ msg: "Password is incorrect." });
 
-      const refresh_token = createRefreshToken({ id: user._id });
+      const refresh_token = createRefreshToken({ _id: user._id });
       res.cookie("refreshtoken", refresh_token, {
         httpOnly: true,
         path: "/user/refresh_token",
@@ -101,12 +100,14 @@ const user = {
   },
   getAccessToken: (req, res) => {
     try {
-      const rf_token = req.cookies.refreshtoken;
+      const { rf_token } = req.body;
+      console.log({user})
       if (!rf_token) return res.status(400).json({ msg: "Please login now!" });
 
       jwt.verify(rf_token, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
         if (err) return res.status(400).json({ msg: "Please login now!" });
 
+        //why user.id not user._id
         const access_token = createAccessToken({ id: user.id });
         res.json({ access_token });
       });

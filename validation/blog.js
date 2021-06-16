@@ -7,13 +7,10 @@ const {
   missingFieldsChecker,
 } = require("../helpers/errors");
 const Blog = require("../models/Blog");
-const User = require("../models/User");
-
-const Validator = require("validator");
-
+const validator = require("validator");
 module.exports = async (req, res, next) => {
   let errors = {};
-  let data = req.body;
+  const data = req.body;
   const id = req.params.id;
   const requiredFields = Blog.requiredFields();
   const requestBody = Object.keys(data);
@@ -28,18 +25,9 @@ module.exports = async (req, res, next) => {
     ...errors,
     ...assignEmptyErrorsToFields(data, difference),
   };
-
-  if (!errors["author"]) {
-    if (Validator.isMongoId(data.author)) {
-      const author = await User.findById(data.author);
-      if (!author) {
-        errors.author = "this author is not found";
-      }
-    } else {
-      errors.author = "this is an invalid user id";
-    }
+  if (!validator.isLength(data.title, { min: 4 })) {
+    errors.title = `title ${data.title} is shorter than the minimum allowed length (4)`;
   }
-
   if (Object.keys(errors).length > 0) {
     // console.log(data, errors);
     return res.status(404).json(errors);
