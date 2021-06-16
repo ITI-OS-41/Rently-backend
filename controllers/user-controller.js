@@ -30,10 +30,10 @@ exports.getOne = (req, res) => {
     });
   }
 
-  User.findById(id)
+  User.findById(id).select({password:0})
     .then((user) => {
       if (user) {
-        return res.select({ password: 0 }).json({ ...user });
+        return res.json(user);
       } else {
         return res.status(404).json({ msg: USER.notFound });
       }
