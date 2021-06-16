@@ -51,7 +51,7 @@ exports.getOne = (req, res) => {
     });
   }
 
-  ItemRate.findById(Id)
+  ItemRate.findById(id)
     .then((itemRate) => {
       if (itemRate) {
         return res.json({

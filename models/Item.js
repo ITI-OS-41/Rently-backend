@@ -104,4 +104,17 @@ const itemSchema = new Schema(
   { timestamps: true }
 );
 
+
+
+var autoPopulateLead = function (next) {
+  this.populate('owner');
+  this.populate('category');
+  this.populate('subcategory');
+  next();
+};
+
+itemSchema.
+  pre('findOne', autoPopulateLead).
+  pre('find', autoPopulateLead);
+
 module.exports = mongoose.model("Item", itemSchema);

@@ -1,9 +1,10 @@
-
 /*
  ** SETUP ENVIRONMENT
  */
 
-require("dotenv").config();
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
 
 const express = require("express");
 const mongoose = require("mongoose");
@@ -15,20 +16,20 @@ const path = require("path");
 /*
  ** ROUTES
  */
-
-// const auth = require('./routes/auth.js');
-const user = require("./routes/user");
-const notification = require("./routes/notification");
-const blog = require("./routes/blog");
-const faq = require("./routes/faq");
-const rent = require("./routes/rent");
-const item = require("./routes/item");
-const category = require("./routes/category");
-const subcategory = require("./routes/subCategory");
-const appRate = require("./routes/appRate");
-const itemRate = require("./routes/itemRate");
-const userRate = require("./routes/userRate");
-
+// const auth = require("./routes/auth.js");
+const user = require("./routes/user.js");
+const notification = require("./routes/notification.js");
+const blog = require("./routes/blog.js");
+const faq = require("./routes/faq.js");
+const rent = require("./routes/rent.js");
+const item = require("./routes/item.js");
+const category = require("./routes/category.js");
+const subcategory = require("./routes/subCategory.js");
+const appRate = require("./routes/appRate.js");
+const itemRate = require("./routes/itemRate.js");
+const userRate = require("./routes/userRate.js");
+const conversation = require("./routes/conversation");
+const message = require("./routes/message");
 
 /*
  ** MONGO DB CONNECT
@@ -66,6 +67,8 @@ mongoose.connect(
 
 const app = express();
 
+require("./config/passport")(passport);
+app.use(passport.initialize());
 
 app.use(cookieParser());
 app.use(express.json());
@@ -86,9 +89,6 @@ app.use(function (req, res, next) {
   next();
 });
 
-app.use(passport.initialize());
-require("./config/passport")(passport);
-
 // app.use("/api/auth", auth);
 app.use("/api/user", user);
 app.use("/api/category", category);
@@ -101,7 +101,8 @@ app.use("/api/item", item);
 app.use("/api/apprate", appRate);
 app.use("/api/itemrate", itemRate);
 app.use("/api/userrate", userRate);
-// TODO
+app.use("/api/conversation", conversation);
+app.use("/api/message", message);
 
 /*
  ** RUN APP
