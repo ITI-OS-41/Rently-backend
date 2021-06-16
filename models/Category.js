@@ -5,6 +5,11 @@ const SubCategory = require("./SubCategory");
 
 const categorySchema = new Schema(
   {
+    createdBy:{
+      type: ObjectId,
+      ref: "User",
+      required: "user is required",
+    },
     name: {
       type: String,
       required: true,
@@ -17,6 +22,7 @@ const categorySchema = new Schema(
     },
     photo: {
       type: String,
+      required: true,
     },
   },
   { timestamps: true }
@@ -26,5 +32,22 @@ categorySchema.pre("remove", function (next) {
   SubCategory.deleteMany({ category: this._id }).exec();
   next();
 });
+
+categorySchema.statics.requiredFields = function () {
+	let arr = [];
+	for (let required in categorySchema.obj) {
+		if (categorySchema.obj[required].required && required !== 'createdBy') {
+			arr.push(required);
+		}
+	}
+	return arr;
+};
+
+let autoPopulateLead = function (next) {
+	this.populate('createdBy');
+	next();
+};
+
+categorySchema.pre('findOne', autoPopulateLead).pre('find', autoPopulateLead);
 
 module.exports = mongoose.model("Category", categorySchema);

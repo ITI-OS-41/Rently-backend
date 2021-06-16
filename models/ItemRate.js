@@ -10,7 +10,6 @@ const itemRateSchema = new Schema({
     required: true,
     index: true
   },
-
   rater: {
     type: ObjectId,
     ref: "User",
@@ -31,7 +30,7 @@ const itemRateSchema = new Schema({
 }, { timestamps: true })
 
 
-var autoPopulateLead = function (next) {
+let autoPopulateLead = function (next) {
   this.populate('rater');
   this.populate('item');
   next();
