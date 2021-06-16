@@ -7,7 +7,7 @@ const itemSchema = new Schema(
     owner: {
       type: ObjectId,
       ref: "User",
-      required: true
+      required: true,
     },
     category: {
       type: ObjectId,
@@ -18,14 +18,13 @@ const itemSchema = new Schema(
       type: String,
       enum: {
         values: ["perfect", "very good", "descent", "good", "fair"],
-        message: '{VALUE} is not supported'
+        message: "{VALUE} is not supported",
       },
-      default: "descent"
-
+      default: "descent",
     },
     status: {
       type: Boolean,
-      required: true
+      required: true,
     },
     subcategory: {
       type: ObjectId,
@@ -46,22 +45,20 @@ const itemSchema = new Schema(
       required: true,
     },
     photo: {
-      // data: Buffer,
       type: String,
-      required: true
+      required: true,
     },
     instructionalVideo: {
-      data: Buffer,
-      contentType: String,
+      type: String,
     },
     location: {
       type: {
         type: String,
         enum: {
           values: ["Point"],
-          message: '{VALUE} is not supported',
+          message: "{VALUE} is not supported",
         },
-        default: "Point"
+        default: "Point",
       },
       coordinates: [
         {
@@ -78,10 +75,9 @@ const itemSchema = new Schema(
       type: String,
       enum: {
         values: ["Easygoing", "Reasonable", "Strict"],
-        message: '{VALUE} is not supported'
+        message: "{VALUE} is not supported",
       },
-      default: "Reasonable"
-
+      default: "Reasonable",
     },
     price: {
       hour: {

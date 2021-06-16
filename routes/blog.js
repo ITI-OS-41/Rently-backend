@@ -1,38 +1,37 @@
 /** @format */
-
-const router = require('express').Router();
-const Blog = require('../models/Blog');
-const passport = require('passport');
-const { catchErrors } = require('../helpers/errors');
-const validateBlog = require('../validation/blog');
+const auth = require("../middleware/auth");
+const router = require("express").Router();
+const Blog = require("../models/Blog");
+const passport = require("passport");
+const { catchErrors } = require("../helpers/errors");
+const validateBlog = require("../validation/blog");
 // Import controllers
 const {
-	create,
-	upload,
-	getAll,
-	getOne,
-	update,
-	deleteOne,
-	getBySlug,
-	getByTag,
-} = require('../controllers/blog-controller');
+  create,
+  upload,
+  getAll,
+  getOne,
+  update,
+  deleteOne,
+  getByTag,
+} = require("../controllers/blog-controller");
 // * create blog
 
-router.post('/', validateBlog, catchErrors(create));
+router.post("/", auth, validateBlog, catchErrors(create));
 // * GET ONE
-router.get('/:id', getOne);
+router.get("/:id", getOne);
 
 // * GET ALL
-router.get('/', catchErrors(getAll));
+router.get("/", catchErrors(getAll));
 
 // * UPDATE
-router.post('/:id', validateBlog, catchErrors(update));
+router.post("/:id", validateBlog, catchErrors(update));
 
 // * DELETE
-router.delete('/:id', deleteOne);
+router.delete("/:id", deleteOne);
 
 // * Find by slug name
-router.get('/slug/:slug', getBySlug);
+// router.get("/slug/:slug", getBySlug);
 
 // * Find by  tag
 // router.get('/tag', getByTag);

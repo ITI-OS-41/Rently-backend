@@ -1,45 +1,35 @@
-const router = require("express").Router()
-const User = require("../models/User")
-const bcrypt = require("bcryptjs")
-const jwt = require("jsonwebtoken")
-const passport = require("passport")
+const router = require("express").Router();
+const user = require("../controllers/user-controller");
+const auth = require("../middleware/auth");
+const authAdmin = require("../middleware/authAdmin");
 
-// Import controllers
-const {
-  getOne,
-  getAll,
-  update,
-  deleteOne,
-  create
-} = require("../controllers/user-controller")
+router.post("/register", user.register);
 
-// * GET ONE
-router.get("/:id",
-  // passport.authenticate("jwt", { session: false }),
-  getOne)
+router.post("/activation", user.activateEmail);
 
-// * GET ALL
-router.get("/",
-  // passport.authenticate("jwt", { session: false }),
-  getAll)
+router.post("/login", user.login);
 
-// * CREATE
-router.post("/",
-  // passport.authenticate("jwt", { session: false }),
-  create)
+router.post("/refresh_token", user.getAccessToken);
 
+router.post("/forgot", user.forgotPassword);
 
-// * UPDATE
-router.post("/:id",
-  // passport.authenticate("jwt", { session: false }),
-  update)
+router.post("/reset", auth, user.resetPassword);
 
-// * DELETE
-router.delete(
-  "/:id",
-  // passport.authenticate("jwt", { session: false }),
-  deleteOne,
-)
+router.get("/infor", auth, user.getUserInfor);
 
+router.get("/all_infor", auth, authAdmin, user.getUsersAllInfor);
 
-module.exports = router
+router.get("/logout", user.logout);
+
+router.patch("/update", auth, user.updateUser);
+
+router.patch("/update_role/:id", auth, authAdmin, user.updateUsersRole);
+
+router.delete("/delete/:id", auth, authAdmin, user.deleteUser);
+
+// Social Login
+router.post("/google_login", user.googleLogin);
+
+router.post("/facebook_login", user.facebookLogin);
+
+module.exports = router;
