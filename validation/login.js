@@ -1,26 +1,25 @@
-const Validator = require('validator');
-import { EMAIL, USERNAME, PASSWORD } from "../helpers/errors"
-
+const Validator = require("validator");
+const { EMAIL, USERNAME, PASSWORD } = require("../helpers/errors");
 
 module.exports = function (data) {
-    let errors = {}
+  let errors = {};
 
-    if(Validator.isEmpty(data.email)){
-        errors.email = EMAIL.required
-    }
-    if(!Validator.isEmail(data.email)){
-        errors.email = EMAIL.invalid
-    }
+  if (Validator.isEmpty(data.email)) {
+    errors.email = EMAIL.required;
+  }
+  if (!Validator.isEmail(data.email)) {
+    errors.email = EMAIL.invalid;
+  }
 
-    if(Validator.isEmpty(data.password)){
-        errors.password = PASSWORD.required
-    }
-    if(!Validator.isLength(data.password, {min: 6, max: 30})){
-        errors.password = PASSWORD.criteria
-    }
+  if (Validator.isEmpty(data.password)) {
+    errors.password = PASSWORD.required;
+  }
+  if (!Validator.isLength(data.password, { min: 6, max: 30 })) {
+    errors.password = PASSWORD.criteria;
+  }
 
-    return {
-        errors,
-        isValid: Object.keys(errors).length === 0
-    }
+  return {
+    errors,
+    isValid: Object.keys(errors).length === 0,
+  };
 };

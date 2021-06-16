@@ -8,14 +8,14 @@ const itemRateSchema = new Schema({
     type: ObjectId,
     ref: "Item",
     required: true,
-    index:true
+    index: true
   },
-  
+
   rater: {
     type: ObjectId,
     ref: "User",
     required: true,
-    index:true
+    index: true
   },
   comment: {
     type: String,
@@ -29,6 +29,18 @@ const itemRateSchema = new Schema({
     max: 5,
   },
 }, { timestamps: true })
+
+
+var autoPopulateLead = function (next) {
+  this.populate('rater');
+  this.populate('item');
+  next();
+};
+
+itemRateSchema.
+  pre('findOne', autoPopulateLead).
+  pre('find', autoPopulateLead);
+
 
 itemRateSchema.index({ rater: 1, item: 1 }, { unique: true });
 

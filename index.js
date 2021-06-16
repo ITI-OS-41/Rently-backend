@@ -1,8 +1,10 @@
-const express = require("express");
-const dotenv = require("dotenv");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const passport = require("passport");
+/** @format */
+
+const express = require('express');
+const dotenv = require('dotenv');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const passport = require('passport');
 
 /*
  ** ROUTES
@@ -31,9 +33,9 @@ dotenv.config();
  ** MONGO DB CONNECT
  */
 mongoose.connect(process.env.MONGODB_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useCreateIndex: true,
+	useNewUrlParser: true,
+	useUnifiedTopology: true,
+	useCreateIndex: true,
 });
 
 /*
@@ -54,24 +56,24 @@ mongoose.connect(process.env.MONGODB_URL, {
 // });
 
 const app = express();
-app.use("/uploads", express.static("uploads"));
+app.use('/uploads', express.static('uploads'));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(
-  cors({
-    exposedHeaders: ["X-Total-Count", "Content-Range"],
-  })
+	cors({
+		exposedHeaders: ['X-Total-Count', 'Content-Range'],
+	})
 );
 
 app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
-  res.header("Access-Control-Expose-Headers", "X-Total-Count, Content-Range");
-  next();
+	res.header('Access-Control-Allow-Origin', '*');
+	res.header(
+		'Access-Control-Allow-Headers',
+		'Origin, X-Requested-With, Content-Type, Accept'
+	);
+	res.header('Access-Control-Expose-Headers', 'X-Total-Count, Content-Range');
+	next();
 });
 
 app.use(passport.initialize());
@@ -98,7 +100,7 @@ app.use("/api/message", message);
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server is up and running on port http://localhost:${PORT}/`);
+	console.log(`Server is up and running on port http://localhost:${PORT}/`);
 });
 
 // ! TODO:

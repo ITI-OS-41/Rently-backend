@@ -1,13 +1,13 @@
 /** @format */
 
-import {
+const {
   assignEmptyErrorsToFields,
   assignErrorsToMissingFields,
   getTwoArraysDifferences,
   missingFieldsChecker,
-} from "../helpers/errors";
-import Blog from "../models/Blog";
-import User from "../models/User";
+} = require("../helpers/errors");
+const Blog = require("../models/Blog");
+const User = require("../models/User");
 
 const Validator = require("validator");
 
@@ -26,7 +26,7 @@ module.exports = async (req, res, next) => {
 
   errors = {
     ...errors,
-    ...assignEmptyErrorsToFields(data, difference)
+    ...assignEmptyErrorsToFields(data, difference),
   };
 
   if (!errors["author"]) {

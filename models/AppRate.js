@@ -34,6 +34,18 @@ const appRateSchema = new Schema({
  
 }, { timestamps: true })
 
+
+var autoPopulateLead = function (next) {
+  this.populate('rater');
+  next();
+};
+
+appRateSchema.
+  pre('findOne', autoPopulateLead).
+  pre('find', autoPopulateLead);
+
+
+
 appRateSchema.index({ rater: 1, site: 1 }, { unique: true });
 
 module.exports = mongoose.model("AppRate", appRateSchema)

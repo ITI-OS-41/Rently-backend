@@ -62,7 +62,7 @@ userSchema.virtual('id').get(function () {
 });
 userSchema.virtual('name').get(function () {
 	if (this.firstname || this.lastname) {
-		return this.firstname || '' + ' ' + this.lastname || '';
+		return ((this.firstname || '') + ' ' + this.lastname);
 	}
 	return this.username;
 });

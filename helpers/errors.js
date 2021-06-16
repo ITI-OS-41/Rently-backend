@@ -116,7 +116,7 @@ const USERRATE = {
   badRequest: "I have made a bad request",
 };
 
-export {
+module.exports= {
   missingFieldsChecker,
   catchErrors,
   validateId,
@@ -135,5 +135,5 @@ export {
   QUESTION,
   ITEMRATE,
   APPRATE,
-  USERRATE,
+  USERRATE
 };

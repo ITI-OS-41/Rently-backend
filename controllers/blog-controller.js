@@ -1,10 +1,11 @@
 /** @format */
-import { validateId } from '../helpers/errors';
+const { validateId } = require('../helpers/errors');
 const mongoose = require('mongoose');
 const Blog = mongoose.model('Blog');
 const multer = require('multer');
 const jimp = require('jimp');
 const uuid = require('uuid');
+const validator = require('validator');
 
 const { BLOG_POST, SLUG } = require('../helpers/errors');
 
@@ -61,14 +62,33 @@ exports.getOne = async (req, res) => {
 };
 
 exports.getAll = async (req, res) => {
-	let { _id, slug } = req.query;
-	const queryObj = {
-		...(_id && { _id }),
-		...(slug && { slug }),
+	let filters = req.query;
+	const sortBy = req.query.sortBy || 'createdAt';
+	const orderBy = req.query.orderBy || 'asc';
+	const sortQuery = {
+		[sortBy]: orderBy,
 	};
-	await Blog.find(queryObj).then((objects) => {
-		res.status(200).send(objects);
+
+	const page = parseInt(req.query.page);
+	const limit = parseInt(req.query.limit);
+	const skip = page * limit - limit;
+
+	delete filters.page;
+	delete filters.limit;
+	delete filters.sortBy;
+	delete filters.orderBy;
+
+	const getPosts = await Blog.find().limit(limit).skip(skip).sort(sortQuery);
+
+	const filteredUsers = getPosts.filter((val) => {
+		let isValid = true;
+		for (key in filters) {
+			isValid = isValid && val[key] == filters[key];
+		}
+		return isValid;
 	});
+
+	res.status(200).send({ filteredUsers, getPosts });
 };
 
 exports.update = async (req, res) => {
@@ -78,13 +98,12 @@ exports.update = async (req, res) => {
 		useFindAndModify: false,
 	})
 		.then((response) => {
-			res.status(200).send(response)
+			res.status(200).send(response);
 		})
 		.catch((error) => {
-			console.log(error)
-			return res.status(500).send({ msg: error.message })
-		})
-
+			console.log(error);
+			return res.status(500).send({ msg: error.message });
+		});
 };
 
 exports.deleteOne = async (req, res) => {
@@ -129,6 +148,5 @@ exports.getByTag = async (req, res) => {
 	const postsPromise = Blog.find({ tags: tagQuery });
 	const [tags, posts] = await Promise.all([tagsPromise, postsPromise]);
 	console.log('tags ', tags);
-
 	res.status(200).send([tags, posts]);
 };

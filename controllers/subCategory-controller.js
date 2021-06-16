@@ -2,9 +2,9 @@ const SubCategory = require('../models/SubCategory');
 // * Create and Save a new Category
 exports.create = async (req, res) => {
 
-    const subCategory = await new SubCategory(req.body).save();
+	const subCategory = await new SubCategory(req.body).save();
 
-    res.status(201).send(subCategory);
+	res.status(201).send(subCategory);
 
 };
 
@@ -17,19 +17,20 @@ exports.getOne = (req, res) => {
 			if (subCategory) {
 				return res.json(subCategory);
 			} else {
-				return res.status(404).json({ msg: error  });
+				return res.status(404).json({ msg: error });
 			}
 		})
 		.catch((err) => {
-			return res.status(500).json({ msg: err});
+			return res.status(500).json({ msg: err });
 		});
 };
 
 //* Get ALL
 exports.getAll = async (req, res) => {
-	let { _id } = req.query;
+	let { _id, category } = req.query;
 	const queryObj = {
 		...(_id && { _id }),
+		...(category && { category }),
 	};
 	await SubCategory.find(queryObj).then((objects) => {
 		res.status(200).send(objects);
@@ -46,7 +47,7 @@ exports.update = async (req, res) => {
 			res.status(200).send(response);
 		})
 		.catch((error) => {
-			return res.status(500).send({message: error });
+			return res.status(500).send({ message: error });
 		});
 };
 
@@ -58,7 +59,7 @@ exports.deleteOne = async (req, res) => {
 					return res.status(200).send(subCategory);
 				});
 			} else {
-				return res.status(404).json({ msg:error });
+				return res.status(404).json({ msg: error });
 			}
 		})
 		.catch((error) => {
