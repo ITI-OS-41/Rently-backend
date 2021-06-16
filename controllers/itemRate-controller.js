@@ -44,7 +44,7 @@ exports.getAll = async (req, res) => {
 };
 
 exports.getOne = (req, res) => {
-  const Id = req.params.id;
+  const id = req.params.id;
   if (!ObjectId.isValid(id)) {
     return res.status(404).json({
       id: ID.invalid,

@@ -109,7 +109,7 @@ module.exports = async function (data) {
     errors.status = "status is required";
   }
 
-  if (data.status !== true && data.status !== false) {
+  if (data.status !== "true" && data.status !== "false") {
     errors.status = "item status should be a true false statement";
   }
 
