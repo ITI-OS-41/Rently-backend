@@ -9,17 +9,6 @@ const appRateSchema = new Schema({
     required: true,
     index:true
   },
-  
-  site: {
-    type: String,
-    enum: {
-      values: ["Rently"],
-      message: '{VALUE} is not supported',
-    },
-    default: "Rently",
-    required: true,
-    index:true
-  },
   comment: {
     type: String,
     required: true,
@@ -35,7 +24,17 @@ const appRateSchema = new Schema({
 }, { timestamps: true })
 
 
-var autoPopulateLead = function (next) {
+appRateSchema.statics.requiredFields = function () {
+	let arr = [];
+	for (let required in appRateSchema.obj) {
+		if (appRateSchema.obj[required].required && required !== 'rater') {
+			arr.push(required);
+		}
+	}
+	return arr;
+};
+
+let autoPopulateLead = function (next) {
   this.populate('rater');
   next();
 };
@@ -43,8 +42,6 @@ var autoPopulateLead = function (next) {
 appRateSchema.
   pre('findOne', autoPopulateLead).
   pre('find', autoPopulateLead);
-
-
 
 appRateSchema.index({ rater: 1, site: 1 }, { unique: true });
 

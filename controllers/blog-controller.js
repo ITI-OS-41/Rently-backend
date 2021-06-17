@@ -1,39 +1,32 @@
 /** @format */
-const { validateId } = require("../helpers/errors");
-const mongoose = require("mongoose");
-const Blog = mongoose.model("Blog");
-const validator = require("validator");
+const { validateId } = require('../helpers/errors');
+const mongoose = require('mongoose');
+const Blog = mongoose.model('Blog');
+const validator = require('validator');
 
-const { BLOG_POST, SLUG } = require("../helpers/errors");
+const { BLOG_POST, SLUG } = require('../helpers/errors');
 
 exports.create = async (req, res) => {
-  // req.body.author = req.user.id;
-
-  const newBlog = new Blog(req.body);
-
-  try {
-    const savedBlog = await newBlog.save();
-    res.status(200).json(savedBlog);
-  } catch (err) {
-    res.status(500).json(err);
-  }
+	req.body.author = req.user.id;
+	const blogPost = await new Blog(req.body).save();
+	res.status(200).send(blogPost);
 };
 
 exports.getOne = async (req, res) => {
-  const id = req.params.id;
-  validateId(id, res);
-  await Blog.findById(id)
-    .then((blogPost) => {
-      if (blogPost) {
-        return res.json(blogPost);
-      } else {
-        return res.status(404).json({ msg: BLOG_POST.notFound });
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-      return res.status(500).json({ msg: POST.invalidId });
-    });
+	const id = req.params.id;
+	validateId(id, res);
+	await Blog.findById(id)
+		.then((blogPost) => {
+			if (blogPost) {
+				return res.json(blogPost);
+			} else {
+				return res.status(404).json({ msg: BLOG_POST.notFound });
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+			return res.status(500).json({ msg: POST.invalidId });
+		});
 };
 
 exports.getAll = async (req, res) => {
@@ -61,38 +54,38 @@ exports.getAll = async (req, res) => {
 };
 
 exports.update = async (req, res) => {
-  await Blog.findOneAndUpdate({ _id: req.params.id }, req.body, {
-    new: true,
-    runValidators: true,
-    useFindAndModify: false,
-  })
-    .then((response) => {
-      res.status(200).send(response);
-    })
-    .catch((error) => {
-      console.log(error);
-      return res.status(500).send({ msg: error.message });
-    });
+	await Blog.findOneAndUpdate({ _id: req.params.id }, req.body, {
+		new: true,
+		runValidators: true,
+		useFindAndModify: false,
+	})
+		.then((response) => {
+			res.status(200).send(response);
+		})
+		.catch((error) => {
+			console.log(error);
+			return res.status(500).send({ msg: error.message });
+		});
 };
 
 exports.deleteOne = async (req, res) => {
-  const id = req.params.id;
-  validateId(id, res);
+	const id = req.params.id;
+	validateId(id, res);
 
-  Blog.findById(req.params.id)
-    .then((blogPost) => {
-      if (blogPost) {
-        blogPost.remove().then(() => {
-          return res.status(200).send(blogPost);
-        });
-      } else {
-        return res.status(404).json({ msg: BLOG_POST.notFound });
-      }
-    })
-    .catch((error) => {
-      console.log(error);
-      return res.status(500).send({ msg: BLOG_POST.invalidId });
-    });
+	Blog.findById(req.params.id)
+		.then((blogPost) => {
+			if (blogPost) {
+				blogPost.remove().then(() => {
+					return res.status(200).send(blogPost);
+				});
+			} else {
+				return res.status(404).json({ msg: BLOG_POST.notFound });
+			}
+		})
+		.catch((error) => {
+			console.log(error);
+			return res.status(500).send({ msg: BLOG_POST.invalidId });
+		});
 };
 
 // exports.getBySlug = async (req, res, next) => {
@@ -111,11 +104,11 @@ exports.deleteOne = async (req, res) => {
 // };
 
 exports.getByTag = async (req, res) => {
-  const tag = req.params.tag;
-  const tagQuery = tag || { $exists: true, $ne: [] };
-  const tagsPromise = Blog.getTagList();
-  const postsPromise = Blog.find({ tags: tagQuery });
-  const [tags, posts] = await Promise.all([tagsPromise, postsPromise]);
-  console.log("tags ", tags);
-  res.status(200).send([tags, posts]);
+	const tag = req.params.tag;
+	const tagQuery = tag || { $exists: true, $ne: [] };
+	const tagsPromise = Blog.getTagList();
+	const postsPromise = Blog.find({ tags: tagQuery });
+	const [tags, posts] = await Promise.all([tagsPromise, postsPromise]);
+	console.log('tags ', tags);
+	res.status(200).send([tags, posts]);
 };

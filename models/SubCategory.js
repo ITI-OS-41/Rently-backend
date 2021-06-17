@@ -1,52 +1,57 @@
-const mongoose = require("mongoose");
+/** @format */
+
+const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const ObjectId = require("mongoose").Types.ObjectId;
+const ObjectId = require('mongoose').Types.ObjectId;
 
 const subcategorySchema = new Schema(
-  {
-    name: {
-      type: String,
-      required: true,
-      index: true,
-    },
-    description: {
-      type: String,
-      required: true,
-    },
-    photo: String,
-    category: {
-      type: ObjectId,
-      ref: "Category",
-      required: true,
-      index: true,
-    },
-  },
-  { timestamps: true }
+	{
+		createdBy:{
+			type: ObjectId,
+			ref: "User",
+			required: "user is required",
+		},
+		name: {
+			type: String,
+			required: true,
+			index: true,
+		},
+		description: {
+			type: String,
+			required: true,
+		},
+		photo: String,
+		category: {
+			type: ObjectId,
+			ref: 'Category',
+			required: true,
+			index: true,
+		},
+	},
+	{ timestamps: true }
 );
 
-
-
-var autoPopulateLead = function (next) {
-  this.populate('category');
-  next();
+subcategorySchema.statics.requiredFields = function () {
+	let arr = [];
+	for (let required in subcategorySchema.obj) {
+		if (subcategorySchema.obj[required].required && required !== 'createdBy') {
+			arr.push(required);
+		}
+	}
+	return arr;
 };
 
-subcategorySchema.
-  pre('findOne', autoPopulateLead).
-  pre('find', autoPopulateLead);
+let autoPopulateLead = function (next) {
+	this.populate('category');
+	this.populate('createdBy');
+	next();
+};
 
-
-// Duplicate the ID field.
-subcategorySchema.virtual('id').get(function () {
-  return this._id.toHexString();
-});
-// Ensure virtual fields are serialised.
-subcategorySchema.set('toJSON', {
-  virtuals: true,
-});
-
+subcategorySchema
+	.pre('findOne', autoPopulateLead)
+	.pre('find', autoPopulateLead);
 
 
 subcategorySchema.index({ name: 1, category: 1 }, { unique: true });
 
-module.exports = mongoose.model("SubCategory", subcategorySchema);
+module.exports = mongoose.model('SubCategory', subcategorySchema);

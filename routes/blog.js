@@ -16,7 +16,7 @@ const {
 } = require("../controllers/blog-controller");
 // * create blog
 
-router.post("/", catchErrors(create));
+router.post("/", auth, validateBlog, catchErrors(create));
 // * GET ONE
 router.get("/:id", getOne);
 

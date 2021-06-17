@@ -1,44 +1,52 @@
-const mongoose = require("mongoose")
-const Schema = mongoose.Schema
+/** @format */
+
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 const { ObjectId } = mongoose.Schema.Types;
 
-const notificationSchema = new Schema({
-  receiver: {
-    type: ObjectId,
-    ref: "User",
-    required: true,
-  },
-  sender: {
-    type: ObjectId,
-    ref: "User",
-    required: true,
-  },
-  content: {
-    type: String,
-    required: true,
-    trim: true
-  }
-}, { timestamps: true })
+const notificationSchema = new Schema(
+	{
+		receiver: {
+			type: ObjectId,
+			ref: 'User',
+			required: true,
+		},
+		sender: {
+			type: ObjectId,
+			ref: 'User',
+			required: true,
+		},
+		content: {
+			type: String,
+			required: true,
+			trim: true,
+		},
+	},
+	{ timestamps: true }
+);
 
-
-var autoPopulateLead = function (next) {
-  this.populate('sender');
-  this.populate('receiver');
-  next();
+let autoPopulateLead = function (next) {
+	this.populate('sender');
+	this.populate('receiver');
+	next();
 };
 
-notificationSchema.
-  pre('findOne', autoPopulateLead).
-  pre('find', autoPopulateLead);
+notificationSchema.statics.requiredFields = function () {
+	let arr = [];
+	for (let required in notificationSchema.obj) {
+		if (
+			notificationSchema.obj[required].required 
+			// required !== 'sender' &&
+			// required !== 'receiver'
+		) {
+			arr.push(required);
+		}
+	}
+	return arr;
+};
 
-// Duplicate the ID field.
-notificationSchema.virtual('id').get(function () {
-  return this._id.toHexString();
-});
+notificationSchema
+	.pre('findOne', autoPopulateLead)
+	.pre('find', autoPopulateLead);
 
-// Ensure virtual fields are serialised.
-notificationSchema.set('toJSON', {
-  virtuals: true,
-});
-
-module.exports = mongoose.model("Notification", notificationSchema)
+module.exports = mongoose.model('Notification', notificationSchema);
