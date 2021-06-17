@@ -43,8 +43,10 @@ categorySchema.statics.requiredFields = function () {
 	return arr;
 };
 
+
 let autoPopulateLead = function (next) {
 	this.populate('createdBy');
+	this.populate('subCategory');
 	next();
 };
 

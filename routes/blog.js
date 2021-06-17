@@ -17,9 +17,9 @@ const {
 } = require("../controllers/blog-controller");
 // * create blog
 
-router.post("/", auth, validateBlog, catchErrors(create));
+router.post("/", validateBlog, catchErrors(create));
 // * GET ONE
-router.get("/:id", getOne);
+// router.get("/:id", getOne);
 
 // * GET ALL
 router.get("/", catchErrors(getAll));
@@ -34,6 +34,6 @@ router.delete("/:id", deleteOne);
 // router.get("/slug/:slug", getBySlug);
 
 // * Find by  tag
-// router.get('/tag', getByTag);
-// router.get('/tag/:tag', getByTag);
+router.get('/tag', getByTag);
+router.get('/tag/:tag', getByTag);
 module.exports = router;
