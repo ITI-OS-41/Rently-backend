@@ -8,6 +8,8 @@ const {
   update,
   deleteOne,
 } = require("../controllers/itemRate-controller")
+const { catchErrors } = require("../helpers/errors")
+const validateItemRate = require("../validation/itemRate");
 
 // * GET ALL
 router.get("/", getAll)
@@ -18,7 +20,7 @@ router.get("/:id", getOne)
 
 
 // * UPDATE
-router.post("/", create)
+router.post("/",validateItemRate,catchErrors(create))
 
 // * UPDATE
 router.post("/:id", update)

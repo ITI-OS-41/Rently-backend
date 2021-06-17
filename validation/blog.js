@@ -11,7 +11,6 @@ const validator = require("validator");
 module.exports = async (req, res, next) => {
   let errors = {};
   const data = req.body;
-  const id = req.params.id;
   const requiredFields = Blog.requiredFields();
   const requestBody = Object.keys(data);
 

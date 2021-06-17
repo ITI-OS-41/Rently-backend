@@ -1,62 +1,34 @@
-const Validator = require("validator");
-const User = require("../models/User");
-const Item = require("../models/Item");
-const ItemRate = require("../models/ItemRate");
+/** @format */
 
-module.exports = async function (data) {
+const {
+  assignEmptyErrorsToFields,
+  assignErrorsToMissingFields,
+  getTwoArraysDifferences,
+  missingFieldsChecker,
+} = require("../helpers/errors");
+
+const itemRate = require("../models/ItemRate");
+module.exports = async (req, res, next) => {
   let errors = {};
+  const data = req.body;
+  const requiredFields = itemRate.requiredFields();
+  const requestBody = Object.keys(data);
 
-  if (Validator.isEmpty(data.rater)) {
-    errors.rater = "rater is required";
-  }
+  let missingFields = missingFieldsChecker(requestBody, requiredFields);
 
-  // refactor, usercheck middleware
+  errors = assignErrorsToMissingFields(missingFields);
 
-  if (!Validator.isMongoId(data.rater)) {
-    errors.rater = "this is not valid user id";
-  } else {
-    const rater = await User.findById(data.rater);
-    if (!rater) {
-      errors.rater = "this rater is not found in our database ";
-    }
-  }
+  let difference = getTwoArraysDifferences(requiredFields, missingFields);
 
-  if (Validator.isEmpty(data.item)) {
-    errors.item = "item is required";
-  }
-
-  if (!Validator.isMongoId(data.item)) {
-    errors.item = "this is not valid item id";
-  } else {
-    const item = await Item.findById(data.item);
-    if (!item) {
-      errors.item = "this item is not found in our database ";
-    }
-  }
-
-  const duplicationCheck = await ItemRate.find({
-    item: data.item,
-    rater: data.rater,
-  });
-  if (duplicationCheck.length) {
-    errors.duplication =
-      "you can't rate the same item more than one time, please update your review instead";
-  }
-
-  if (Validator.isEmpty(data.rating)) {
-    errors.rating = "rating is required";
-  }
-
-  if (data.rating > 5 || data.rating < 1) {
-    errors.rating = "rating  must be between 1 to 5";
-  }
-
-  if (Validator.isEmpty(data.comment)) {
-    errors.comment = "comment is required";
-  }
-
-  return {
-    errors,
-    isValid: Object.keys(errors).length === 0,
+  errors = {
+    ...errors,
+    ...assignEmptyErrorsToFields(data, difference),
   };
+
+  if (Object.keys(errors).length > 0) {
+    // console.log(data, errors);
+    return res.status(404).json(errors);
+  } else {
+    return next();
+  }
 };

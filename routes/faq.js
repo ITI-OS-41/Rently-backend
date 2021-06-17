@@ -2,7 +2,8 @@
 
 const router = require('express').Router();
 const FAQ = require('../models/FAQ');
-
+const validateFAQ = require('../validation/faq');
+const { catchErrors } = require('../helpers/errors');
 // Import controllers
 const {
 	create,
@@ -13,7 +14,7 @@ const {
 } = require('../controllers/faq-controller');
 // * create blog
 
-router.post('/', create);
+router.post('/', validateFAQ, catchErrors(create));
 // * GET ONE
 router.get('/:id', getOne);
 
