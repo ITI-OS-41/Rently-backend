@@ -6,33 +6,33 @@ const rentSchema = new Schema({
   owner: {
     type: ObjectId,
     ref: "User",
-    required: true,
+    required: [true, "owner is required"],
   },
   renter: {
     type: ObjectId,
     ref: "User",
-    required: true,
+    required: [true, "renter is required"],
   },
   item: {
     type: ObjectId,
     ref: "Item",
-    required: true,
+    required: [true,"item is required"],
   },
   from: {
     type: Date,
-    required: true,
+    required: [true, "start date is required"],
   },
   to: {
     type: Date,
-    required: true,
+    required: [true, "end date is required"],
   },
   insurance: {
     type: Number,
-    required: true
+    required: [true, "insurance is required"]
   },
   price: {
     type: Number,
-    required: true
+    required: [true, "rent price is required"]
   },
   status: {
     type: String,
@@ -45,17 +45,23 @@ const rentSchema = new Schema({
 
 }, { timestamps: true })
 
+rentSchema.statics.requiredFields = function () {
+  let arr = [];
+  for (let required in rentSchema.obj) {
+    if (rentSchema.obj[required].required && required !== "renter") {
+      arr.push(required);
+    }
+  }
+  return arr;
+};
 
-// Duplicate the ID field.
-rentSchema.virtual('id').get(function(){
-  return this._id.toHexString();
-});
+let autoPopulateLead = function (next) {
+  this.populate("renter");
+  this.populate("owner");
+  this.populate("item");
+  next();
+};
 
-// Ensure virtual fields are serialised.
-rentSchema.set('toJSON', {
-  virtuals: true,
-
-});
-
+rentSchema.pre("findOne", autoPopulateLead).pre("find", autoPopulateLead);
 
 module.exports = mongoose.model("Rent", rentSchema)

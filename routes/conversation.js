@@ -4,9 +4,9 @@ const Conversation = require("../models/Conversation");
 //new conv
 
 router.post("/", async (req, res) => {
-  const newConversation = new Conversation({
-    members: [req.body.senderId, req.body.receiverId],
-  });
+  Conversation.requiredFields();
+ 
+  const newConversation = new Conversation(req.body);
 
   try {
     const savedConversation = await newConversation.save();

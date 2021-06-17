@@ -74,7 +74,7 @@ const itemSchema = new Schema(
     cancellation: {
       type: String,
       enum: {
-        values: ["Easygoing", "Reasonable", "Strict"],
+        values: ["easygoing", "reasonable", "strict"],
         message: "{VALUE} is not supported",
       },
       default: "Reasonable",
@@ -104,9 +104,18 @@ const itemSchema = new Schema(
   { timestamps: true }
 );
 
+itemSchema.statics.requiredFields = function () {
+  let arr = [];
+  for (let required in itemSchema.obj) {
+    if (itemSchema.obj[required].required && required!== "owner") {
+      arr.push(required);
+      console.log({ required });
+    }
+  }
+  return arr;
+};
 
-
-var autoPopulateLead = function (next) {
+let autoPopulateLead = function (next) {
   this.populate('owner');
   this.populate('category');
   this.populate('subcategory');
