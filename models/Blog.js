@@ -9,33 +9,31 @@ const blogSchema = new mongoose.Schema(
     author: {
       type: ObjectId,
       ref: "User",
-      required: "author is required",
+      required: [true, "author is required"],
     },
     title: {
       type: String,
       trim: true,
-      required: "title is required",
-	  minlength:4
+      required: [true, "title is required"],
+      minlength: [4, "title is really short, needed to be 4, got {VALUE}"],
     },
     slug: String,
     description: {
       type: String,
       trim: true,
-      required: true,
+      required: [true, "description is required"],
     },
     tags: [String],
 
     photo: {
       type: String,
-      required: true
+      required: [true, "photo is required"],
     },
   },
   { timestamps: true }
 );
 
 // loop over el required fields and return an array
-
-
 
 blogSchema.pre("save", async function (next) {
   if (!this.isModified("title")) {
@@ -53,7 +51,6 @@ blogSchema.pre("save", async function (next) {
   // TODO make more resiliant so slugs are unique
 });
 
-
 blogSchema.statics.requiredFields = function () {
   let arr = [];
   for (let required in blogSchema.obj) {
@@ -64,15 +61,12 @@ blogSchema.statics.requiredFields = function () {
   return arr;
 };
 
-var autoPopulateLead = function (next) {
+let autoPopulateLead = function (next) {
   this.populate("author");
   next();
 };
 
-blogSchema
-.pre("findOne", autoPopulateLead)
-.pre("find", autoPopulateLead);
-
+blogSchema.pre("findOne", autoPopulateLead).pre("find", autoPopulateLead);
 
 blogSchema.statics.getTagList = function () {
   return this.aggregate([

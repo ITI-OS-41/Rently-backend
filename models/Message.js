@@ -6,19 +6,37 @@ const messageSchema = new mongoose.Schema(
     conversationId: {
       type: ObjectId,
       ref: "Conversation",
-      required: true,
+      required: [true, "conversation id is required"],
     },
     sender: {
       type: ObjectId,
       ref: "User",
-      required: true,
+      required: [true, "sender is required"],
     },
     text: {
       type: String,
-      required: true,
+      required: [true, "message content is required"],
     },
   },
   { timestamps: true }
 );
+
+messageSchema.statics.requiredFields = function () {
+  let arr = [];
+  for (let required in messageSchema.obj) {
+    if (messageSchema.obj[required].required && required !== "sender") {
+      arr.push(required);
+    }
+  }
+  return arr;
+};
+
+let autoPopulateLead = function (next) {
+  this.populate("conversationId");
+  this.populate("sender");
+  next();
+};
+
+messageSchema.pre("findOne", autoPopulateLead).pre("find", autoPopulateLead);
 
 module.exports = mongoose.model("Message", messageSchema);

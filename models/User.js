@@ -2,6 +2,7 @@
 
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const Rent = require("./Rent");
 
 const userSchema = new Schema(
   {
@@ -9,23 +10,23 @@ const userSchema = new Schema(
       type: String,
       enum: {
         values: ["user", "admin"],
+        message: "{VALUE} is not supported",
       },
       default: "user",
     },
     photo: {
-      data: Buffer,
       type: String,
-      // required: true
+      required: true,
     },
     firstname: {
       type: String,
       trim: true,
-      // required: true,
+      required: true,
     },
     lastname: {
       type: String,
       trim: true,
-      // required: true,
+      required: true,
     },
     email: {
       type: String,
@@ -37,8 +38,8 @@ const userSchema = new Schema(
     username: {
       type: String,
       trim: true,
-      // required: true,
-      // unique: true,
+      required: true,
+      unique: true,
     },
     password: {
       type: String,
@@ -46,6 +47,10 @@ const userSchema = new Schema(
     },
     referralCode: {
       type: String,
+    },
+    dateOfBirth: {
+      type: Date,
+      required: [true, "date of birth is required"],
     },
     isVerified: {
       type: Boolean,
@@ -56,10 +61,6 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
-// Duplicate the ID field.
-userSchema.virtual("id").get(function () {
-  return this._id.toHexString();
-});
 userSchema.virtual("name").get(function () {
   if (this.firstname || this.lastname) {
     return (this.firstname || "") + " " + this.lastname;
@@ -71,5 +72,11 @@ userSchema.virtual("name").get(function () {
 userSchema.set("toJSON", {
   virtuals: true,
 });
+if (Rent.status==="returned"){
+  userSchema.pre("remove", function (next) {
+    Category.deleteMany({ createdBy: this._id }).exec();
 
+    next();
+  });
+};
 module.exports = mongoose.model("User", userSchema);

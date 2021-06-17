@@ -8,7 +8,6 @@ const validateBlog = require("../validation/blog");
 // Import controllers
 const {
   create,
-  upload,
   getAll,
   getOne,
   update,
@@ -17,7 +16,7 @@ const {
 } = require("../controllers/blog-controller");
 // * create blog
 
-router.post("/", auth, validateBlog, catchErrors(create));
+router.post("/", catchErrors(create));
 // * GET ONE
 router.get("/:id", getOne);
 

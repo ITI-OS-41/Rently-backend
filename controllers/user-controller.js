@@ -101,7 +101,6 @@ const user = {
   getAccessToken: (req, res) => {
     try {
       const { rf_token } = req.body;
-      console.log({user})
       if (!rf_token) return res.status(400).json({ msg: "Please login now!" });
 
       jwt.verify(rf_token, process.env.REFRESH_TOKEN_SECRET, (err, user) => {

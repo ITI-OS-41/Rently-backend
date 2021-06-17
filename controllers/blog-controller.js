@@ -7,10 +7,16 @@ const validator = require("validator");
 const { BLOG_POST, SLUG } = require("../helpers/errors");
 
 exports.create = async (req, res) => {
-  req.body.author = req.user.id;
+  // req.body.author = req.user.id;
 
-  const blogPost = await new Blog(req.body).save();
-  res.status(200).send(blogPost);
+  const newBlog = new Blog(req.body);
+
+  try {
+    const savedBlog = await newBlog.save();
+    res.status(200).json(savedBlog);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 };
 
 exports.getOne = async (req, res) => {
@@ -31,7 +37,13 @@ exports.getOne = async (req, res) => {
 };
 
 exports.getAll = async (req, res) => {
-  let filters = req.query;
+  let { _id, title, slug, tags } = req.query;
+  const queryObj = {
+    ...(_id && { _id }),
+    ...(title && { title: new RegExp(`${title}`) }),
+    ...(slug && { slug }),
+    ...(tags && { tags: new RegExp(tags.replace(/,/g, "|")) }),
+  };
   const sortBy = req.query.sortBy || "createdAt";
   const orderBy = req.query.orderBy || "asc";
   const sortQuery = {
@@ -40,23 +52,12 @@ exports.getAll = async (req, res) => {
   const page = parseInt(req.query.page);
   const limit = parseInt(req.query.limit);
   const skip = page * limit - limit;
+  const getPosts = await Blog.find(queryObj)
+    .limit(limit)
+    .skip(skip)
+    .sort(sortQuery);
 
-  delete filters.page;
-  delete filters.limit;
-  delete filters.sortBy;
-  delete filters.orderBy;
-
-  const getPosts = await Blog.find().limit(limit).skip(skip).sort(sortQuery);
-
-  const filteredUsers = getPosts.filter((val) => {
-    let isValid = true;
-    for (key in filters) {
-      isValid = isValid && val[key] == filters[key];
-    }
-    return isValid;
-  });
-
-  res.status(200).send({ filteredUsers, getPosts });
+  res.status(200).send({ getPosts });
 };
 
 exports.update = async (req, res) => {
