@@ -24,12 +24,12 @@ const itemSchema = new Schema(
     },
     status: {
       type: Boolean,
-      required: true,
+      // required: true,
     },
     subcategory: {
       type: ObjectId,
       ref: "SubCategory",
-      required: true,
+      // required: true,
     },
     name: {
       type: String,
@@ -42,11 +42,11 @@ const itemSchema = new Schema(
     },
     description: {
       type: String,
-      required: true,
+      // required: true,
     },
     photo: {
       type: String,
-      required: true,
+      // required: true,
     },
     instructionalVideo: {
       type: String,
@@ -63,12 +63,12 @@ const itemSchema = new Schema(
       coordinates: [
         {
           type: Number,
-          required: [true, "You must supply coordinates!"],
+          // required: [true, "You must supply coordinates!"],
         },
       ],
       address: {
         type: String,
-        required: [true, "You must supply an address!"],
+        // required: [true, "You must supply an address!"],
       },
     },
     cancellation: {
@@ -77,7 +77,7 @@ const itemSchema = new Schema(
         values: ["easygoing", "reasonable", "strict"],
         message: "{VALUE} is not supported",
       },
-      default: "Reasonable",
+      default: "reasonable",
     },
     price: {
       hour: {
@@ -95,7 +95,7 @@ const itemSchema = new Schema(
     },
     deliverable: {
       type: Boolean,
-      required: true,
+      // required: true,
     },
     deposit: {
       type: Number,

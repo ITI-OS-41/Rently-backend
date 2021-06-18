@@ -43,7 +43,7 @@ exports.getOne = (req, res) => {
     })
   }
 
-  Item.findById(id)
+  Item.findOne({_id:id}).populate('itemRate')
     .then((item) => {
       if (item) {
         return res.json(item)
@@ -58,11 +58,14 @@ exports.getOne = (req, res) => {
 }
 
 exports.create = async (req, res) => {
-  const { isValid, errors } =  await validateItem(req.body)
+  req.body.owner = req.user.id;
+  console.log(req.user.id)
 
-  if (!isValid) {
-    return res.status(404).json(errors)
-  }
+  // const { isValid, errors } =  await validateItem(req.body)
+
+  // if (!isValid) {
+  //   return res.status(404).json(errors)
+  // }
 
 
   const item = new Item({
@@ -72,7 +75,7 @@ exports.create = async (req, res) => {
   await item
     .save()
     .then((result) => {
-      res.json({ item })
+      res.json({ result })
     })
     .catch((err) => {
       return res.status(500).send({ msg: err.message })

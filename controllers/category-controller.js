@@ -1,18 +1,19 @@
-const Category = require('../models/Category');
+const { validateId } = require("../helpers/errors");
+const mongoose = require("mongoose");
+const Category = mongoose.model("Category");
+
 // * Create and Save a new Category
 exports.create = async (req, res) => {
-
+	req.body.createdBy = req.user.id;
     const category = await new Category(req.body).save();
-
     res.status(201).send(category);
-
 };
-
 
 //* Get One
 exports.getOne = (req, res) => {
-	const Id = req.params.id;
-	Category.findOne({ _id: req.params.id })
+	const id = req.params.id;
+	if (!validateId(id, res)) {
+	Category.findById(id)
 		.then((category) => {
 			if (category) {
 				return res.json(category);
@@ -20,9 +21,7 @@ exports.getOne = (req, res) => {
 				return res.status(404).json({ msg: error  });
 			}
 		})
-		.catch((err) => {
-			return res.status(500).json({ msg: err});
-		});
+	}
 };
 
 //* Get ALL
@@ -39,19 +38,16 @@ exports.getAll = async (req, res) => {
 exports.update = async (req, res) => {
 	await Category.findOneAndUpdate({ _id: req.params.id }, req.body, {
 		new: true,
-		runValidators: true,
-		useFindAndModify: false,
 	})
 		.then((response) => {
 			res.status(200).send(response);
 		})
-		.catch((error) => {
-			return res.status(500).send({message: error });
-		});
 };
 
 exports.deleteOne = async (req, res) => {
-	Category.findById(req.params.id)
+	const id = req.params.id;
+	if (!validateId(id, res)) {
+	Category.findById(id)
 		.then((category) => {
 			if (category) {
 				category.remove().then(() => {
@@ -61,9 +57,6 @@ exports.deleteOne = async (req, res) => {
 				return res.status(404).json({ msg:error });
 			}
 		})
-		.catch((error) => {
-	
-			return res.status(500).send({ msg: error });
-		});
+	}
 };
 

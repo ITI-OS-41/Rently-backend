@@ -8,7 +8,6 @@ exports.create = async (req, res) => {
 
 };
 
-
 //* Get One
 exports.getOne = (req, res) => {
 	const Id = req.params.id;

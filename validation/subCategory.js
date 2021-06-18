@@ -7,11 +7,11 @@ const {
   missingFieldsChecker,
 } = require("../helpers/errors");
 
-const userRate = require("../models/UserRate");
+const SubCategory = require("../models/SubCategory");
 module.exports = async (req, res, next) => {
   let errors = {};
   const data = req.body;
-  const requiredFields = userRate.requiredFields();
+  const requiredFields = SubCategory.requiredFields();
   const requestBody = Object.keys(data);
 
   let missingFields = missingFieldsChecker(requestBody, requiredFields);

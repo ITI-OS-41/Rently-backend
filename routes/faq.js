@@ -22,7 +22,7 @@ router.get('/:id', getOne);
 router.get('/', getAll);
 
 // * UPDATE
-router.post('/:id', update);
+router.post('/:id', validateFAQ, catchErrors(update));
 
 // * DELETE
 router.delete('/:id', deleteOne);

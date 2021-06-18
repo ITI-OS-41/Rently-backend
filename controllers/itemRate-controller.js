@@ -3,30 +3,13 @@ const { ITEMRATE, ID } = require("../helpers/errors");
 const ObjectId = require("mongoose").Types.ObjectId;
 
 const validateItemRate = require("../validation/itemRate");
+const itemRate = require("../validation/itemRate");
 
 exports.create = async (req, res) => {
-  const { isValid, errors } = await validateItemRate(req.body);
-
-  //   ItemRate.collection.getIndexes({key: rater_1_item_1}).then(indexes => {
-  //     console.log("indexes:", indexes);
-  // }).catch(console.error);
-
-  if (!isValid) {
-    return res.status(404).json(errors);
-  }
-
-  const itemRate = new ItemRate({
-    ...req.body,
-  });
-
-  await itemRate
-    .save()
-    .then((itemRate) => {
-      res.json({ itemRate });
-    })
-    .catch((err) => {
-      return res.status(500).send({ msg: ITEMRATE.badRequest });
-    });
+  // req.body.author = req.user.id;
+  // req.body.item = req.params.id;
+	const itemRate = await new ItemRate(req.body).save();
+	res.status(200).send(itemRate);
 };
 
 exports.getAll = async (req, res) => {
