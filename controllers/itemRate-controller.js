@@ -6,8 +6,9 @@ const validateItemRate = require("../validation/itemRate");
 const itemRate = require("../validation/itemRate");
 
 exports.create = async (req, res) => {
-  // req.body.author = req.user.id;
-  // req.body.item = req.params.id;
+  req.body.rater = req.user.id;
+  req.body.item = req.params.id;
+  console.log(req.params)
 	const itemRate = await new ItemRate(req.body).save();
 	res.status(200).send(itemRate);
 };

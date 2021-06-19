@@ -16,7 +16,7 @@ const auth = require("../middleware/auth");
 
 
 // * CREATE
-router.post("/", auth, validateItemRate, catchErrors(create));
+router.post("/:id", auth, catchErrors(create));
 
 // * GET ALL
 router.get("/", getAll);
@@ -25,7 +25,7 @@ router.get("/", getAll);
 router.get("/:id", getOne);
 
 // * UPDATE
-router.post("/:id", validateItemRate, catchErrors(update));
+// router.post("/:id", validateItemRate, catchErrors(update));
 
 // * DELETE
 router.delete("/:id", deleteOne);
