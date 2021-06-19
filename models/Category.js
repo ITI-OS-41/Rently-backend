@@ -20,5 +20,8 @@ const categorySchema = new Schema(
   },
   { timestamps: true }
 );
-
+categorySchema.pre("remove", function (next) {
+  SubCategory.deleteMany({ category: this._id }).exec();
+  next();
+});
 module.exports = mongoose.model("Category", categorySchema);
