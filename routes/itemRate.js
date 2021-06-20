@@ -1,7 +1,6 @@
 /** @format */
 
 const router = require("express").Router();
-
 // Import controllers
 const {
 	getOne,
@@ -27,6 +26,6 @@ router.get("/:id", catchErrors(getOne));
 router.post("/:id", validateItemRate, catchErrors(update));
 
 // * DELETE
-router.delete("/:id", catchError(deleteOne));
+router.delete("/:id", catchErrors(deleteOne));
 
 module.exports = router;

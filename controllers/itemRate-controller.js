@@ -1,17 +1,22 @@
 /** @format */
 const { validateId } = require("../helpers/errors");
 const mongoose = require("mongoose");
-const ItemRate = mongoose.model("ItemRate");
+const ItemRate = require("../models/ItemRate");
+const Item = require("../models/Item");
 
 exports.create = async (req, res) => {
 	req.body.rater = req.user.id;
 	req.body.item = req.params.id;
 	console.log(req.params);
 	const itemRate = await new ItemRate(req.body).save();
+	await Item.updateMany(
+		{ _id: itemRate.item },
+		{ $push: { itemRate: itemRate._id } }
+	);
 	res.status(200).send(itemRate);
 };
 
-exports.getOne = (req, res) => {
+exports.getOne = async (req, res) => {
 	const id = req.params.id;
 	if (!validateId(id, res)) {
 		await ItemRate.findById(id).then((itemRate) => {
@@ -25,17 +30,26 @@ exports.getOne = (req, res) => {
 };
 
 exports.getAll = async (req, res) => {
-	let { _id, item, rater, rating } = req.query;
-	const queryObj = {
-		...(_id && { _id }),
-		...(item && { item }),
-		...(rater && { rater }),
-		...(rating && { rating }),
+	const sortBy = req.query.sortBy || "createdAt";
+	const orderBy = req.query.orderBy || "asc";
+	const sortQuery = {
+		[sortBy]: orderBy,
 	};
 
-	await ItemRate.find(queryObj).then((objects) => {
-		res.status(200).send(objects);
-	});
+	const page = parseInt(req.query.page);
+	const limit = parseInt(req.query.limit);
+	const skip = page * limit - limit;
+	let { rating } = req.query;
+	const queryObj = {
+		...(rating && { rating }),
+	};
+	await ItemRate.find(queryObj)
+		.limit(limit)
+		.skip(skip)
+		.sort(sortQuery)
+		.then((objects) => {
+			res.status(200).send(objects);
+		});
 };
 
 exports.update = async (req, res) => {

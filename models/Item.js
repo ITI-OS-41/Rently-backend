@@ -3,7 +3,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const { ObjectId } = mongoose.Schema.Types;
-
 const itemSchema = new Schema(
 	{
 		owner: {
@@ -102,12 +101,13 @@ const itemSchema = new Schema(
 		deposit: {
 			type: Number,
 		},
+		itemRate: [{ type: ObjectId, ref: "ItemRate" }],
 	},
-	{ timestamps: true },
-	{
-		toJSON: { virtuals: true },
-		toObject: { virtuals: true },
-	}
+	{ timestamps: true }
+	// {
+	// 	toJSON: { virtuals: true },
+	// 	toObject: { virtuals: true },
+	// }
 );
 
 itemSchema.statics.requiredFields = function () {
@@ -120,16 +120,11 @@ itemSchema.statics.requiredFields = function () {
 	}
 	return arr;
 };
-itemSchema.virtual("itemRate", {
-	ref: "Item",
-	localField: "_id",
-	foreignField: "item",
-});
 
 let autoPopulateLead = function (next) {
 	this.populate("owner");
-	// this.populate("category");
-	// this.populate("subcategory");
+	this.populate("category");
+	this.populate("subcategory");
 	this.populate("itemRate");
 	next();
 };

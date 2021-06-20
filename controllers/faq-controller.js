@@ -8,7 +8,7 @@ exports.create = async (req, res) => {
 	res.status(200).send(question);
 };
 
-exports.getOne = (req, res) => {
+exports.getOne = async (req, res) => {
 	const id = req.params.id;
 	if (!validateId(id, res)) {
 		await FAQ.findById(id).then((faq) => {
@@ -22,15 +22,25 @@ exports.getOne = (req, res) => {
 };
 
 exports.getAll = async (req, res) => {
-	let { _id, slug } = req.query;
-	console.log(req.query);
-	const queryObj = {
-		...(_id && { _id }),
-		...(slug && { slug }),
+	const sortBy = req.query.sortBy || "createdAt";
+	const orderBy = req.query.orderBy || "asc";
+	const sortQuery = {
+		[sortBy]: orderBy,
 	};
-	await FAQ.find(queryObj).then((objects) => {
-		res.status(200).send(objects);
-	});
+
+	const page = parseInt(req.query.page);
+	const limit = parseInt(req.query.limit);
+	const skip = page * limit - limit;
+
+	let { title } = req.query;
+	const queryObj = {
+		...(title && { title: new RegExp(`${title}`) }),
+	};
+	const getFAQ = await FAQ.find(queryObj)
+		.limit(limit)
+		.skip(skip)
+		.sort(sortQuery);
+	res.status(200).send(getFAQ);
 };
 
 exports.update = async (req, res) => {

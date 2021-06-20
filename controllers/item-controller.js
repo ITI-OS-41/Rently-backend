@@ -47,28 +47,18 @@ exports.getAll = async (req, res) => {
 };
 
 exports.getOne = async (req, res) => {
-	const id = req.params.id;
-
-	if (!ObjectId.isValid(id)) {
-		return res.status(404).json({
-			id: ID.invalid,
-		});
-	}
-	const tour = await Item.findById(req.params.id).populate("rater itemRate");
-	res.status(200).send(tour);
-	// await Item.findOne({ _id: id })
-	// 	.populate("itemRate")
-	// 	.then((item) => {
-	// 		if (item) {
-	// 			return res.json(item);
-	// 		} else {
-	// 			return res.status(404).json({ msg: Item.notFound });
-	// 		}
-	// 	})
-	// .catch((err) => {
-	// 	console.log({ err });
-	// 	return res.status(500).json({ msg: ID.invalid });
-	// });
+	await Item.findOne({ _id: id })
+		.then((item) => {
+			if (item) {
+				return res.json(item);
+			} else {
+				return res.status(404).json({ msg: Item.notFound });
+			}
+		})
+	.catch((err) => {
+		console.log({ err });
+		return res.status(500).json({ msg: ID.invalid });
+	});
 };
 
 exports.create = async (req, res) => {

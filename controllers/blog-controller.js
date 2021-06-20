@@ -32,10 +32,9 @@ exports.getAll = async (req, res) => {
 	const page = parseInt(req.query.page);
 	const limit = parseInt(req.query.limit);
 	const skip = page * limit - limit;
-	let { _id, title, slug, tags } = req.query;
+	let {title, slug, tags } = req.query;
 
 	const queryObj = {
-		...(_id && { _id }),
 		...(title && { title: new RegExp(`${title}`) }),
 		...(slug && { slug }),
 		...(tags && { tags: new RegExp(tags.replace(/,/g, "|")) }),
