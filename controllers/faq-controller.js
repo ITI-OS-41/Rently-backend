@@ -1,29 +1,24 @@
 /** @format */
-
-const mongoose = require('mongoose');
-const { QUESTION  } = require('../helpers/errors');
-const FAQ = require('../models/FAQ');
+const { validateId } = require("../helpers/errors");
+const mongoose = require("mongoose");
+const FAQ = mongoose.model("FAQ");
 
 exports.create = async (req, res) => {
 	const question = await new FAQ(req.body).save();
-	console.log(question);
 	res.status(200).send(question);
 };
 
 exports.getOne = (req, res) => {
-	const Id = req.params.id;
-	FAQ.findOne({ _id: req.params.id })
-		.then((question) => {
-			if (question) {
-				return res.json(question);
+	const id = req.params.id;
+	if (!validateId(id, res)) {
+		await FAQ.findById(id).then((faq) => {
+			if (faq) {
+				return res.json(faq);
 			} else {
-				return res.status(404).json({ msg: QUESTION.notFound });
+				return res.status(404).json({ msg: "question not found" });
 			}
-		})
-		.catch((err) => {
-			console.log(err);
-			return res.status(500).json({ msg: QUESTION.invalidId });
 		});
+	}
 };
 
 exports.getAll = async (req, res) => {
@@ -41,31 +36,22 @@ exports.getAll = async (req, res) => {
 exports.update = async (req, res) => {
 	await FAQ.findOneAndUpdate({ _id: req.params.id }, req.body, {
 		new: true,
-		runValidators: true,
-		useFindAndModify: false,
-	})
-		.then((response) => {
-			res.status(200).send(response);
-		})
-		.catch((error) => {
-			console.log(error);
-			return res.status(500).send({ msg: QUESTION.invalidId });
-		});
+	}).then((response) => {
+		res.status(200).send(response);
+	});
 };
 
 exports.deleteOne = async (req, res) => {
-	FAQ.findById(req.params.id)
-		.then((question) => {
+	const id = req.params.id;
+	if (!validateId(id, res)) {
+		Blog.findById(req.params.id).then((question) => {
 			if (question) {
 				question.remove().then(() => {
 					return res.status(200).send(question);
 				});
 			} else {
-				return res.status(404).json({ msg: QUESTION.notFound });
+				return res.status(404).json({ msg: "post not found" });
 			}
-		})
-		.catch((error) => {
-			console.log(error);
-			return res.status(500).send({ msg: QUESTION.invalidId });
 		});
+	}
 };

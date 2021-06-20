@@ -10,7 +10,6 @@ const {
 	getOne,
 	update,
 	deleteOne,
-	getByTag,
 } = require("../controllers/blog-controller");
 // * create blog
 

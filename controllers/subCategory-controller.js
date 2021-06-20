@@ -1,27 +1,24 @@
-const SubCategory = require('../models/SubCategory');
+/** @format */
+
+const SubCategory = require("../models/SubCategory");
 // * Create and Save a new Category
 exports.create = async (req, res) => {
-
 	const subCategory = await new SubCategory(req.body).save();
-
-	res.status(201).send(subCategory);
-
+	res.status(200).send(subCategory);
 };
 
 //* Get One
 exports.getOne = (req, res) => {
-	const Id = req.params.id;
-	SubCategory.findOne({ _id: req.params.id })
-		.then((subCategory) => {
+	const id = req.params.id;
+	if (!validateId(id, res)) {
+		await SubCategory.findById(id).then((subCategory) => {
 			if (subCategory) {
 				return res.json(subCategory);
 			} else {
-				return res.status(404).json({ msg: error });
+				return res.status(404).json({ msg: "post not found" });
 			}
-		})
-		.catch((err) => {
-			return res.status(500).json({ msg: err });
 		});
+	}
 };
 
 //* Get ALL
@@ -39,31 +36,22 @@ exports.getAll = async (req, res) => {
 exports.update = async (req, res) => {
 	await SubCategory.findOneAndUpdate({ _id: req.params.id }, req.body, {
 		new: true,
-		runValidators: true,
-		useFindAndModify: false,
-	})
-		.then((response) => {
-			res.status(200).send(response);
-		})
-		.catch((error) => {
-			return res.status(500).send({ message: error });
-		});
+	}).then((response) => {
+		res.status(200).send(response);
+	});
 };
 
 exports.deleteOne = async (req, res) => {
-	SubCategory.findById(req.params.id)
-		.then((subCategory) => {
+	const id = req.params.id;
+	if (!validateId(id, res)) {
+		SubCategory.findById(req.params.id).then((subCategory) => {
 			if (subCategory) {
 				subCategory.remove().then(() => {
 					return res.status(200).send(subCategory);
 				});
 			} else {
-				return res.status(404).json({ msg: error });
+				return res.status(404).json({ msg: "sub category not found" });
 			}
-		})
-		.catch((error) => {
-
-			return res.status(500).send({ msg: error });
 		});
+	}
 };
-

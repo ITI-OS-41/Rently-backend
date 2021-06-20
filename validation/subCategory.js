@@ -20,6 +20,15 @@ module.exports = async (req, res, next) => {
 
   let difference = getTwoArraysDifferences(requiredFields, missingFields);
 
+  const duplicationCheck = await SubCategory.find({
+    name: data.name,
+    category: data.category,
+  });
+  if (duplicationCheck.length) {
+    errors.duplication =
+      "you can't rate the same item more than one time, please update your review instead";
+  }
+
   errors = {
     ...errors,
     ...assignEmptyErrorsToFields(data, difference),

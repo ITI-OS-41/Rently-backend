@@ -2,10 +2,9 @@
 const { validateId } = require("../helpers/errors");
 const mongoose = require("mongoose");
 const Blog = mongoose.model("Blog");
-// const {sortAndPagination} = require("../helpers/errors")
+
 exports.create = async (req, res) => {
 	req.body.author = req.user.id;
-	console.log(req.user.id)
 	const blogPost = await new Blog(req.body).save();
 	res.status(200).send(blogPost);
 };
@@ -51,7 +50,6 @@ exports.getAll = async (req, res) => {
 
 exports.update = async (req, res) => {
 	req.body.author = req.user.id
-	console.log(req.user.id);
 	await Blog.findOneAndUpdate({ _id: req.params.id }, req.body, {
 		new: true,
 	})

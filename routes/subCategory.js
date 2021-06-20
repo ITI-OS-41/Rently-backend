@@ -16,14 +16,14 @@ const { catchErrors } = require("../helpers/errors");
 router.post("/", validateSubCategory,catchErrors(create));
 
 // * GET ONE
-router.get("/:id", getOne);
+router.get("/:id", catchErrors(getOne));
 
 // * GET ALL
-router.get("/", getAll);
+router.get("/", catchErrors(getAll));
 
 // * UPDATE
 router.post("/:id",validateSubCategory, catchErrors(update));
 
 // * DELETE
-router.delete("/:id", deleteOne);
+router.delete("/:id", catchErrors(deleteOne));
 module.exports = router;

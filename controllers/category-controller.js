@@ -6,7 +6,7 @@ const Category = mongoose.model("Category");
 exports.create = async (req, res) => {
 	req.body.createdBy = req.user.id;
     const category = await new Category(req.body).save();
-    res.status(201).send(category);
+    res.status(200).send(category);
 };
 
 //* Get One
