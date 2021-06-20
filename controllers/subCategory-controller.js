@@ -1,8 +1,13 @@
+const Category = require('../models/Category');
 const SubCategory = require('../models/SubCategory');
 // * Create and Save a new Category
 exports.create = async (req, res) => {
 
 	const subCategory = await new SubCategory(req.body).save();
+  await Category.updateMany(
+    { _id: subCategory.category },
+    { $push: { subcategory: subCategory._id } }
+  );
 
 	res.status(201).send(subCategory);
 

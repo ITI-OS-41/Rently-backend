@@ -16,17 +16,17 @@ const userSchema = new Schema(
     },
     photo: {
       type: String,
-      required: true,
+      // required: true,
     },
     firstname: {
       type: String,
       trim: true,
-      required: true,
+      // required: true,
     },
     lastname: {
       type: String,
       trim: true,
-      required: true,
+      // required: true,
     },
     email: {
       type: String,
@@ -38,8 +38,8 @@ const userSchema = new Schema(
     username: {
       type: String,
       trim: true,
-      required: true,
-      unique: true,
+      // required: true,
+      // unique: true,
     },
     password: {
       type: String,
@@ -50,7 +50,7 @@ const userSchema = new Schema(
     },
     dateOfBirth: {
       type: Date,
-      required: [true, "date of birth is required"],
+      // required: [true, "date of birth is required"],
     },
     isVerified: {
       type: Boolean,

@@ -55,22 +55,14 @@ module.exports = async (req, res, next) => {
     }
   }
 
-  if (Validator.isEmpty(data.from)) {
-    errors.from = "start rental date is required";
-  }
 
-  if (Validator.isEmpty(data.to)) {
-    errors.to = "end rental date is required";
-  }
 
   // from should be before to
   if (from > to) {
     errors.time = "start date should be before end date";
   }
 
-  if (Validator.isEmpty(data.insurance)) {
-    errors.insurance = "insurance is required";
-  }
+ 
   if (data.insurance && data.insurance < 1) {
     errors.insurance = "insurance must be greater than 1";
   }

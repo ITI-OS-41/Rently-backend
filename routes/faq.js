@@ -1,29 +1,28 @@
 /** @format */
-
-const router = require('express').Router();
-const FAQ = require('../models/FAQ');
+const auth = require("../middleware/auth");
+const router = require("express").Router();
 
 // Import controllers
 const {
-	create,
-	getAll,
-	getOne,
-	update,
-	deleteOne,
-} = require('../controllers/faq-controller');
-// * create blog
+  create,
+  getAll,
+  getOne,
+  update,
+  deleteOne,
+} = require("../controllers/faq-controller");
+// * create Faq
 
-router.post('/', create);
-// * GET ONE
-router.get('/:id', getOne);
+router.post("/", auth, create);
+// * GET ONE Faq
+router.get("/:id", getOne);
 
-// * GET ALL
-router.get('/', getAll);
+// * GET ALL Faqs
+router.get("/", getAll);
 
-// * UPDATE
-router.post('/:id', update);
+// * UPDATE One Faq
+router.post("/:id", auth, update);
 
-// * DELETE
-router.delete('/:id', deleteOne);
+// * DELETE One Faq
+router.delete("/:id", deleteOne);
 
 module.exports = router;

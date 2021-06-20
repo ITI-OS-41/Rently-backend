@@ -14,17 +14,21 @@ const { CLIENT_URL } = process.env;
 const user = {
   register: async (req, res) => {
     try {
-      const { email, password } = req.body;
+      const { username, email, password } = req.body;
 
-      if (!email || !password)
+      if (!email || !password || !username)
         return res.status(400).json({ msg: "Please fill in all fields." });
 
       if (!validateEmail(email))
         return res.status(400).json({ msg: "Invalid emails." });
-
+      
       const user = await User.findOne({ email });
       if (user)
         return res.status(400).json({ msg: "This email already exists." });
+
+        const user1 = await User.findOne({ username });
+        if (user1)
+          return res.status(400).json({ msg: "This username already exists." });
 
       if (password.length < 6)
         return res
@@ -36,6 +40,7 @@ const user = {
       const newUser = {
         email,
         password: passwordHash,
+        username
       };
 
       const activation_token = createActivationToken(newUser);
@@ -92,6 +97,8 @@ const user = {
         path: "/user/refresh_token",
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       });
+      console.log({ refresh_token });
+        console.log("user refresh token", user._id);
 
       res.json({ msg: "Login success!" });
     } catch (err) {
@@ -107,8 +114,9 @@ const user = {
         if (err) return res.status(400).json({ msg: "Please login now!" });
 
         //why user.id not user._id
-        const access_token = createAccessToken({ id: user.id });
+        const access_token = createAccessToken({ id: user._id });
         res.json({ access_token });
+        console.log("user access token",user._id)
       });
     } catch (err) {
       return res.status(500).json({ msg: err.message });
@@ -339,7 +347,7 @@ const createActivationToken = (payload) => {
 
 const createAccessToken = (payload) => {
   return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "15m",
+    expiresIn: "1d",
   });
 };
 

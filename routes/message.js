@@ -1,6 +1,19 @@
+/** @format */
+const auth = require("../middleware/auth");
 const router = require("express").Router();
 const Message = require("../models/Message");
+const passport = require("passport");
+const validateMessage = require("../validation/message");
 
+// Import controllers
+const {
+  create,
+  getAll,
+  getOne,
+  update,
+  deleteOne,
+  getByTag,
+} = require("../controllers/message-controller");
 //add
 
 router.post("/", async (req, res) => {

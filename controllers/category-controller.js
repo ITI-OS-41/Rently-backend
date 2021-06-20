@@ -1,7 +1,7 @@
 const Category = require('../models/Category');
 // * Create and Save a new Category
 exports.create = async (req, res) => {
-
+	req.body.createdBy= req.user.id
     const category = await new Category(req.body).save();
 
     res.status(201).send(category);
@@ -27,10 +27,10 @@ exports.getOne = (req, res) => {
 
 //* Get ALL
 exports.getAll = async (req, res) => {
-	let { _id } = req.query;
+	let { model } = req.query;
 	const queryObj = {
-		...(_id && { _id }),
-	};
+    ...(model && { model }),
+  };
 	await Category.find(queryObj).then((objects) => {
 		res.status(200).send(objects);
 	});

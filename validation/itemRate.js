@@ -6,9 +6,7 @@ const ItemRate = require("../models/ItemRate");
 module.exports = async function (data) {
   let errors = {};
 
-  if (Validator.isEmpty(data.rater)) {
-    errors.rater = "rater is required";
-  }
+ 
 
   // refactor, usercheck middleware
 
@@ -21,9 +19,7 @@ module.exports = async function (data) {
     }
   }
 
-  if (Validator.isEmpty(data.item)) {
-    errors.item = "item is required";
-  }
+  
 
   if (!Validator.isMongoId(data.item)) {
     errors.item = "this is not valid item id";
@@ -43,17 +39,13 @@ module.exports = async function (data) {
       "you can't rate the same item more than one time, please update your review instead";
   }
 
-  if (Validator.isEmpty(data.rating)) {
-    errors.rating = "rating is required";
-  }
+  
 
   if (data.rating > 5 || data.rating < 1) {
     errors.rating = "rating  must be between 1 to 5";
   }
 
-  if (Validator.isEmpty(data.comment)) {
-    errors.comment = "comment is required";
-  }
+  
 
   return {
     errors,

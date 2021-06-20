@@ -1,38 +1,76 @@
-const mongoose = require("mongoose")
-const Schema = mongoose.Schema
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
+const slug = require("slugs");
 const { ObjectId } = mongoose.Schema.Types;
 
-const FAQSchema = new Schema({
-  createdBy:{
+const faqSchema = new Schema({
+  createdBy: {
     type: ObjectId,
     ref: "User",
-    required: "user is required",
+    required: [true, "user is required"],
   },
-  title: {
+  questions: {
+    question: {
+      type: String,
+      trim: true,
+      unique: true,
+      required: true,
+    },
+    answer: {
+      type: String,
+      trim: true,
+      required: true,
+    },
+  },
+  category: {
+    type: ObjectId,
+    ref: "Cagtegory",
+    required: [true, "faq category is required"],
+  },
+  slug: {
     type: String,
-    required:true
+    trim: true,
+    unique: true,
   },
-  description:{
-      type:String,
-      required:true
-  }
-})
+});
+faqSchema.post("findOneAndUpdate", async function () {
+  const docToUpdate = await this.model.findOne(this.getQuery());
+  console.log(docToUpdate.slug);
+  docToUpdate.slug = slug(docToUpdate.questions.question);
+  docToUpdate.save(); // The document that `findOneAndUpdate()` will modify
+});
 
-FAQSchema.statics.requiredFields = function () {
-	let arr = [];
-	for (let required in FAQSchema.obj) {
-		if (FAQSchema.obj[required].required && required !== 'createdBy') {
-			arr.push(required);
-		}
-	}
-	return arr;
+faqSchema.pre("save", async function (next) {
+  if (!this.isModified("questions.question")) {
+    next(); // skip it
+    return; // stop this function from running
+  }
+  this.slug = slug(this.questions.question);
+  // find other stores that have a slug of wes, wes-1, wes-2
+  const slugRegEx = new RegExp(`^(${this.slug})((-[0-9]*$)?)$`, "i");
+  const postWithSlug = await this.constructor.find({ slug: slugRegEx });
+  if (postWithSlug.length) {
+    this.slug = `${this.slug}-${postWithSlug.length + 1}`;
+  }
+  next();
+  // TODO make more resiliant so slugs are unique
+});
+
+faqSchema.statics.requiredFields = function () {
+  let arr = [];
+  for (let required in faqSchema.obj) {
+    if (faqSchema.obj[required].required && required !== "createdBy") {
+      arr.push(required);
+    }
+  }
+  return arr;
 };
 
 let autoPopulateLead = function (next) {
-	this.populate('createdBy');
-	next();
+  this.populate("createdBy");
+  next();
 };
 
-FAQSchema.pre('findOne', autoPopulateLead).pre('find', autoPopulateLead);
+faqSchema.pre("findOne", autoPopulateLead).pre("find", autoPopulateLead);
 
-module.exports = mongoose.model("FAQ", FAQSchema)
+module.exports = mongoose.model("Faq", faqSchema);
