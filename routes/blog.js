@@ -49,10 +49,5 @@ router.delete("/:id", deleteOneBlog);
 // * DELETE Comment
 router.delete("/:blogId/comment/:commentId", deleteOneComment);
 
-// * Find by slug name
-// router.get("/slug/:slug", getBySlug);
 
-// * Find by  tag
-// router.get('/tag', getByTag);
-// router.get('/tag/:tag', getByTag);
 module.exports = router;

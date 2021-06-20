@@ -1,69 +1,73 @@
-const Category = require('../models/Category');
+const { validateId } = require("../helpers/errors");
+const mongoose = require("mongoose");
+const Category = mongoose.model("Category");
+
 // * Create and Save a new Category
 exports.create = async (req, res) => {
-	req.body.createdBy= req.user.id
-    const category = await new Category(req.body).save();
-
-    res.status(201).send(category);
-
+  req.body.createdBy = req.user.id;
+  const category = await new Category(req.body).save();
+  res.status(200).send(category);
 };
-
 
 //* Get One
 exports.getOne = (req, res) => {
-	const Id = req.params.id;
-	Category.findOne({ _id: req.params.id })
-		.then((category) => {
-			if (category) {
-				return res.json(category);
-			} else {
-				return res.status(404).json({ msg: error  });
-			}
-		})
-		.catch((err) => {
-			return res.status(500).json({ msg: err});
-		});
+  const id = req.params.id;
+  if (!validateId(id, res)) {
+    Category.findById(id).then((category) => {
+      if (category) {
+        return res.json(category);
+      } else {
+        return res.status(404).json({ msg: error });
+      }
+    });
+  }
 };
 
 //* Get ALL
 exports.getAll = async (req, res) => {
-	let { model } = req.query;
-	const queryObj = {
-    ...(model && { model }),
+  let { name, model, subcategory } = req.query;
+  const sortBy = req.query.sortBy || "createdAt";
+  const orderBy = req.query.orderBy || "asc";
+  const sortQuery = {
+    [sortBy]: orderBy,
   };
-	await Category.find(queryObj).then((objects) => {
-		res.status(200).send(objects);
-	});
+
+  const page = parseInt(req.query.page);
+  const limit = parseInt(req.query.limit);
+  const skip = page * limit - limit;
+  const queryObj = {
+    ...(model && { model }),
+    ...(name && { name: new RegExp(`${name}`) }),
+    ...(subcategory && {
+      subcategory: new RegExp(subcategory.replace(/,/g, "|")),
+    }),
+  };
+  const getCategories = await Category.find(queryObj)
+    .limit(limit)
+    .skip(skip)
+    .sort(sortQuery);
+  res.status(200).send({ getCategories, pagination: { limit, skip, page } });
 };
 
 exports.update = async (req, res) => {
-	await Category.findOneAndUpdate({ _id: req.params.id }, req.body, {
-		new: true,
-		runValidators: true,
-		useFindAndModify: false,
-	})
-		.then((response) => {
-			res.status(200).send(response);
-		})
-		.catch((error) => {
-			return res.status(500).send({message: error });
-		});
+  await Category.findOneAndUpdate({ _id: req.params.id }, req.body, {
+    new: true,
+  }).then((response) => {
+    res.status(200).send(response);
+  });
 };
 
 exports.deleteOne = async (req, res) => {
-	Category.findById(req.params.id)
-		.then((category) => {
-			if (category) {
-				category.remove().then(() => {
-					return res.status(200).send(category);
-				});
-			} else {
-				return res.status(404).json({ msg:error });
-			}
-		})
-		.catch((error) => {
-	
-			return res.status(500).send({ msg: error });
-		});
+  const id = req.params.id;
+  if (!validateId(id, res)) {
+    Category.findById(id).then((category) => {
+      if (category) {
+        category.remove().then(() => {
+          return res.status(200).send(category);
+        });
+      } else {
+        return res.status(404).json({ msg: error });
+      }
+    });
+  }
 };
-

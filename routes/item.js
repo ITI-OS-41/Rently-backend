@@ -8,7 +8,9 @@ const {
   update,
   deleteOne,
 } = require("../controllers/item-controller")
-
+const { catchErrors } = require("../helpers/errors");
+const validateItem = require("../validation/item");
+const auth = require("../middleware/auth");
 
 // * GET ALL
 router.get("/", getAll)
@@ -18,8 +20,8 @@ router.get("/", getAll)
 router.get("/:id", getOne)
 
 
-// * UPDATE
-router.post("/", create)
+// * CREATE
+router.post("/", auth,catchErrors(create))
 
 // * UPDATE
 router.post("/:id", update)

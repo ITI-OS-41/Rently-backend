@@ -1,7 +1,8 @@
+/** @format */
+const auth = require("../middleware/auth");
 const router = require("express").Router();
-const Category = require("../models/Category");
-const auth = require("../middleware/auth")
-// const {categories} = require("../controllers/category-controller");
+const { catchErrors } = require("../helpers/errors");
+const validateCategory = require("../validation/category");
 // Import controllers
 const {
   getOne,
@@ -11,17 +12,19 @@ const {
   create,
 } = require("../controllers/category-controller");
 //  * Create New
-router.post("/", auth, create);
+router.post("/", auth, validateCategory, catchErrors(create));
 // * GET ONE
-router.get("/:id", getOne);
+router.get("/:id", catchErrors(getOne));
 
 // * GET ALL
-router.get("/", getAll);
+
+router.get("/", catchErrors(getAll));
 
 // * UPDATE
-router.post("/:id", update);
+router.post("/:id", auth, validateCategory, catchErrors(update));
 
 // * DELETE
-router.delete("/:id", deleteOne);
+
+router.delete("/:id", catchErrors(deleteOne));
 
 module.exports = router;

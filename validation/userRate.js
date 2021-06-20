@@ -1,109 +1,42 @@
-const Validator = require("validator");
-const User = require("../models/User") ;
-const UserRate = require("../models/UserRate");
-const Item = require("../models/Item") ;
-const Rent = require("../models/Rent") ;
+/** @format */
 
-module.exports = async function (data) {
-  let errors = {};
+const {
+	assignEmptyErrorsToFields,
+	assignErrorsToMissingFields,
+	getTwoArraysDifferences,
+	missingFieldsChecker,
+} = require("../helpers/errors");
 
-  if (Validator.isEmpty(data.item)) {
-    errors.item = "item id is required";
-  }
+const userRate = require("../models/UserRate");
+module.exports = async (req, res, next) => {
+	let errors = {};
+	const data = req.body;
+	const requiredFields = userRate.requiredFields();
+	const requestBody = Object.keys(data);
 
+	let missingFields = missingFieldsChecker(requestBody, requiredFields);
 
-  if (!Validator.isMongoId(data.item)) {
-    errors.item = "this is not valid item id";
-  } else {
-    const item = await Itemgit .findById(data.item);
-    if (!item) {
-      errors.item = "this item is not found in our database ";
-    }
-  }
+	errors = assignErrorsToMissingFields(missingFields);
 
-  if (Validator.isEmpty(data.renter)) {
-    errors.renter = "renter id is required";
-  }
+	let difference = getTwoArraysDifferences(requiredFields, missingFields);
+	const duplicationCheck = await UserRate.find({
+		rater: data.rater,
+		owner: data.owner,
+	});
+	if (duplicationCheck.length) {
+		errors.duplication =
+			"you can't rate the user twice";
+	}
 
-  // refactor, usercheck middleware
+	errors = {
+		...errors,
+		...assignEmptyErrorsToFields(data, difference),
+	};
 
-  if (Validator.isEmpty(data.renter)) {
-    errors.renter = "renter id is required";
-  }
-
-  if (!Validator.isMongoId(data.renter)) {
-    errors.renter = "this is not valid user id";
-  } else {
-    const renter = await User.findById(data.renter);
-    if (!renter) {
-      errors.renter = "this user is not found in our database ";
-    }
-  }
-
-  if (Validator.isEmpty(data.owner)) {
-    errors.owner = "owner id is required";
-  }
-
-  if (!Validator.isMongoId(data.owner)) {
-    errors.owner = "this is not valid owner id";
-  } else {
-    const owner = await User.findById(data.owner);
-    if (!owner) {
-      errors.owner = "this user is not found in our database ";
-    }
-  }
-
-  const duplicationCheck = await UserRate.find({
-    owner: data.owner,
-    renter: data.renter,
-    item: data.item
-  });
-  if (duplicationCheck.length) {
-    errors.duplication =
-      "you can't rate the same user more than one time for the same item, please update your review instead";
-  }
-
-  if (data.renter === data.owner) {
-    errors.renter = "you can't rate yourself";
-  }
-
-  if (Validator.isEmpty(data.rating)) {
-    errors.rating = "rating is required";
-  }
-
-  if (data.rating > 5 || data.rating < 1) {
-    errors.rating = "rating  must be between 1 to 5";
-  }
-
-  if (Validator.isEmpty(data.comment)) {
-    errors.comment = "comment is required";
-  }
-
-
-    //check renter if he rented an item from the owner
-
-
-  const renterRatingCheck = await Rent.find({
-    owner: data.owner,
-    renter: data.renter,
-    item: data.item
-  });
-
-  if (renterRatingCheck.length) {
-
-    renterRatingCheck.forEach(rating => {
-
-      if (rating.status !== "returned") {
-        errors.renterRating =
-          "the renting process should end before submitting a review for the renter";
-      }
-    });
-    
-    
-  }
-
-  return {
-    errors,
-    isValid: Object.keys(errors).length === 0,
-  };
+	if (Object.keys(errors).length > 0) {
+		// console.log(data, errors);
+		return res.status(404).json(errors);
+	} else {
+		return next();
+	}
 };

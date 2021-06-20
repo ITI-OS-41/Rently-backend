@@ -164,34 +164,3 @@ exports.deleteOneComment = async (req, res) => {
     });
 };
 
-// exports.getBySlug = async (req, res, next) => {
-//   Blog.findOne({ slug: req.params.slug })
-//     .then((blogPost) => {
-//       if (blogPost) {
-//         return res.status(200).json(blogPost);
-//       } else {
-//         return res.status(404).json({ msg: SLUG.notFound });
-//       }
-//     })
-//     .catch((err) => {
-//       console.log(err);
-//       return res.status(500).json({ msg: SLUG.invalidSlug });
-//     });
-// };
-
-// exports.getByTag = async (req, res) => {
-// 	const tag = req.params.tag;
-// 	const tagQuery = tag || { $exists: true, $ne: [] };
-// 	const tagsPromise = Blog.getTagList();
-// 	const postsPromise = Blog.find({ tags: tagQuery });
-// 	const [tags, posts] = await Promise.all([tagsPromise, postsPromise]);
-// 	console.log('tags ', tags);
-// 	res.status(200).send([tags, posts]);
-// };
-
-exports.getAllCategories= async(req,res)=> {
-
-	const categoriesPromise = await Blog.getCategoryList();
-  res.status(200).send(categoriesPromise)
-
-}

@@ -1,7 +1,8 @@
 /** @format */
 const auth = require("../middleware/auth");
 const router = require("express").Router();
-
+const validateFaq = require("../validation/faq");
+const { catchErrors } = require("../helpers/errors");
 // Import controllers
 const {
   create,
@@ -12,17 +13,17 @@ const {
 } = require("../controllers/faq-controller");
 // * create Faq
 
-router.post("/", auth, create);
-// * GET ONE Faq
-router.get("/:id", getOne);
+router.post("/", validateFaq, catchErrors(create));
+// * GET ONE
+router.get("/:id", catchErrors(getOne));
 
-// * GET ALL Faqs
-router.get("/", getAll);
+// * GET ALL
+router.get("/", catchErrors(getAll));
 
-// * UPDATE One Faq
-router.post("/:id", auth, update);
+// * UPDATE
+router.post("/:id", validateFaq, catchErrors(update));
 
-// * DELETE One Faq
-router.delete("/:id", deleteOne);
+// * DELETE
+router.delete("/:id", catchErrors(deleteOne));
 
 module.exports = router;

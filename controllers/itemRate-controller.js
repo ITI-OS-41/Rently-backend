@@ -1,125 +1,76 @@
+/** @format */
+const { validateId } = require("../helpers/errors");
+const mongoose = require("mongoose");
 const ItemRate = require("../models/ItemRate");
-const { ITEMRATE, ID } = require("../helpers/errors");
-const ObjectId = require("mongoose").Types.ObjectId;
-
-const validateItemRate = require("../validation/itemRate");
+const Item = require("../models/Item");
 
 exports.create = async (req, res) => {
-  const { isValid, errors } = await validateItemRate(req.body);
+	req.body.rater = req.user.id;
+	req.body.item = req.params.id;
+	console.log(req.params);
+	const itemRate = await new ItemRate(req.body).save();
+	await Item.updateMany(
+		{ _id: itemRate.item },
+		{ $push: { itemRate: itemRate._id } }
+	);
+	res.status(200).send(itemRate);
+};
 
-  //   ItemRate.collection.getIndexes({key: rater_1_item_1}).then(indexes => {
-  //     console.log("indexes:", indexes);
-  // }).catch(console.error);
-
-  if (!isValid) {
-    return res.status(404).json(errors);
-  }
-
-  const itemRate = new ItemRate({
-    ...req.body,
-  });
-
-  await itemRate
-    .save()
-    .then((itemRate) => {
-      res.json({ itemRate });
-    })
-    .catch((err) => {
-      return res.status(500).send({ msg: ITEMRATE.badRequest });
-    });
+exports.getOne = async (req, res) => {
+	const id = req.params.id;
+	if (!validateId(id, res)) {
+		await ItemRate.findById(id).then((itemRate) => {
+			if (itemRate) {
+				return res.json(itemRate);
+			} else {
+				return res.status(404).json({ msg: "rate not found" });
+			}
+		});
+	}
 };
 
 exports.getAll = async (req, res) => {
-  let { _id, item, rater, rating } = req.query;
-  const queryObj = {
-    ...(_id && { _id }),
-    ...(item && { item }),
-    ...(rater && { rater }),
-    ...(rating && { rating }),
-  };
+	const sortBy = req.query.sortBy || "createdAt";
+	const orderBy = req.query.orderBy || "asc";
+	const sortQuery = {
+		[sortBy]: orderBy,
+	};
 
-  await ItemRate.find(queryObj).then((objects) => {
-    res.status(200).send(objects);
-  });
-};
-
-exports.getOne = (req, res) => {
-  const id = req.params.id;
-  if (!ObjectId.isValid(id)) {
-    return res.status(404).json({
-      id: ID.invalid,
-    });
-  }
-
-  ItemRate.findById(id)
-    .then((itemRate) => {
-      if (itemRate) {
-        return res.json({
-          _id: itemRate._id,
-          item: itemRate.item,
-          rater: itemRate.rater,
-          rating: itemRate.rating,
-          comment: itemRate.comment,
-        });
-      } else {
-        return res.status(404).json({ msg: ITEMRATE.notFound });
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-      return res.status(500).json({ msg: ITEMRATE.invalidId });
-    });
+	const page = parseInt(req.query.page);
+	const limit = parseInt(req.query.limit);
+	const skip = page * limit - limit;
+	let { rating } = req.query;
+	const queryObj = {
+		...(rating && { rating }),
+	};
+	await ItemRate.find(queryObj)
+		.limit(limit)
+		.skip(skip)
+		.sort(sortQuery)
+		.then((objects) => {
+			res.status(200).send(objects);
+		});
 };
 
 exports.update = async (req, res) => {
-  const id = req.params.id;
-  if (!ObjectId.isValid(id)) {
-    return res.status(404).json({
-      id: ID.invalid,
-    });
-  }
-
-  const { isValid, errors } = await validateItemRate(req.body);
-
-  if (!isValid) {
-    return res.status(404).json(errors);
-  }
-  await ItemRate.findOneAndUpdate({ _id: req.params.id }, req.body, {
-    new: true,
-    runValidators: true,
-    useFindAndModify: false,
-  })
-    .select({ item: 0, rater: 0 })
-    .then((response) => {
-      res.status(200).send(response);
-    })
-    .catch((error) => {
-      console.log(error);
-      return res.status(500).send({ msg: error.message });
-    });
+	await ItemRate.findOneAndUpdate({ _id: req.params.id }, req.body, {
+		new: true,
+	}).then((response) => {
+		res.status(200).send(response);
+	});
 };
 
 exports.deleteOne = async (req, res) => {
-  const id = req.params.id;
-
-  if (!ObjectId.isValid(id)) {
-    return res.status(404).json({
-      id: ID.invalid,
-    });
-  }
-
-  ItemRate.findById(req.params.id)
-    .then((itemRate) => {
-      if (itemRate) {
-        itemRate.remove().then(() => {
-          return res.status(200).send(itemRate);
-        });
-      } else {
-        return res.status(404).json({ msg: ITEMRATE.notFound });
-      }
-    })
-    .catch((error) => {
-      console.log(error);
-      return res.status(500).send({ msg: ITEMRATE.notFound });
-    });
+	const id = req.params.id;
+	if (!validateId(id, res)) {
+		ItemRate.findById(req.params.id).then((itemRate) => {
+			if (itemRate) {
+				itemRate.remove().then(() => {
+					return res.status(200).send(itemRate);
+				});
+			} else {
+				return res.status(404).json({ msg: "rate not found" });
+			}
+		});
+	}
 };
