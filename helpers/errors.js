@@ -2,6 +2,7 @@
 
 const validator = require("validator");
 const Category = require("../models/Category");
+const Blog = require("../models/Blog");
 const catchErrors = (fn) => {
   return function (req, res, next) {
     return fn(req, res, next).catch((next) => {
@@ -11,7 +12,7 @@ const catchErrors = (fn) => {
   };
 };
 const categoryIdCheck = async (id, res) => {
-    let errors = {};
+  let errors = {};
   if (id) {
     if (!validator.isMongoId(id)) {
       errors.id = "invalid category id";
@@ -21,8 +22,8 @@ const categoryIdCheck = async (id, res) => {
         errors.id = "category not found";
       }
     }
-}
-return errors;
+  }
+  return errors;
 };
 
 const blogIdCheck = async (id, res) => {

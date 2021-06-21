@@ -27,9 +27,9 @@ const {
 // * create blog
 router.post("/:categoryId/blog", auth, validateBlog, createBlog);
 // * GET ONE Blog
-router.get("/:categoryId/blog/:blogId", getOneBlog);
+router.get("/:categoryId/blog/:blogId", auth,getOneBlog);
 // * GET ALL Blogs
-router.get("/:categoryId/blog", getAllBlogs);
+router.get("/:categoryId/blog", auth,getAllBlogs);
 // * UPDATE Blog
 router.post("/:categoryId/blog/:blogId", auth, validateBlog, updateBlog);
 // * DELETE Blog

@@ -17,13 +17,13 @@ const {
 router.post("/:blogId/comment", auth,validateComment, createComment);
 
 // * GET ALL Blog Comments
-router.get("/:blogId/comment", getAllComments);
+router.get("/:blogId/comment", auth, getAllComments);
 
 // * UPDATE Comment
-router.post("/:blogId/comment/:commentId",validateComment, updateComment);
+router.post("/:blogId/comment/:commentId",auth, validateComment, updateComment);
 
 
 // * DELETE Comment
-router.delete("/:blogId/comment/:commentId", deleteOneComment);
+router.delete("/:blogId/comment/:commentId",auth, deleteOneComment);
 
 module.exports = router;

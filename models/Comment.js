@@ -27,7 +27,11 @@ const commentSchema = new mongoose.Schema(
 commentSchema.statics.requiredFields = function () {
   let arr = [];
   for (let required in commentSchema.obj) {
-    if (commentSchema.obj[required].required && required !== "blogPost") {
+    if (
+      commentSchema.obj[required].required &&
+      required !== "commenter" &&
+      required !== "blogPost"
+    ) {
       arr.push(required);
     }
   }

@@ -14,17 +14,17 @@ module.exports = async (req, res, next) => {
   let errors = {};
   const id = req.params.commentId;
   const data = req.body;
-  const requiredFields = Blog.requiredFields();
+  const requiredFields = Comment.requiredFields();
   const requestBody = Object.keys(data);
 
-  const idCheck = await blogIdCheck(req.params.categoryId, res);
+  const idCheck = await blogIdCheck(req.params.blogId, res);
   if (Object.keys(idCheck).length > 0) {
     return res.status(404).json(idCheck);
   }
 
   if (id) {
     if (!validator.isMongoId(id)) {
-      errors.id = "invalid id";
+      errors.id = "invalid comment id";
       return res.status(404).json(errors);
     } else {
       const idCheck = await Comment.findById(id);

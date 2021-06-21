@@ -3,6 +3,7 @@
 const mongoose = require("mongoose");
 const slug = require("slugs");
 const { ObjectId } = mongoose.Schema.Types;
+const Comment = require("../models/Comment");
 
 const blogSchema = new mongoose.Schema(
   {
@@ -47,6 +48,10 @@ const blogSchema = new mongoose.Schema(
 // blogSchema.statics.getCategoryList = function () {
 //   return this.aggregate([{ $group: { _id: "$category" } }]);
 // };
+blogSchema.pre("remove", function (next) {
+  Comment.deleteMany({ blogPost: this._id }).exec();
+  next();
+});
 
 blogSchema.post("findOneAndUpdate", async function () {
   const docToUpdate = await this.model.findOne(this.getQuery());
