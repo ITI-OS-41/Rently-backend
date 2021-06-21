@@ -1,53 +1,29 @@
 /** @format */
 const auth = require("../middleware/auth");
+const authAdmin = require("../middleware/authAdmin");
 const router = require("express").Router();
-const { catchErrors } = require("../helpers/errors");
-const validateBlog = require("../validation/blog");
+const validateComment = require("../validation/comment");
 // Import controllers
 const {
-  getAllCategories,
-  createBlog,
   createComment,
-  getAllBlogs,
   getAllComments,
-  getOneBlog,
-  updateBlog,
   updateComment,
-  deleteOneBlog,
   deleteOneComment,
 } = require("../controllers/blog-controller");
 
+
+
 // * create comment
-
-router.post("/:blogId/comment", auth, catchErrors(createComment));
-
-// * create blog
-router.post("/", auth, validateBlog, catchErrors(createBlog));
-// * GET ONE Blog
-// router.get("/:id", getOneBlog);
-
-// * GET ALL Blogs
-router.get("/", catchErrors(getAllBlogs));
+router.post("/:blogId/comment", auth,validateComment, createComment);
 
 // * GET ALL Blog Comments
-router.get("/:blogId/comment", catchErrors(getAllComments));
-
-// * GET ALL Blog Categories
-router.get("/categories", catchErrors(getAllCategories));
-
-// * UPDATE Blog
-router.post("/:id", validateBlog, catchErrors(updateBlog));
+router.get("/:blogId/comment", getAllComments);
 
 // * UPDATE Comment
-router.post(
-  "/:blogId/comment/:commentId", catchErrors(updateComment)
-);
+router.post("/:blogId/comment/:commentId",validateComment, updateComment);
 
-// * DELETE Blog
-router.delete("/:id", deleteOneBlog);
 
 // * DELETE Comment
 router.delete("/:blogId/comment/:commentId", deleteOneComment);
-
 
 module.exports = router;

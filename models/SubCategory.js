@@ -18,7 +18,6 @@ const subcategorySchema = new Schema(
 		},
 		description: {
 			type: String,
-			required: true,
 		},
 		photo: String,
 		category: {
@@ -27,6 +26,10 @@ const subcategorySchema = new Schema(
 			required: true,
 			index: true,
 		},
+		model:{
+			type:String,
+			default:"item"
+		}
 	},
 	{ timestamps: true }
 );

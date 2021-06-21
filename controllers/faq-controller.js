@@ -28,7 +28,7 @@ exports.getOne = async (req, res) => {
 };
 
 exports.getAll = async (req, res) => {
-  let { _id, slug, title } = req.query;
+  let { _id, slug, title,category, subCategory } = req.query;
   const sortBy = req.query.sortBy || "createdAt";
   const orderBy = req.query.orderBy || "asc";
   const sortQuery = {
@@ -42,6 +42,8 @@ exports.getAll = async (req, res) => {
   const queryObj = {
     ...(_id && { _id }),
     ...(title && { title: new RegExp(`${title}`) }),
+    ...(title && { category: new RegExp(`${category}`) }),
+    ...(title && { subCategory: new RegExp(`${subCategory}`) }),
     ...(slug && { slug }),
   };
   const getFaqs = await Faq.find(queryObj)

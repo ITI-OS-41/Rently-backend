@@ -190,8 +190,7 @@ const user = {
       await Users.findOneAndUpdate(
         { _id: req.user.id },
         {
-          name,
-          avatar,
+         ...req.body,
         }
       );
 

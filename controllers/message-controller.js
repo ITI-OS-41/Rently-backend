@@ -20,6 +20,7 @@ exports.getAll = async (req, res) => {
   try {
     const messages = await Message.find({
       conversationId: req.params.conversationId,
+      hidden: false,
     });
     res.status(200).json(messages);
   } catch (err) {

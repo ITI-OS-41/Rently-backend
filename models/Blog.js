@@ -20,7 +20,7 @@ const blogSchema = new mongoose.Schema(
     },
     slug: {
       type: String,
-      unique: true,
+      index: true,
     },
     description: {
       type: String,
@@ -38,6 +38,7 @@ const blogSchema = new mongoose.Schema(
       type: ObjectId,
       ref: "Cagtegory",
       required: [true, "faq category is required"],
+      index: true,
     },
   },
   { timestamps: true }
@@ -49,7 +50,8 @@ const blogSchema = new mongoose.Schema(
 
 blogSchema.post("findOneAndUpdate", async function () {
   const docToUpdate = await this.model.findOne(this.getQuery());
-  console.log(docToUpdate);
+  docToUpdate.slug = slug(docToUpdate.title);
+  docToUpdate.save();
   // The document that `findOneAndUpdate()` will modify
 });
 
@@ -60,11 +62,11 @@ blogSchema.pre("save", async function (next) {
   }
   this.slug = slug(this.title);
   // find other stores that have a slug of wes, wes-1, wes-2
-  const slugRegEx = new RegExp(`^(${this.slug})((-[0-9]*$)?)$`, "i");
-  const postWithSlug = await this.constructor.find({ slug: slugRegEx });
-  if (postWithSlug.length) {
-    this.slug = `${this.slug}-${postWithSlug.length + 1}`;
-  }
+  // const slugRegEx = new RegExp(`^(${this.slug})((-[0-9]*$)?)$`, "i");
+  // const postWithSlug = await this.constructor.find({ slug: slugRegEx });
+  // if (postWithSlug.length) {
+  //   this.slug = `${this.slug}-${postWithSlug.length + 1}`;
+  // }
   next();
   // TODO make more resiliant so slugs are unique
 });
@@ -72,7 +74,11 @@ blogSchema.pre("save", async function (next) {
 blogSchema.statics.requiredFields = function () {
   let arr = [];
   for (let required in blogSchema.obj) {
-    if (blogSchema.obj[required].required && required !== "author") {
+    if (
+      blogSchema.obj[required].required &&
+      required !== "author" &&
+      required !== "category"
+    ) {
       arr.push(required);
     }
   }
@@ -88,6 +94,6 @@ let autoPopulateLead = function (next) {
 
 blogSchema.pre("findOne", autoPopulateLead).pre("find", autoPopulateLead);
 
-blogSchema.index({ title: 1, category: 1 }, { unique: true });
+blogSchema.index({ title: 1, category: 1, slug: 1 }, { unique: true });
 
 module.exports = mongoose.model("Blog", blogSchema);

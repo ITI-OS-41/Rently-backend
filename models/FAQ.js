@@ -27,6 +27,12 @@ const faqSchema = new Schema({
     ref: "Cagtegory",
     required: [true, "faq category is required"],
   },
+  subCategory: {
+    type: ObjectId,
+    ref: "SubCagtegory",
+    required: [true, "faq Subcategory is required"],
+  },
+
   slug: {
     type: String,
     trim: true,

@@ -1,50 +1,76 @@
 /** @format */
-const { validateId } = require("../helpers/errors");
+const { validateId, categoryIdCheck } = require("../helpers/errors");
 const Comment = require("../models/Comment");
 const Blog = require("../models/Blog");
-
-const { BLOG_POST } = require("../helpers/errors");
+const User = require("../models/User");
 
 exports.createBlog = async (req, res) => {
   req.body.author = req.user.id;
-  const blogPost = await new Blog(req.body).save();
-  res.status(200).send(blogPost);
+  req.body.category = req.params.categoryId;
+  
+  const blog = await new Blog(req.body);
+  try {
+    const savedBlog = await blog.save();
+    if (savedBlog) {
+      return res.status(200).json(savedBlog);
+    } else {
+      return res.status(404).json({ msg: "blog not saved" });
+    }
+  } catch (err) {
+    res.status(500).json(err);
+  }
 };
 
 exports.createComment = async (req, res) => {
   req.body.commenter = req.user.id;
   req.body.blogPost = req.params.blogId;
-  const comment = await new Comment(req.body).save();
-  res.status(200).send(comment);
-
-  await Blog.updateMany(
-    { _id: comment.blogPost },
-    { $push: { comments: comment._id } }
-  );
+  const comment = await new Comment(req.body);
+  try {
+    const savedComment = await comment.save();
+    if (savedComment) {
+      await Blog.updateMany(
+        { _id: comment.blogPost },
+        { $push: { comments: comment._id } }
+      );
+      return res.status(200).json(savedComment);
+    } else {
+      return res.status(404).json({ msg: "Comment not saved" });
+    }
+  } catch (err) {
+    res.status(500).json(err);
+  }
 };
 
 exports.getOneBlog = async (req, res) => {
-  const id = req.params.id;
-  validateId(id, res);
-  await Blog.findById(id)
-    .then((blogPost) => {
-      if (blogPost) {
-        return res.json(blogPost);
-      } else {
-        return res.status(404).json({ msg: "post not found" });
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-      return res.status(500).json({ msg: "post invalid id"});
-    });
+  const id = req.params.blogId;
+
+  req.body.category = req.params.categoryId;
+  const idCheck = await categoryIdCheck(req.params.categoryId, res);
+  if (Object.keys(idCheck).length > 0) {
+    return res.status(404).json(idCheck);
+  }
+
+  if (validateId(id, res)) {
+    return res.status(404).json({ msg: "invalid id" });
+  }
+  try {
+    const blog = await Blog.findById(id);
+    if (blog) {
+      return res.json(blog);
+    } else {
+      return res.status(404).json({ msg: "blog not found" });
+    }
+  } catch (err) {
+    return res.status(500).json(err);
+  }
 };
 
 exports.getAllBlogs = async (req, res) => {
-  let { _id, title,category, slug, tags } = req.query;
+  let { _id, title, category, slug, tags, description } = req.query;
   const queryObj = {
     ...(_id && { _id }),
     ...(title && { title: new RegExp(`${title}`) }),
+    ...(description && { description: new RegExp(`${description}`) }),
     ...(category && { category: new RegExp(`${category}`) }),
     ...(slug && { slug }),
     ...(tags && { tags: new RegExp(tags.replace(/,/g, "|")) }),
@@ -57,12 +83,22 @@ exports.getAllBlogs = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 5;
   const skip = page * limit - limit;
-  const getPosts = await Blog.find(queryObj)
-    .limit(limit)
-    .skip(skip)
-    .sort(sortQuery);
 
-  res.status(200).send({ getPosts, pagination: { limit, skip, page } });
+   req.body.category = req.params.categoryId;
+   const idCheck = await categoryIdCheck(req.params.categoryId, res);
+   if (Object.keys(idCheck).length > 0) {
+     return res.status(404).json(idCheck);
+   }
+
+  try {
+    const getPosts = await Blog.find(queryObj)
+      .limit(limit)
+      .skip(skip)
+      .sort(sortQuery);
+    res.status(200).send({ res:getPosts, pagination: { limit, skip, page } });
+  } catch (err) {
+    res.status(500).json(err);
+  }
 };
 
 exports.getAllComments = async (req, res) => {
@@ -89,21 +125,33 @@ exports.getAllComments = async (req, res) => {
       .skip(skip)
       .sort(sortQuery);
 
-    res.status(200).send({ getComments, pagination: { limit, skip, page } });
+    res
+      .status(200)
+      .send({ res: getComments, pagination: { limit, skip, page } });
   }
 };
 
 exports.updateBlog = async (req, res) => {
-  await Blog.findOneAndUpdate({ _id: req.params.id }, req.body, {
-    new: true,
-  })
-    .then((response) => {
-      res.status(200).send(response);
-    })
-    .catch((error) => {
-      console.log(error);
-      return res.status(500).send({ msg: error.message });
-    });
+  try {
+    const updatedBlog = await Blog.findOneAndUpdate(
+      { _id: req.params.id },
+      req.body,
+      {
+        new: true,
+      }
+    );
+
+    const loggedUser = await User.findById(req.user.id);
+    if (updatedBlog.author._id != req.user.id && loggedUser.role !== "admin") {
+      return res
+        .status(404)
+        .json({ msg: "you are not authorized to perform this operation" });
+    } else {
+      return res.status(200).send(updatedBlog);
+    }
+  } catch (err) {
+    return res.status(500).json(err);
+  }
 };
 
 exports.updateComment = async (req, res) => {
@@ -116,30 +164,41 @@ exports.updateComment = async (req, res) => {
         res.status(200).send(response);
       })
       .catch((error) => {
-        console.log(error);
         return res.status(500).send({ msg: error.message });
       });
   }
 };
 
 exports.deleteOneBlog = async (req, res) => {
-  const id = req.params.id;
-  validateId(id, res);
 
-  Blog.findById(req.params.id)
-    .then((blogPost) => {
-      if (blogPost) {
-        blogPost.remove().then(() => {
-          return res.status(200).send(blogPost);
-        });
+  const id = req.params.blogId;
+  req.body.category = req.params.categoryId;
+  if (validateId(id, res)) {
+    return res.status(404).json({ msg: "invalid blog id" });
+  }
+  const idCheck = await categoryIdCheck(req.params.categoryId, res);
+  if (Object.keys(idCheck).length > 0) {
+    return res.status(404).json(idCheck);
+  }
+  try {
+    const blog = await Blog.findById(id);
+    if (blog) {
+      const loggedUser = await User.findById(req.user.id);
+      if (blog.author._id != req.user.id && loggedUser.role !== "admin") {
+        return res
+          .status(404)
+          .json({ msg: "you are not authorized to perform this operation" });
       } else {
-        return res.status(404).json({ msg: BLOG_POST.notFound });
+        blog.remove().then(() => {
+          return res.status(200).send(blog);
+        });
       }
-    })
-    .catch((error) => {
-      console.log(error);
-      return res.status(500).send({ msg: BLOG_POST.invalidId });
-    });
+    } else {
+      return res.status(404).json({ msg: "blog not found" });
+    }
+  } catch (error) {
+    return res.status(500).json({ msg: "invalid blog id" });
+  }
 };
 
 exports.deleteOneComment = async (req, res) => {
@@ -159,8 +218,6 @@ exports.deleteOneComment = async (req, res) => {
       }
     })
     .catch((error) => {
-      console.log(error);
       return res.status(500).send({ msg: "invalid comment id" });
     });
 };
-

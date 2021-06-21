@@ -7,6 +7,7 @@ const {
   missingFieldsChecker,
 } = require("../helpers/errors");
 const Conversation = require("../models/Conversation");
+const User = require("../models/User");
 const validator = require("validator");
 module.exports = async (req, res, next) => {
   let errors = {};
@@ -24,8 +25,24 @@ module.exports = async (req, res, next) => {
     ...errors,
     ...assignEmptyErrorsToFields(data, difference),
   };
-  if (!validator.isLength(data.title, { min: 4 })) {
-    errors.title = `title ${data.title} is shorter than the minimum allowed length (4)`;
+
+  req.body.sender = req.user.id;
+  const findDuplication = await Conversation.find({
+    members: [req.body.sender, req.body.receiver],
+  });
+  if (findDuplication.length) {
+    errors.duplication = "conversation duplication error";
+  }
+
+  if (data.receiver && !errors.receiver) {
+    if (!validator.isMongoId(data.receiver)) {
+      errors.receiver = "this is not a valid user id";
+    } else {
+      const receiver = await User.findById(data.receiver);
+      if (!receiver) {
+        errors.receiver = "this user is not found in our database ";
+      }
+    }
   }
   if (Object.keys(errors).length > 0) {
     // console.log(data, errors);

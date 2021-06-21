@@ -4,19 +4,27 @@ const ObjectId = require("mongoose").Types.ObjectId;
 
 const conversationSchema = new mongoose.Schema(
   {
-    sender: {
-      type: ObjectId,
-      ref: "User",
-      required: [true, "sender is required"],
-      index: true,
+    members: {
+      type: [ObjectId],
     },
-    receiver: {
-      type: ObjectId,
-      ref: "User",
-      required: [true, "receiver is required"],
-      index: true,
-    },
-    //
+    // sender: {
+    //   type: ObjectId,
+    //   ref: "User",
+    //   required: [true, "sender is required"],
+    //   index: true,
+    // },
+    // receiver: {
+    //   type: ObjectId,
+    //   ref: "User",
+    //   required: [true, "receiver is required"],
+    //   index: true,
+    // },
+    //TODO
+    //   deletedBy:[{
+    //     type:ObjectId,
+    //     ref: "User"
+    //   }
+    // ],
   },
   { timestamps: true }
 );
@@ -47,6 +55,6 @@ conversationSchema
   .pre("findOne", autoPopulateLead)
   .pre("find", autoPopulateLead);
 
-conversationSchema.index({ sender: 1, receiver: 1 }, { unique: true });
+// conversationSchema.index({ sender: 1, receiver: 1 }, { unique: true });
 
 module.exports = mongoose.model("Conversation", conversationSchema);

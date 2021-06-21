@@ -1,62 +1,98 @@
+const User = require("../models/User");
 const Conversation = require("../models/Conversation");
-
+const { validateId } = require("../helpers/errors");
 //new conv
 
-exports.create= async (req, res) => {
-  req.body.sender= req.user.id
-  const newConversation = new Conversation(req.body);
-
+exports.create = async (req, res) => {
+  req.body.sender = req.user.id;
+  const newConversation = new Conversation({
+    members: [req.body.sender, req.body.receiver],
+  });
   try {
     const savedConversation = await newConversation.save();
-    res.status(200).json(savedConversation);
-  } catch (err) {
-    res.status(500).json(err);
-  }
-};
-
-//get conv of a user
-
-exports.getAll= async (req, res) => {
-  try {
-    const conversation = await Conversation.find({
-      sender: { $in: [req.params.userId] },
-    });
-    res.status(200).json(conversation);
+    if (savedConversation) {
+      return res.status(200).json(savedConversation);
+    } else {
+      return res.status(404).json({ msg: "conversation not saved" });
+    }
   } catch (err) {
     res.status(500).json(err);
   }
 };
 
 // get conv includes two userId
+exports.getOne = async (req, res) => {
+  const senderId = req.params.firstUserId;
+  const receiverId = req.params.secondUserId;
 
-exports.getOne= async (req, res) => {
+  if (validateId(senderId, res) || validateId(receiverId, res)) {
+    return res.status(404).json({ msg: "invalid id" });
+  }
+
   try {
     const conversation = await Conversation.findOne({
-      sender: { $in: [req.params.firstUserId] },
-      receiver: { $in: [req.params.secondUserId] },
+      members: { $all: [senderId, receiverId] },
     });
-    res.status(200).json(conversation);
+    if (conversation) {
+      return res.status(200).json(conversation);
+    } else {
+      return res.status(404).json({ msg: "conversation not found" });
+    }
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
+
+//get conversations of a user
+exports.getAll = async (req, res) => {
+  try {
+    const conversation = await Conversation.find({
+      members: { $in: [req.params.userId] },
+    });
+    if (conversation) {
+      return res.status(200).json(conversation);
+    } else {
+      return res.status(404).json({ msg: "conversation not found" });
+    }
   } catch (err) {
     res.status(500).json(err);
   }
 };
 
-exports.delete=async (req, res) => {
+exports.deleteOne = async (req, res) => {
   const id = req.params.id;
+  if (validateId(id, res)) {
+    return res.status(404).json({ msg: "invalid id" });
+  }
+  try {
+    const conversation = await Conversation.findById(id);
+    if (conversation) {
+      const loggedUser = await User.findById(req.user.id);
 
-  Conversation.findById(req.params.id)
-    .then((conversation) => {
-      if (conversation) {
+      if (
+        conversation.members[0] != req.user.id &&
+        conversation.members[1] != req.user.id &&
+        loggedUser.role !== "admin"
+      ) {
+        return res
+          .status(404)
+          .json({ msg: "you are not authorized to perform this operation" });
+      } else {
         conversation.remove().then(() => {
           return res.status(200).send(conversation);
         });
-      } else {
-        return res.status(404).json({ msg: "conversation not found" });
       }
-    })
-    .catch((error) => {
-      console.log(error);
-      return res.status(500).send({ msg: "bad server" });
-    });
+    } else {
+      return res.status(404).json({ msg: "conversation not found" });
+    }
+  } catch (error) {
+    return res.status(500).json(error);
+  }
 };
-
+// const messages = await Message.updateMany(
+//   {
+//     conversationId: req.params.conversationId,
+//   },
+//   { $set: { hidden: true, deletedBy: req.user.id } }
+// );
+// res.status(200).json(messages)
