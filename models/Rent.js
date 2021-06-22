@@ -47,7 +47,7 @@ const rentSchema = new Schema({
 
 let autoPopulateLead = function (next) {
   this.populate("renter");
-  this.populate("owner");
+  this.populate("owner", "-email -password -createdAt -updatedAt -__v");
   this.populate("item");
   next();
 };
