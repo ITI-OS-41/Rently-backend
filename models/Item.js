@@ -111,7 +111,7 @@ const itemSchema = new Schema(
 
 
 var autoPopulateLead = function (next) {
-  this.populate('owner');
+  this.populate("owner", "-email -password -createdAt -updatedAt -__v");
   this.populate('category');
   this.populate('subcategory');
   next();
