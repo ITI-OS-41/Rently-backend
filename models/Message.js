@@ -17,14 +17,14 @@ const messageSchema = new mongoose.Schema(
       type: String,
       required: [true, "message content is required"],
     },
-    hidden:{
-      type:Boolean,
-      default:false
-    },
-    deletedBy:{
-      type:ObjectId,
-      ref: "User"
-    }
+    // hidden:{
+    //   type:Boolean,
+    //   default:false
+    // },
+    // deletedBy:{
+    //   type:ObjectId,
+    //   ref: "User"
+    // }
   },
   { timestamps: true }
 );

@@ -3,6 +3,7 @@
 const validator = require("validator");
 const Category = require("../models/Category");
 const Blog = require("../models/Blog");
+const Conversation = require("../models/Conversation");
 const catchErrors = (fn) => {
   return function (req, res, next) {
     return fn(req, res, next).catch((next) => {
@@ -11,6 +12,26 @@ const catchErrors = (fn) => {
     });
   };
 };
+
+
+const conversationIdCheck = async (id, res) => {
+  let errors = {};
+  if (id) {
+    if (!validator.isMongoId(id)) {
+      errors.id = "invalid conversation id";
+    } else {
+      const idCheck = await Conversation.findById(id);
+      if (!idCheck) {
+        errors.id = "convresation not found";
+      }
+    }
+  }
+  return errors;
+};
+
+
+
+
 const categoryIdCheck = async (id, res) => {
   let errors = {};
   if (id) {
@@ -151,6 +172,7 @@ module.exports = {
   missingFieldsChecker,
   catchErrors,
   validateId,
+  conversationIdCheck,
   categoryIdCheck,
   blogIdCheck,
   assignErrorsToMissingFields,

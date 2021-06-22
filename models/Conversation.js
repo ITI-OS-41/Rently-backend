@@ -4,10 +4,9 @@ const ObjectId = require("mongoose").Types.ObjectId;
 
 const conversationSchema = new mongoose.Schema(
   {
-    members: {
-      type: [ObjectId],
-    },
-    // sender: {
+    members: 
+     [{type:ObjectId, ref:"User"}],
+      // sender: {
     //   type: ObjectId,
     //   ref: "User",
     //   required: [true, "sender is required"],
@@ -46,8 +45,7 @@ conversationSchema.statics.requiredFields = function () {
 };
 
 let autoPopulateLead = function (next) {
-  this.populate("sender");
-  this.populate("receiver");
+  // this.populate('members');
   next();
 };
 
