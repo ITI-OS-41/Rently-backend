@@ -45,7 +45,14 @@ const rentSchema = new Schema({
 
 }, { timestamps: true })
 
+let autoPopulateLead = function (next) {
+  this.populate("renter");
+  this.populate("owner");
+  this.populate("item");
+  next();
+};
 
+rentSchema.pre("findOne", autoPopulateLead).pre("find", autoPopulateLead);
 // Duplicate the ID field.
 rentSchema.virtual('id').get(function(){
   return this._id.toHexString();
