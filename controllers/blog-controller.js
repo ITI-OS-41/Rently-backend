@@ -1,7 +1,5 @@
 /** @format */
-const {
-  validateId,
-} = require("../helpers/errors");
+const { validateId } = require("../helpers/errors");
 const Comment = require("../models/Comment");
 const Blog = require("../models/Blog");
 const User = require("../models/User");
@@ -51,10 +49,12 @@ exports.getOneBlog = async (req, res) => {
   if (validateId(id, res)) {
     return res.status(404).json({ msg: "invalid blog id" });
   }
+  console.log(id);
+
   try {
     const foundBlog = await Blog.findById(id);
     if (foundBlog) {
-      return res.json(foundBlog);
+      return res.status(200).json(foundBlog);
     } else {
       return res.status(404).json({ msg: "blog not found" });
     }
@@ -65,14 +65,14 @@ exports.getOneBlog = async (req, res) => {
 
 exports.getOneComment = async (req, res) => {
   const id = req.params.id;
-  
+
   if (validateId(id, res)) {
     return res.status(404).json({ msg: "invalid comment id" });
   }
   try {
     const foundComment = await Comment.findById(id);
     if (foundComment) {
-      return res.json(foundComment);
+      return res.status(200).json(foundComment);
     } else {
       return res.status(404).json({ msg: "comment not found" });
     }
@@ -86,8 +86,8 @@ exports.getAllBlogs = async (req, res) => {
   const queryObj = {
     ...(title && { title: new RegExp(`${title}`) }),
     ...(description && { description: new RegExp(`${description}`) }),
-    ...(category && { category}),
-    ...(author && { author}),
+    ...(category && { category }),
+    ...(author && { author }),
     ...(slug && { slug }),
     ...(tags && { tags: new RegExp(tags.replace(/,/g, "|")) }),
   };
@@ -112,7 +112,7 @@ exports.getAllBlogs = async (req, res) => {
 };
 
 exports.getAllComments = async (req, res) => {
-  let { body, commenter,blogPost } = req.query;
+  let { body, commenter, blogPost } = req.query;
 
   const queryObj = {
     ...(body && { body: new RegExp(`${body}`) }),
@@ -157,7 +157,7 @@ exports.updateOneBlog = async (req, res) => {
       return res.status(200).send(updatedBlog);
     } else {
       return res
-        .status(404)
+        .status(403)
         .json({ msg: "you are not authorized to perform this operation" });
     }
   } catch (err) {
@@ -175,17 +175,16 @@ exports.updateOneComment = async (req, res) => {
       }
     );
     const loggedUser = await User.findById(req.user.id);
-    
+
     if (
       updatedComment.commenter == req.user.id ||
       loggedUser.role === "admin"
     ) {
       return res.status(200).send(updatedComment);
     } else {
-            return res
-        .status(404)
+      return res
+        .status(403)
         .json({ msg: "you are not authorized to perform this operation" });
-
     }
   } catch (err) {
     return res.status(500).json(err);
@@ -207,11 +206,10 @@ exports.deleteOneBlog = async (req, res) => {
         deletedBlog.remove().then(() => {
           return res.status(200).send(deletedBlog);
         });
-        ;
       } else {
-          return res
-          .status(404)
-          .json({ msg: "you are not authorized to perform this operation" })
+        return res
+          .status(403)
+          .json({ msg: "you are not authorized to perform this operation" });
       }
     } else {
       return res.status(404).json({ msg: "blog not found" });

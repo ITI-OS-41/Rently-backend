@@ -2,8 +2,8 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const ObjectId = require("mongoose").Types.ObjectId;
 const SubCategory = require("./SubCategory");
-const Item = require("./Item")
-const Faq = require("./Faq")
+const Item = require("./Item");
+const Faq = require("./Faq");
 const Blog = require("./Blog");
 const categorySchema = new Schema(
   {
@@ -15,7 +15,7 @@ const categorySchema = new Schema(
     name: {
       type: String,
       required: true,
-      index:true
+      index: true,
     },
     subcategory: [{ type: ObjectId, ref: "SubCategory" }],
     blogs: [{ type: ObjectId, ref: "Blog" }],
@@ -30,8 +30,8 @@ const categorySchema = new Schema(
     model: {
       type: String,
       default: "item",
-      index:true
-    }
+      index: true,
+    },
   },
   { timestamps: true }
 );
@@ -43,13 +43,12 @@ const categorySchema = new Schema(
 //   docToUpdate.save(); // The document that `findOneAndUpdate()` will modify
 // });
 
-categorySchema.pre("remove", function (next) {
-  SubCategory.deleteMany({ category: this._id }).exec();
-  Item.deleteMany({ category: this._id }).exec();
-  Faq.deleteMany({ category: this._id }).exec();
-  Blog.deleteMany({ category: this._id }).exec();
+categorySchema.pre("remove", async function (next) {
+  await Item.deleteMany({ category: this._id }).exec();
+  await Faq.deleteMany({ category: this._id }).exec();
+  await SubCategory.deleteMany({ category: this._id }).exec();
+  await Blog.deleteMany({ category: this._id }).exec();
   next();
-
 });
 
 categorySchema.statics.requiredFields = function () {
@@ -63,7 +62,7 @@ categorySchema.statics.requiredFields = function () {
 };
 
 let autoPopulateLead = function (next) {
-  this.populate("createdBy","-email -password -createdAt -updatedAt -__v");
+  this.populate("createdBy", "-email -password -createdAt -updatedAt -__v");
   this.populate("subCategory", "-category -createdAt -updatedAt -__v");
   next();
 };

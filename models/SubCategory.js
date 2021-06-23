@@ -3,35 +3,33 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const ObjectId = require("mongoose").Types.ObjectId;
+const Faq = require("./Faq")
 
 const subcategorySchema = new Schema(
-	{
-		createdBy:{
-			type: ObjectId,
-			ref: "User",
-			required: "user is required",
-		},
-		faq: [{ type: ObjectId, ref: "Faq" }],
-		name: {
-			type: String,
-			required: true,
-		},
-		description: {
-			type: String,
-		},
-		photo: String,
-		category: {
-			type: ObjectId,
-			ref: 'Category',
-			required: true,
-		},
-		model:{
-			type:String,
-			default:"item"
-		}
-	},
-	{ timestamps: true }
+  {
+    createdBy: {
+      type: ObjectId,
+      ref: "User",
+      required: "user is required",
+    },
+    faq: [{ type: ObjectId, ref: "Faq" }],
+    name: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+    },
+    photo: String,
+    category: {
+      type: ObjectId,
+      ref: "Category",
+      required: true,
+    },
+  },
+  { timestamps: true }
 );
+
 
 subcategorySchema.statics.requiredFields = function () {
 	let arr = [];

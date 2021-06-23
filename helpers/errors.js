@@ -7,6 +7,8 @@ const Blog = require("../models/Blog");
 const Comment = require("../models/Comment");
 const Conversation = require("../models/Conversation");
 const User = require("../models/User");
+const Faq = require("../models/Faq");
+
 const catchErrors = (fn) => {
   return function (req, res, next) {
     return fn(req, res, next).catch((next) => {
@@ -18,17 +20,30 @@ const catchErrors = (fn) => {
 
 const receiverIdCheck = async (id, res) => {
   let errors = {};
-    if (!validator.isMongoId(id)) {
-      errors.id = "this is not a valid user id";
-    } else {
-      const idCheck = await User.findById(id);
-      if (!idCheck) {
-        errors.id = "this user is not found in our database ";
-      }
+  if (!validator.isMongoId(id)) {
+    errors.id = "this is not a valid user id";
+  } else {
+    const idCheck = await User.findById(id);
+    if (!idCheck) {
+      errors.id = "this user is not found in our database ";
     }
+  }
   return errors;
 };
-
+const faqIdCheck = async (id, res) => {
+  let errors = {};
+  if (id) {
+    if (!validator.isMongoId(id)) {
+      errors.id = "invalid faq id";
+    } else {
+      const idCheck = await Faq.findById(id);
+      if (!idCheck) {
+        errors.id = "faq not found";
+      }
+    }
+  }
+  return errors;
+};
 const conversationIdCheck = async (id, res) => {
   let errors = {};
   if (id) {
@@ -43,22 +58,21 @@ const conversationIdCheck = async (id, res) => {
   }
   return errors;
 };
+
 const subCategoryIdCheck = async (id, res) => {
   let errors = {};
   if (id) {
     if (!validator.isMongoId(id)) {
-      errors.id = "invalid subcategory id";
+      errors.id = "invalid subCategory id";
     } else {
       const idCheck = await SubCategory.findById(id);
       if (!idCheck) {
-        errors.id = "subcategory not found";
+        errors.id = "subCategory not found";
       }
     }
   }
   return errors;
 };
-
-
 
 const categoryIdCheck = async (id, res) => {
   let errors = {};
@@ -105,7 +119,7 @@ const commentIdCheck = async (id, res) => {
   return errors;
 };
 
-const validateId = (id, res) => {
+const validateId = (id,res) => {
   let errors = {};
   if (!validator.isMongoId(id)) {
     return (errors.id = "invalid id");
@@ -128,7 +142,7 @@ const assignErrorsToMissingFields = (missingFields) => {
   let errors = {};
   if (missingFields.length) {
     missingFields.map((err) => {
-      errors[err] = `${err} is required`;
+      errors[err] = `${err} field is required`;
     });
   }
   return errors;
@@ -216,6 +230,7 @@ module.exports = {
   catchErrors,
   validateId,
   conversationIdCheck,
+  faqIdCheck,
   receiverIdCheck,
   categoryIdCheck,
   blogIdCheck,

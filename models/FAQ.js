@@ -3,7 +3,6 @@ const Schema = mongoose.Schema;
 const slug = require("slugs");
 const { ObjectId } = mongoose.Schema.Types;
 
-
 const faqSchema = new Schema({
   createdBy: {
     type: ObjectId,
@@ -24,12 +23,12 @@ const faqSchema = new Schema({
   },
   category: {
     type: ObjectId,
-    ref: "Cagtegory",
+    ref: "Category",
     required: [true, "faq category is required"],
   },
   subCategory: {
     type: ObjectId,
-    ref: "SubCagtegory",
+    ref: "SubCategory",
     required: [true, "faq Subcategory is required"],
   },
 
@@ -72,18 +71,19 @@ faqSchema.statics.requiredFields = function () {
 };
 
 let autoPopulateLead = function (next) {
-  this.populate("createdBy");
-  this.populate("category");
-  // this.populate("subCategory");
-  //TODO: handle the problem of nested object Ids
-
-  this.populate({path:"category", model:"Category"});
-  // this.populate({path:"subCategory", model:"SubCategory"});
-  // this.populate("subCategory");
+  this.populate("createdBy", "-email -password -createdAt -updatedAt -__v");
+  this.populate(
+    "category",
+    "-subcategory -blogs -description -photo -createdAt -updatedAt -__v"
+  );
+  this.populate(
+    "subCategory",
+    "-faq -description -photo -category -createdAt -updatedAt -__v "
+  );
   next();
 };
 
 faqSchema.pre("findOne", autoPopulateLead).pre("find", autoPopulateLead);
-faqSchema.index({ questions: 1, category: 1,slug:1 }, { unique: true });
+faqSchema.index({ questions: 1, category: 1, slug: 1 }, { unique: true });
 
 module.exports = mongoose.model("Faq", faqSchema);
