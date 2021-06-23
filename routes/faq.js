@@ -2,28 +2,28 @@
 const auth = require("../middleware/auth");
 const router = require("express").Router();
 const validateFaq = require("../validation/faq");
-const { catchErrors } = require("../helpers/errors");
+
 // Import controllers
 const {
-  create,
-  getAll,
-  getOne,
-  update,
-  deleteOne,
+  createOneFaq,
+  getAllFaqs,
+  getOneFaq,
+  updateOneFaq,
+  deleteOneFaq,
 } = require("../controllers/faq-controller");
 // * create Faq
 
-router.post("/", validateFaq, catchErrors(create));
+router.post("/",auth, validateFaq, createOneFaq);
 // * GET ONE
-router.get("/:id", catchErrors(getOne));
+router.get("/:id", getOneFaq);
 
 // * GET ALL
-router.get("/", catchErrors(getAll));
+router.get("/", getAllFaqs);
 
 // * UPDATE
-router.post("/:id", validateFaq, catchErrors(update));
+router.post("/:id",auth, updateOneFaq);
 
 // * DELETE
-router.delete("/:id", catchErrors(deleteOne));
+router.delete("/:id", deleteOneFaq);
 
 module.exports = router;

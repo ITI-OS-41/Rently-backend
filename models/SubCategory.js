@@ -11,10 +11,10 @@ const subcategorySchema = new Schema(
 			ref: "User",
 			required: "user is required",
 		},
+		faq: [{ type: ObjectId, ref: "Faq" }],
 		name: {
 			type: String,
 			required: true,
-			index: true,
 		},
 		description: {
 			type: String,
@@ -24,7 +24,6 @@ const subcategorySchema = new Schema(
 			type: ObjectId,
 			ref: 'Category',
 			required: true,
-			index: true,
 		},
 		model:{
 			type:String,
@@ -45,8 +44,8 @@ subcategorySchema.statics.requiredFields = function () {
 };
 
 let autoPopulateLead = function (next) {
-	this.populate('category');
-	this.populate('createdBy');
+	this.populate('faq',"-subCategory -category -createdAt -updatedAt -__v");
+	this.populate('createdBy',"-email -password -createdAt -updatedAt -__v");
 	next();
 };
 

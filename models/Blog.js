@@ -12,10 +12,14 @@ const blogSchema = new mongoose.Schema(
       ref: "User",
       required: [true, "author is required"],
     },
+    category: {
+      type: ObjectId,
+      ref: "Category",
+      required: [true, "faq category is required"],
+    },
     title: {
       type: String,
       trim: true,
-      index: true,
       required: [true, "title is required"],
       minlength: [4, "title is really short, needed to be 4, got {VALUE}"],
     },
@@ -35,12 +39,6 @@ const blogSchema = new mongoose.Schema(
     },
     bodyPhotos: [String],
     comments: [{ type: ObjectId, ref: "Comment" }],
-    category: {
-      type: ObjectId,
-      ref: "Cagtegory",
-      required: [true, "faq category is required"],
-      index: true,
-    },
   },
   { timestamps: true }
 );
@@ -81,8 +79,7 @@ blogSchema.statics.requiredFields = function () {
   for (let required in blogSchema.obj) {
     if (
       blogSchema.obj[required].required &&
-      required !== "author" &&
-      required !== "category"
+      required !== "author"
     ) {
       arr.push(required);
     }
@@ -91,8 +88,9 @@ blogSchema.statics.requiredFields = function () {
 };
 
 let autoPopulateLead = function (next) {
-  this.populate("author");
-  this.populate("comments");
+  this.populate("category","-subcategory -blogs -description -photo -createdAt -updatedAt -__v");
+  this.populate("author","-email -password -createdAt -updatedAt -__v");
+  this.populate("comments","-blogPost -createdAt -updatedAt -__v");
 
   next();
 };

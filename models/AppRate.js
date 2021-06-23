@@ -7,7 +7,7 @@ const appRateSchema = new Schema({
     type: ObjectId,
     ref: "User",
     required: true,
-    index:true
+    unique:true
   },
   comment: {
     type: String,
@@ -42,7 +42,5 @@ let autoPopulateLead = function (next) {
 appRateSchema.
   pre('findOne', autoPopulateLead).
   pre('find', autoPopulateLead);
-
-appRateSchema.index({ rater: 1, site: 1 }, { unique: true });
 
 module.exports = mongoose.model("AppRate", appRateSchema)

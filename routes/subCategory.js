@@ -2,7 +2,7 @@
 
 const router = require("express").Router();
 const validateSubCategory = require("../validation/subCategory");
-
+const auth= require("../middleware/auth")
 const {
 	getOne,
 	getAll,
@@ -13,7 +13,7 @@ const {
 const { catchErrors } = require("../helpers/errors");
 
 //  * Create
-router.post("/", validateSubCategory,catchErrors(create));
+router.post("/", auth, validateSubCategory,catchErrors(create));
 
 // * GET ONE
 router.get("/:id", catchErrors(getOne));

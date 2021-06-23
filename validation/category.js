@@ -36,6 +36,7 @@ module.exports = async (req, res, next) => {
 
 	const duplicationCheck = await Category.find({
 		name: data.name,
+		model:data.model
 	});
 
 	if (duplicationCheck.length) {

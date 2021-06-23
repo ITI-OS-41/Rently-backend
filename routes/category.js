@@ -1,40 +1,44 @@
 /** @format */
 const auth = require("../middleware/auth");
+const authAdmin = require("../middleware/authAdmin");
 const router = require("express").Router();
 const { catchErrors } = require("../helpers/errors");
 const validateCategory = require("../validation/category");
 const validateBlog = require("../validation/blog");
-// Import controllers
+// Import category controllers
 const {
-  getOne,
-  getAll,
-  update,
-  deleteOne,
-  create,
+  createOneCategory,
+  getOneCategory,
+  getAllCategories,
+  updateOneCategory,
+  deleteOneCategory,
 } = require("../controllers/category-controller");
 
+
+// Import faq controllers
 const {
-  createBlog,
-  getAllBlogs,
-  getOneBlog,
-  updateBlog,
-  deleteOneBlog,
-} = require("../controllers/blog-controller");
+  createOneFaq,
+  getOneFaq,
+  getAllFaqs,
+  updateOneFaq,
+  deleteOneFaq,
+} = require("../controllers/faq-controller");
+
+
 //****************** 
-//*blog routes
+//*Faq routes
 //****************
 
-// * create blog
-router.post("/:categoryId/blog", auth, validateBlog, createBlog);
-// * GET ONE Blog
-router.get("/:categoryId/blog/:blogId", auth,getOneBlog);
-// * GET ALL Blogs
-router.get("/:categoryId/blog", auth,getAllBlogs);
-// * UPDATE Blog
-router.post("/:categoryId/blog/:blogId", auth, validateBlog, updateBlog);
-// * DELETE Blog
-router.delete("/:categoryId/blog/:blogId", auth, deleteOneBlog);
-
+// * create faq
+router.post("/:categoryId/subCategory/:subCategoryId/faq", auth,authAdmin, validateBlog, createOneFaq);
+// * GET ONE faq
+router.get("/:categoryId/subCategory/:subCategoryId/faq/:faqId",getOneFaq);
+// * GET ALL faqs
+router.get("/:categoryId/subCategory/:subCategoryId/faq",getAllFaqs);
+// * UPDATE faq
+router.post("/:categoryId/subCategory/:subCategoryId/faq/:faqId", auth, authAdmin,validateBlog, updateOneFaq);
+// * DELETE faq
+router.delete("/:categoryId/subCategory/:subCategoryId/faq/:faqId", auth,authAdmin, deleteOneFaq);
 
 //*******************
 //* category routes
@@ -42,14 +46,14 @@ router.delete("/:categoryId/blog/:blogId", auth, deleteOneBlog);
 
 //  * Create New
 
-router.post("/", auth, validateCategory, catchErrors(create));
+router.post("/", auth, validateCategory, catchErrors(createOneCategory));
 // * GET ONE
-router.get("/:id", catchErrors(getOne));
+router.get("/:id", catchErrors(getOneCategory));
 // * GET ALL
-router.get("/", catchErrors(getAll));
+router.get("/", catchErrors(getAllCategories));
 // * UPDATE
-router.post("/:id", auth, validateCategory, catchErrors(update));
+router.post("/:id", auth, validateCategory, catchErrors(updateOneCategory));
 // * DELETE
-router.delete("/:id", catchErrors(deleteOne));
+router.delete("/:id", catchErrors(deleteOneCategory));
 
 module.exports = router;

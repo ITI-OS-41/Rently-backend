@@ -3,17 +3,17 @@ const mongoose = require("mongoose");
 const Category = mongoose.model("Category");
 
 // * Create and Save a new Category
-exports.create = async (req, res) => {
+exports.createOneCategory = async (req, res) => {
   req.body.createdBy = req.user.id;
   const category = await new Category(req.body).save();
   res.status(200).send(category);
 };
 
 //* Get One
-exports.getOne = (req, res) => {
+exports.getOneCategory = async (req, res) => {
   const id = req.params.id;
   if (!validateId(id, res)) {
-    Category.findById(id).then((category) => {
+    await Category.findById(id).then((category) => {
       if (category) {
         return res.json(category);
       } else {
@@ -24,7 +24,7 @@ exports.getOne = (req, res) => {
 };
 
 //* Get ALL
-exports.getAll = async (req, res) => {
+exports.getAllCategories = async (req, res) => {
   let { name, model, subcategory } = req.query;
   const sortBy = req.query.sortBy || "createdAt";
   const orderBy = req.query.orderBy || "asc";
@@ -49,7 +49,7 @@ exports.getAll = async (req, res) => {
   res.status(200).send({ getCategories, pagination: { limit, skip, page } });
 };
 
-exports.update = async (req, res) => {
+exports.updateOneCategory = async (req, res) => {
   await Category.findOneAndUpdate({ _id: req.params.id }, req.body, {
     new: true,
   }).then((response) => {
@@ -57,7 +57,7 @@ exports.update = async (req, res) => {
   });
 };
 
-exports.deleteOne = async (req, res) => {
+exports.deleteOneCategory = async (req, res) => {
   const id = req.params.id;
   if (!validateId(id, res)) {
     Category.findById(id).then((category) => {

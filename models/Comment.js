@@ -29,9 +29,8 @@ commentSchema.statics.requiredFields = function () {
   for (let required in commentSchema.obj) {
     if (
       commentSchema.obj[required].required &&
-      required !== "commenter" &&
-      required !== "blogPost"
-    ) {
+      required !== "commenter" 
+        ) {
       arr.push(required);
     }
   }
@@ -39,7 +38,8 @@ commentSchema.statics.requiredFields = function () {
 };
 
 let autoPopulateLead = function (next) {
-  this.populate("commenter");
+  this.populate("commenter", "-email -password -createdAt -updatedAt -__v");
+  this.populate("blogPost", "-slug -description -tags -headerPhoto -bodyPhotos -category -createdAt -updatedAt -__v");
   next();
 };
 

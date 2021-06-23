@@ -2,7 +2,9 @@
 
 const validator = require("validator");
 const Category = require("../models/Category");
+const SubCategory = require("../models/SubCategory");
 const Blog = require("../models/Blog");
+const Comment = require("../models/Comment");
 const Conversation = require("../models/Conversation");
 const catchErrors = (fn) => {
   return function (req, res, next) {
@@ -28,7 +30,20 @@ const conversationIdCheck = async (id, res) => {
   }
   return errors;
 };
-
+const subCategoryIdCheck = async (id, res) => {
+  let errors = {};
+  if (id) {
+    if (!validator.isMongoId(id)) {
+      errors.id = "invalid subcategory id";
+    } else {
+      const idCheck = await SubCategory.findById(id);
+      if (!idCheck) {
+        errors.id = "subcategory not found";
+      }
+    }
+  }
+  return errors;
+};
 
 
 
@@ -56,6 +71,21 @@ const blogIdCheck = async (id, res) => {
       const idCheck = await Blog.findById(id);
       if (!idCheck) {
         errors.id = "blog not found";
+      }
+    }
+  }
+  return errors;
+};
+
+const commentIdCheck = async (id, res) => {
+  let errors = {};
+  if (id) {
+    if (!validator.isMongoId(id)) {
+      errors.id = "invalid comment id";
+    } else {
+      const idCheck = await Comment.findById(id);
+      if (!idCheck) {
+        errors.id = "comment not found";
       }
     }
   }
@@ -175,6 +205,8 @@ module.exports = {
   conversationIdCheck,
   categoryIdCheck,
   blogIdCheck,
+  subCategoryIdCheck,
+  commentIdCheck,
   assignErrorsToMissingFields,
   getTwoArraysDifferences,
   assignEmptyErrorsToFields,

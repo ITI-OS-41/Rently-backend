@@ -1,7 +1,7 @@
 /** @format */
-
 const {
   blogIdCheck,
+  commentIdCheck,
   assignEmptyErrorsToFields,
   assignErrorsToMissingFields,
   getTwoArraysDifferences,
@@ -12,40 +12,32 @@ const Comment = require("../models/Comment");
 
 module.exports = async (req, res, next) => {
   let errors = {};
-  const id = req.params.commentId;
+  const id = req.params.id;
   const data = req.body;
   const requiredFields = Comment.requiredFields();
   const requestBody = Object.keys(data);
-
-  const idCheck = await blogIdCheck(req.params.blogId, res);
-  if (Object.keys(idCheck).length > 0) {
-    return res.status(404).json(idCheck);
-  }
-
-  if (id) {
-    if (!validator.isMongoId(id)) {
-      errors.id = "invalid comment id";
-      return res.status(404).json(errors);
-    } else {
-      const idCheck = await Comment.findById(id);
-      if (!idCheck) {
-        errors.id = "comment not found";
-        return res.status(404).json(errors);
-      }
+  
+    const idCommentCheck = await commentIdCheck(id, res);
+    if (Object.keys(idCommentCheck).length > 0) {
+     return res.status(404).json(idCommentCheck)
     }
-  }
 
   let missingFields = missingFieldsChecker(requestBody, requiredFields);
-
+  
   errors = assignErrorsToMissingFields(missingFields);
-
+  
   let difference = getTwoArraysDifferences(requiredFields, missingFields);
-
+  
   errors = {
     ...errors,
     ...assignEmptyErrorsToFields(data, difference),
   };
 
+  const idBlogCheck = await blogIdCheck(data.blogPost, res);
+  if (Object.keys(idBlogCheck).length > 0) {
+    errors.blog=idBlogCheck
+  }
+  
   if (Object.keys(errors).length > 0) {
     return res.status(404).json(errors);
   } else {

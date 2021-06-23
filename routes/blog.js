@@ -1,29 +1,37 @@
 /** @format */
 const auth = require("../middleware/auth");
-const authAdmin = require("../middleware/authAdmin");
 const router = require("express").Router();
-const validateComment = require("../validation/comment");
-// Import controllers
+const validateBlog = require("../validation/blog");
+
+
+// Import blog controllers
 const {
-  createComment,
-  getAllComments,
-  updateComment,
-  deleteOneComment,
+  createOneBlog,
+  getAllBlogs,
+  getOneBlog,
+  updateOneBlog,
+  deleteOneBlog,
 } = require("../controllers/blog-controller");
 
 
 
-// * create comment
-router.post("/:blogId/comment", auth,validateComment, createComment);
+//****************** 
+//*blog routes
+//****************
 
-// * GET ALL Blog Comments
-router.get("/:blogId/comment", auth, getAllComments);
+// * create blog
+router.post("/", auth, validateBlog, createOneBlog);
+// * GET ONE Blog
+router.get("/:id",getOneBlog);
+// * GET ALL Blogs
+router.get("/",getAllBlogs);
+// * UPDATE Blog
+router.post("/:id", auth, validateBlog, updateOneBlog);
+// * DELETE Blog
+router.delete("/:id", auth, deleteOneBlog);
 
-// * UPDATE Comment
-router.post("/:blogId/comment/:commentId",auth, validateComment, updateComment);
 
 
-// * DELETE Comment
-router.delete("/:blogId/comment/:commentId",auth, deleteOneComment);
+
 
 module.exports = router;

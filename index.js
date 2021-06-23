@@ -12,26 +12,8 @@ const cookieParser = require("cookie-parser");
 const path = require("path");
 
 /*
- ** ROUTES
- */
-// const auth = require("./routes/auth.js");
-const user = require("./routes/user.js");
-const notification = require("./routes/notification.js");
-const blog = require("./routes/blog.js");
-const faq = require("./routes/faq.js");
-const rent = require("./routes/rent.js");
-const item = require("./routes/item.js");
-const category = require("./routes/category.js");
-const subcategory = require("./routes/subCategory.js");
-const appRate = require("./routes/appRate.js");
-const itemRate = require("./routes/itemRate.js");
-const userRate = require("./routes/userRate.js");
-const conversation = require("./routes/conversation");
-const message = require("./routes/message");
-
-/*
- ** MONGO DB CONNECT
- */
+** MONGO DB CONNECT
+*/
 mongoose.connect(
   process.env.MONGODB_URL,
   {
@@ -44,7 +26,27 @@ mongoose.connect(
     if (err) throw err;
     console.log("Connected to mongodb on atlas");
   }
-);
+  );
+  
+  /*
+   ** ROUTES
+   */
+// const auth = require("./routes/auth.js");
+const user = require("./routes/user.js");
+const category = require("./routes/category.js");
+const subcategory = require("./routes/subCategory.js");
+const blog = require("./routes/blog.js");
+const comment = require("./routes/comment.js");
+const notification = require("./routes/notification.js");
+const faq = require("./routes/faq.js");
+const rent = require("./routes/rent.js");
+const item = require("./routes/item.js");
+const appRate = require("./routes/appRate.js");
+const itemRate = require("./routes/itemRate.js");
+const userRate = require("./routes/userRate.js");
+const conversation = require("./routes/conversation");
+const message = require("./routes/message");
+
 
 /*
  ** ! Pusher
@@ -91,9 +93,10 @@ app.use(function (req, res, next) {
 app.use("/api/user", user);
 app.use("/api/category", category);
 app.use("/api/subcategory", subcategory);
-app.use("/api/notification", notification);
 app.use("/api/blog", blog);
+app.use("/api/comment", comment);
 app.use("/api/faq", faq);
+app.use("/api/notification", notification);
 app.use("/api/rent", rent);
 app.use("/api/item", item);
 app.use("/api/apprate", appRate);
