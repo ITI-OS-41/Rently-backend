@@ -5,14 +5,15 @@ const validateMessage = require("../validation/message");
 
 // Import controllers
 const {
-  create,
-  getAll,
+  createOneMessage,
+  getAllMessages,
 } = require("../controllers/message-controller");
 //add
 
-router.post("/", auth, validateMessage, create);
+router.post("/", auth, validateMessage, createOneMessage);
 
 //get
-router.get("/:conversationId", auth, getAll);
+router.get("/:conversationId", auth, getAllMessages);
+
 
 module.exports = router;

@@ -16,11 +16,11 @@ router.post("/",auth,validateConversation, create);
 //get conv of a user
 
 // TODO:get conversation of logged in user
-router.get("/:userId",auth, getAll);
+router.get("/",auth, getAll);
 
 // get conv includes two userId
 
-router.get("/:firstUserId/:secondUserId", auth, getOne);
+router.get("/:id", auth, getOne);
 
 router.delete("/:id", auth, deleteOne );
 

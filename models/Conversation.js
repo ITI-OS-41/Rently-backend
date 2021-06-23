@@ -4,9 +4,14 @@ const ObjectId = require("mongoose").Types.ObjectId;
 
 const conversationSchema = new mongoose.Schema(
   {
-    members: 
-     [{type:ObjectId, ref:"User"}],
-      // sender: {
+    members: [
+      {
+        type: ObjectId,
+        ref: "User",
+        required: [true, "should define conversation participants"],
+      },
+    ],
+    // sender: {
     //   type: ObjectId,
     //   ref: "User",
     //   required: [true, "sender is required"],
@@ -36,16 +41,15 @@ conversationSchema.pre("remove", function (next) {
 conversationSchema.statics.requiredFields = function () {
   let arr = [];
   for (let required in conversationSchema.obj) {
-    if (conversationSchema.obj[required].required && required !== "sender") {
+    if (conversationSchema.obj[required][0].required) {
       arr.push(required);
-      console.log({ required });
     }
   }
   return arr;
 };
 
 let autoPopulateLead = function (next) {
-  // this.populate('members');
+  this.populate("members", "-email -password -createdAt -updatedAt -__v");
   next();
 };
 

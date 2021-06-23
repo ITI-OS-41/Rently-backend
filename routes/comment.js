@@ -28,6 +28,6 @@ router.get("/",  getAllComments);
 router.post("/:id",auth, validateComment, updateOneComment);
 
 // * DELETE ONE Comment
-router.delete(":id",auth, deleteOneComment);
+router.delete("/:id",auth, deleteOneComment);
 
 module.exports = router;

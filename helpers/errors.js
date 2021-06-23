@@ -6,6 +6,7 @@ const SubCategory = require("../models/SubCategory");
 const Blog = require("../models/Blog");
 const Comment = require("../models/Comment");
 const Conversation = require("../models/Conversation");
+const User = require("../models/User");
 const catchErrors = (fn) => {
   return function (req, res, next) {
     return fn(req, res, next).catch((next) => {
@@ -15,6 +16,18 @@ const catchErrors = (fn) => {
   };
 };
 
+const receiverIdCheck = async (id, res) => {
+  let errors = {};
+    if (!validator.isMongoId(id)) {
+      errors.id = "this is not a valid user id";
+    } else {
+      const idCheck = await User.findById(id);
+      if (!idCheck) {
+        errors.id = "this user is not found in our database ";
+      }
+    }
+  return errors;
+};
 
 const conversationIdCheck = async (id, res) => {
   let errors = {};
@@ -127,7 +140,7 @@ const assignEmptyErrorsToFields = (data, fields) => {
   if (fields) {
     fields.forEach((field) => {
       if (!data[field].length) {
-        errors[field] = `${field} is empty`;
+        errors[field] = `${field} field is empty`;
       }
     });
   }
@@ -203,6 +216,7 @@ module.exports = {
   catchErrors,
   validateId,
   conversationIdCheck,
+  receiverIdCheck,
   categoryIdCheck,
   blogIdCheck,
   subCategoryIdCheck,

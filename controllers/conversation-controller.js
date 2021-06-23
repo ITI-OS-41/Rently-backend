@@ -6,7 +6,7 @@ const { validateId } = require("../helpers/errors");
 exports.create = async (req, res) => {
   req.body.sender = req.user.id;
   const newConversation = new Conversation({
-    members: [req.body.sender, req.body.receiver],
+    members: [req.body.sender, req.body.members],
   });
   try {
     const savedConversation = await newConversation.save();
@@ -22,19 +22,25 @@ exports.create = async (req, res) => {
 
 // get conv includes two userId
 exports.getOne = async (req, res) => {
-  const senderId = req.params.firstUserId;
-  const receiverId = req.params.secondUserId;
-
-  if (validateId(senderId, res) || validateId(receiverId, res)) {
-    return res.status(404).json({ msg: "invalid id" });
+  if (validateId(req.params.id, res)) {
+    return res.status(404).json({ msg: "invalid conversation id" });
   }
-
+  const loggedUser = await User.findById(req.user.id);
   try {
-    const conversation = await Conversation.findOne({
-      members: { $all: [senderId, receiverId] },
+    const conversation = await Conversation.findById({
+      _id: req.params.id,
     });
+
     if (conversation) {
-      return res.status(200).json(conversation);
+      if (
+        conversation.members[0]._id == req.user.id ||
+        conversation.members[1]._id == req.user.id ||
+        loggedUser.role === "admin"
+      ) {
+        return res.status(200).json(conversation);
+      } else {
+        return res.status(403).json({ msg: "unauthorized resources access" });
+      }
     } else {
       return res.status(404).json({ msg: "conversation not found" });
     }
@@ -47,12 +53,12 @@ exports.getOne = async (req, res) => {
 exports.getAll = async (req, res) => {
   try {
     const conversation = await Conversation.find({
-      members: { $in: [req.params.userId] },
+      members: { $in: [req.user.id] },
     });
-    if (conversation) {
+    if (conversation.length) {
       return res.status(200).json(conversation);
     } else {
-      return res.status(404).json({ msg: "conversation not found" });
+      return res.status(404).json({ msg: "no conversation found for this user" });
     }
   } catch (err) {
     res.status(500).json(err);
@@ -70,17 +76,17 @@ exports.deleteOne = async (req, res) => {
       const loggedUser = await User.findById(req.user.id);
 
       if (
-        conversation.members[0] != req.user.id &&
-        conversation.members[1] != req.user.id &&
-        loggedUser.role !== "admin"
+        conversation.members[0] == req.user.id ||
+        conversation.members[1] == req.user.id ||
+        loggedUser.role === "admin"
       ) {
-        return res
-          .status(404)
-          .json({ msg: "you are not authorized to perform this operation" });
-      } else {
         conversation.remove().then(() => {
           return res.status(200).send(conversation);
         });
+      } else {
+        return res
+          .status(404)
+          .json({ msg: "you are not authorized to perform this operation" });
       }
     } else {
       return res.status(404).json({ msg: "conversation not found" });

@@ -1,11 +1,12 @@
 const Message = require("../models/Message");
+const Conversation = require("../models/Conversation");
 const { conversationIdCheck } = require("../helpers/errors");
 
 //add
 
-exports.create = async (req, res) => {
+exports.createOneMessage = async (req, res) => {
+  req.body.sender = req.user.id;
   const newMessage = new Message(req.body);
-
   try {
     const savedMessage = await newMessage.save();
     res.status(200).json(savedMessage);
@@ -16,11 +17,21 @@ exports.create = async (req, res) => {
 
 //get
 
-exports.getAll = async (req, res) => {
-  
+exports.getAllMessages = async (req, res) => {
+  req.body.sender = req.user.id;
   const idCheck = await conversationIdCheck(req.params.conversationId, res);
   if (Object.keys(idCheck).length > 0) {
     return res.status(404).json(idCheck);
+  } else {
+    const checkSender = await Conversation.find({
+      _id: req.params.conversationId,
+      members: { $in: [req.body.sender] },
+    });
+    if (!checkSender.length) {
+      return res
+        .status(403)
+        .json({ msg: "sender is not part of the requested conversation " });
+    }
   }
   try {
     const messages = await Message.find({

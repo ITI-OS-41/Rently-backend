@@ -76,6 +76,7 @@ blogSchema.pre("save", async function (next) {
 // loop over el required fields and return an array
 blogSchema.statics.requiredFields = function () {
   let arr = [];
+  console.log(blogSchema.obj);
   for (let required in blogSchema.obj) {
     if (
       blogSchema.obj[required].required &&

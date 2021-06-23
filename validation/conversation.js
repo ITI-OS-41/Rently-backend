@@ -1,6 +1,7 @@
 /** @format */
 
 const {
+  receiverIdCheck,
   assignEmptyErrorsToFields,
   assignErrorsToMissingFields,
   getTwoArraysDifferences,
@@ -14,7 +15,7 @@ module.exports = async (req, res, next) => {
   const data = req.body;
   const requiredFields = Conversation.requiredFields();
   const requestBody = Object.keys(data);
-
+  
   let missingFields = missingFieldsChecker(requestBody, requiredFields);
 
   errors = assignErrorsToMissingFields(missingFields);
@@ -26,26 +27,26 @@ module.exports = async (req, res, next) => {
     ...assignEmptyErrorsToFields(data, difference),
   };
 
-  req.body.sender = req.user.id;
-  const findDuplication = await Conversation.find({
-    members: [req.body.sender, req.body.receiver],
-  });
-  if (findDuplication.length) {
-    errors.duplication = "conversation duplication error";
+  if (data.members && !errors.members) {
+    const idreceiverCheck = await receiverIdCheck(data.members, res);
+    if (Object.keys(idreceiverCheck).length > 0) {
+      return res.status(404).json(idreceiverCheck);
+    }
+    else if(data.sender == data.members) {
+      errors.duplication="you can't start a conversation with yourself, please choose another user"
+    }
   }
-
-  if (data.receiver && !errors.receiver) {
-    if (!validator.isMongoId(data.receiver)) {
-      errors.receiver = "this is not a valid user id";
-    } else {
-      const receiver = await User.findById(data.receiver);
-      if (!receiver) {
-        errors.receiver = "this user is not found in our database ";
-      }
+  
+  if (!errors.members) {
+    req.body.sender = req.user.id;
+    const findDuplication = await Conversation.find({
+      members: [req.body.sender, req.body.members],
+    });
+    if (findDuplication.length) {
+      errors.duplication = "a conversation between these participants already exists";
     }
   }
   if (Object.keys(errors).length > 0) {
-    // console.log(data, errors);
     return res.status(404).json(errors);
   } else {
     return next();
