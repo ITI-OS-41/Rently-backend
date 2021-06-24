@@ -47,7 +47,7 @@ module.exports = async (req, res, next) => {
     errors.title = `title ${data.title} is shorter than the minimum allowed length (4)`;
   }
 
-  if (!errors.category) {
+  if (Object.keys(errors).length == 0) {
     const duplicationCheck = await Blog.find({
       title: data.title,
       category: data.category,
@@ -58,7 +58,7 @@ module.exports = async (req, res, next) => {
           errors.duplication =
             "a blog with this title has been published in this category, please choose another title";
         }
-      } else{
+      } else {
         errors.duplication =
           "a blog with this title has been published in this category, please choose another title";
       }

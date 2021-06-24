@@ -187,7 +187,7 @@ exports.updateOneBlog = async (req, res) => {
           .json({ msg: "you are not authorized to perform this operation" });
       }
     } else {
-      return res.status(403).json({ msg: "blog not updated" });
+      return res.status(404).json({ msg: "blog not updated" });
     }
   } catch (error) {
     return res.status(500).json(err);
@@ -217,7 +217,7 @@ exports.updateOneComment = async (req, res) => {
           .json({ msg: "you are not authorized to perform this operation" });
       }
     } else {
-      return res.status(403).json({ msg: "comment not updated" });
+      return res.status(404).json({ msg: "comment not updated" });
     }
   } catch (err) {
     return res.status(500).json(err);

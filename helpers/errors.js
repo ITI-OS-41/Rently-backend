@@ -9,6 +9,7 @@ const Conversation = require("../models/Conversation");
 const User = require("../models/User");
 const Faq = require("../models/Faq");
 const Item = require("../models/Item");
+const AppRate= require("../models/AppRate")
 
 const catchErrors = (fn) => {
   return function (req, res, next) {
@@ -18,16 +19,29 @@ const catchErrors = (fn) => {
     });
   };
 };
-
+const appRateIdCheck = async (id, res) => {
+  let errors = {};
+  if (id) {
+    if (!validator.isMongoId(id)) {
+      errors.id = "this is not a valid appRate id";
+    } else {
+      const idCheck = await AppRate.findById(id);
+      if (!idCheck) {
+        errors.id = " appRate not found";
+      }
+    }
+  }
+  return errors;
+};
 const userIdCheck = async (id, res) => {
   let errors = {};
   if (id) {
     if (!validator.isMongoId(id)) {
-      errors.id = "this is not a valid user id";
+      errors.id = "user id not valid";
     } else {
       const idCheck = await User.findById(id);
       if (!idCheck) {
-        errors.id = "this user is not found in our database ";
+        errors.id = "user not found ";
       }
     }
   }
@@ -257,6 +271,7 @@ module.exports = {
   validateId,
   conversationIdCheck,
   itemIdCheck,
+  appRateIdCheck,
   faqIdCheck,
   userIdCheck,
   categoryIdCheck,
