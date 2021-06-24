@@ -6,8 +6,17 @@ const User = require("../models/User");
 const Category = require("../models/Category");
 
 exports.createOneBlog = async (req, res) => {
-  req.body.author = req.user.id;
-  const blog = await new Blog(req.body);
+  const { category, title, description, tags, headerPhoto, bodyPhotos } =
+    req.body;
+  const blog = await new Blog({
+    author: req.user.id,
+    category,
+    title,
+    description,
+    tags,
+    headerPhoto,
+    bodyPhotos,
+  });
   try {
     const savedBlog = await blog.save();
     if (savedBlog) {
@@ -49,8 +58,6 @@ exports.getOneBlog = async (req, res) => {
   if (validateId(id, res)) {
     return res.status(404).json({ msg: "invalid blog id" });
   }
-  console.log(id);
-
   try {
     const foundBlog = await Blog.findById(id);
     if (foundBlog) {
@@ -143,24 +150,44 @@ exports.getAllComments = async (req, res) => {
 };
 
 exports.updateOneBlog = async (req, res) => {
+  const { category, title, description, tags, headerPhoto, bodyPhotos } =
+    req.body;
   try {
+    const blog = await Blog.findById(req.params.id);
+
     const updatedBlog = await Blog.findOneAndUpdate(
-      { _id: req.params.id },
-      req.body,
+      {
+        _id: req.params.id,
+      },
+      {
+        author: req.user.id,
+        category,
+        title,
+        description,
+        tags: req.body.tags || blog.tags,
+        headerPhoto,
+        bodyPhotos: req.body.bodyPhotos || blog.bodyPhotos,
+      },
       {
         new: true,
       }
     );
-
-    const loggedUser = await User.findById(req.user.id);
-    if (updatedBlog.author._id == req.user.id || loggedUser.role === "admin") {
-      return res.status(200).send(updatedBlog);
+    if (updatedBlog) {
+      const loggedUser = await User.findById(req.user.id);
+      if (
+        updatedBlog.author._id == req.user.id ||
+        loggedUser.role === "admin"
+      ) {
+        return res.status(200).send(updatedBlog);
+      } else {
+        return res
+          .status(403)
+          .json({ msg: "you are not authorized to perform this operation" });
+      }
     } else {
-      return res
-        .status(403)
-        .json({ msg: "you are not authorized to perform this operation" });
+      return res.status(403).json({ msg: "blog not updated" });
     }
-  } catch (err) {
+  } catch (error) {
     return res.status(500).json(err);
   }
 };
@@ -174,17 +201,21 @@ exports.updateOneComment = async (req, res) => {
         new: true,
       }
     );
-    const loggedUser = await User.findById(req.user.id);
+    if (updatedComment) {
+      const loggedUser = await User.findById(req.user.id);
 
-    if (
-      updatedComment.commenter == req.user.id ||
-      loggedUser.role === "admin"
-    ) {
-      return res.status(200).send(updatedComment);
+      if (
+        updatedComment.commenter == req.user.id ||
+        loggedUser.role === "admin"
+      ) {
+        return res.status(200).send(updatedComment);
+      } else {
+        return res
+          .status(403)
+          .json({ msg: "you are not authorized to perform this operation" });
+      }
     } else {
-      return res
-        .status(403)
-        .json({ msg: "you are not authorized to perform this operation" });
+      return res.status(403).json({ msg: "comment not updated" });
     }
   } catch (err) {
     return res.status(500).json(err);

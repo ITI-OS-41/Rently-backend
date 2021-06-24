@@ -58,7 +58,7 @@ module.exports = async (req, res, next) => {
           errors.duplication =
             "a blog with this title has been published in this category, please choose another title";
         }
-      } else if (duplicationCheck.length) {
+      } else{
         errors.duplication =
           "a blog with this title has been published in this category, please choose another title";
       }
