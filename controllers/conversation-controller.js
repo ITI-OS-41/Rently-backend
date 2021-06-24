@@ -16,7 +16,7 @@ exports.create = async (req, res) => {
       return res.status(404).json({ msg: "conversation not saved" });
     }
   } catch (err) {
-    res.status(500).json(err);
+    return res.status(500).json(err);
   }
 };
 
@@ -61,7 +61,7 @@ exports.getAll = async (req, res) => {
       return res.status(404).json({ msg: "no conversation found for this user" });
     }
   } catch (err) {
-    res.status(500).json(err);
+    return res.status(500).json(err);
   }
 };
 

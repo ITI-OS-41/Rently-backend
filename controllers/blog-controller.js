@@ -48,7 +48,7 @@ exports.createOneComment = async (req, res) => {
       return res.status(404).json({ msg: "Comment not saved" });
     }
   } catch (err) {
-    res.status(500).json(err);
+    return res.status(500).json(err);
   }
 };
 
@@ -112,9 +112,11 @@ exports.getAllBlogs = async (req, res) => {
       .limit(limit)
       .skip(skip)
       .sort(sortQuery);
-    res.status(200).send({ res: getPosts, pagination: { limit, skip, page } });
+    return res
+      .status(200)
+      .send({ res: getPosts, pagination: { limit, skip, page } });
   } catch (err) {
-    res.status(500).json(err);
+    return res.status(500).json(err);
   }
 };
 
@@ -141,11 +143,11 @@ exports.getAllComments = async (req, res) => {
       .skip(skip)
       .sort(sortQuery);
 
-    res
+    return res
       .status(200)
       .send({ res: getComments, pagination: { limit, skip, page } });
   } catch (err) {
-    res.status(500).json(err);
+    return res.status(500).json(err);
   }
 };
 

@@ -11,6 +11,7 @@ const {
 } = require("../helpers/errors");
 
 const Faq = require("../models/Faq");
+const Category = require("../models/Category");
 module.exports = async (req, res, next) => {
   let errors = {};
   const id = req.params.id;
@@ -52,7 +53,16 @@ module.exports = async (req, res, next) => {
     errors.subCategory = idSubCategoryCheck;
   }
 
-  if (!errors.category) {
+  if(!errors.category && !errors.subCategory){
+    const includeSubCheck= await Category.find({_id:data.category})
+    if (includeSubCheck.length===1){
+      if(includeSubCheck[0].subcategory.indexOf(data.subCategory)===-1){
+        errors.subCategory= "subset error, the provided SubCategory is not part of the provided Category"
+      }
+    }
+  }
+
+  if (!errors.category && !errors.subCategory) {
     const duplicationCheck = await Faq.find({
       category: data.category,
       "questions.question": data["questions"].question,

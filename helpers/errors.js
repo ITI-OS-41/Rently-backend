@@ -153,7 +153,7 @@ const assignEmptyErrorsToFields = (data, fields) => {
 
   if (fields) {
     fields.forEach((field) => {
-      if (!data[field].length) {
+      if (!data[field].trim().length) {
         errors[field] = `${field} field is empty`;
       }
     });

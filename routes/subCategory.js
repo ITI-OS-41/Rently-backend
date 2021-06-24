@@ -2,28 +2,29 @@
 
 const router = require("express").Router();
 const validateSubCategory = require("../validation/subCategory");
-const auth= require("../middleware/auth")
+const auth = require("../middleware/auth");
+const authAdmin = require("../middleware/authAdmin");
 const {
-	getOne,
-	getAll,
-	update,
-	deleteOne,
-	create,
+  createOneSubCategory,
+  getOneSubCategory,
+  getAllSubCategories,
+  updateOneSubCategory,
+  deleteOneSubCategory,
 } = require("../controllers/subCategory-controller");
 const { catchErrors } = require("../helpers/errors");
 
 //  * Create
-router.post("/", auth, validateSubCategory,catchErrors(create));
+router.post("/", auth,authAdmin, validateSubCategory, createOneSubCategory);
 
 // * GET ONE
-router.get("/:id", catchErrors(getOne));
+router.get("/:id", getOneSubCategory);
 
 // * GET ALL
-router.get("/", catchErrors(getAll));
+router.get("/", getAllSubCategories);
 
 // * UPDATE
-router.post("/:id",validateSubCategory, catchErrors(update));
+router.post("/:id", auth, authAdmin, validateSubCategory, updateOneSubCategory);
 
 // * DELETE
-router.delete("/:id", catchErrors(deleteOne));
+router.delete("/:id", auth, authAdmin, deleteOneSubCategory);
 module.exports = router;

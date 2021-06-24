@@ -20,7 +20,7 @@ exports.createOneFaq = async (req, res) => {
       return res.status(404).json({ msg: "question not saved" });
     }
   } catch (err) {
-    res.status(500).json(err);
+    return res.status(500).json(err);
   }
 };
 
@@ -67,9 +67,9 @@ exports.getAllFaqs = async (req, res) => {
       .limit(limit)
       .skip(skip)
       .sort(sortQuery);
-    res.status(200).send({ res: getFaqs, pagination: { limit, skip, page } });
+    return res.status(200).send({ res: getFaqs, pagination: { limit, skip, page } });
   } catch (err) {
-    res.status(500).json(err);
+    return res.status(500).json(err);
   }
 };
 

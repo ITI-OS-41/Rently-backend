@@ -41,7 +41,6 @@ const categorySchema = new Schema(
 
 categorySchema.post("findOneAndUpdate", async function () {
   const docToUpdate = await this.model.findOne(this.getQuery());
-  console.log(docToUpdate.slug);
   docToUpdate.slug = slug(docToUpdate.name);
   docToUpdate.save(); // The document that `findOneAndUpdate()` will modify
 });

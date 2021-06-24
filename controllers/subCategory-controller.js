@@ -1,77 +1,110 @@
-const Category = require('../models/Category');
-const SubCategory = require('../models/SubCategory');
+const { validateId } = require("../helpers/errors");
+const Category = require("../models/Category");
+const SubCategory = require("../models/SubCategory");
 // * Create and Save a new Category
-exports.create = async (req, res) => {
-	req.body.createdBy= req.user.id
-	const subCategory = await new SubCategory(req.body).save();
-  await Category.updateMany(
-    { _id: subCategory.category },
-    { $push: { subcategory: subCategory._id } }
-  );
-
-	res.status(200).send(subCategory);
-
+exports.createOneSubCategory = async (req, res) => {
+  req.body.createdBy = req.user.id;
+  const subCategory = await new SubCategory(req.body);
+  try {
+    const savedsubCategory = await subCategory.save();
+    if (savedsubCategory) {
+      await Category.updateMany(
+        { _id: savedsubCategory.category },
+        { $push: { subcategory: savedsubCategory._id } }
+      );
+      return res.status(200).json(savedsubCategory);
+    } else {
+      return res.status(404).json({ msg: "subCategory not saved" });
+    }
+  } catch (err) {
+    return res.status(500).json(err);
+  }
 };
 
 //* Get One
-exports.getOne = async (req, res) => {
-	const id = req.params.id;
-	if (!validateId(id, res)) {
-		await SubCategory.findById(id).then((subCategory) => {
-			if (subCategory) {
-				return res.json(subCategory);
-			} else {
-				return res.status(404).json({ msg: "post not found" });
-			}
-		});
-	}
+exports.getOneSubCategory = async (req, res) => {
+  const id = req.params.id;
+  if (validateId(id, res)) {
+    return res.status(404).json({ msg: "invalid subCategory id" });
+  }
+  try {
+    const foundSubCategory = await SubCategory.findById(id);
+    if (foundSubCategory) {
+      return res.status(200).json(foundSubCategory);
+    } else {
+      return res.status(404).json({ msg: "subCategory not found" });
+    }
+  } catch (err) {
+    return res.status(500).json(err);
+  }
 };
 
 //* Get ALL
-exports.getAll = async (req, res) => {
-	const sortBy = req.query.sortBy || "createdAt";
-	const orderBy = req.query.orderBy || "asc";
-	const sortQuery = {
-		[sortBy]: orderBy,
-	};
+exports.getAllSubCategories = async (req, res) => {
+  let { name, description, category, createdBy } = req.query;
+  const sortBy = req.query.sortBy || "createdAt";
+  const orderBy = req.query.orderBy || "asc";
+  const sortQuery = {
+    [sortBy]: orderBy,
+  };
 
-	const page = parseInt(req.query.page);
-	const limit = parseInt(req.query.limit);
-	const skip = page * limit - limit;
-	let { name } = req.query;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 5;
+  const skip = page * limit - limit;
 
-	const queryObj = {
-		...(name && { name: new RegExp(`${name}`) }),
-	};
-
-	await SubCategory.find(queryObj)
-		.limit(limit)
-		.skip(skip)
-		.sort(sortQuery)
-		.then((objects) => {
-			res.status(200).send(objects);
-		});
+  const queryObj = {
+    ...(name && { name: new RegExp(`${name}`) }),
+    ...(description && { description: new RegExp(`${description}`) }),
+    ...(createdBy && { createdBy }),
+    ...(category && { category }),
+  };
+  try {
+    const getSubCategories = await SubCategory.find(queryObj)
+      .limit(limit)
+      .skip(skip)
+      .sort(sortQuery);
+    return res
+      .status(200)
+      .send({ res: getSubCategories, pagination: { limit, skip, page } });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
 };
 
-exports.update = async (req, res) => {
-	await SubCategory.findOneAndUpdate({ _id: req.params.id }, req.body, {
-		new: true,
-	}).then((response) => {
-		res.status(200).send(response);
-	});
+exports.updateOneSubCategory = async (req, res) => {
+  try {
+    const updatedSubCategory = await SubCategory.findOneAndUpdate(
+      { _id: req.params.id },
+      req.body,
+      {
+        new: true,
+      }
+    );
+    if (updatedSubCategory) {
+      return res.status(200).send(updatedSubCategory);
+    } else {
+      return res.status(404).json({ msg: "subCategory not updated" });
+    }
+  } catch (err) {
+    return res.status(500).json(err);
+  }
 };
 
-exports.deleteOne = async (req, res) => {
-	const id = req.params.id;
-	if (!validateId(id, res)) {
-		SubCategory.findById(req.params.id).then((subCategory) => {
-			if (subCategory) {
-				subCategory.remove().then(() => {
-					return res.status(200).send(subCategory);
-				});
-			} else {
-				return res.status(404).json({ msg: "sub category not found" });
-			}
-		});
-	}
+exports.deleteOneSubCategory = async (req, res) => {
+  const id = req.params.id;
+  if (validateId(id, res)) {
+    return res.status(404).json({ msg: "invalid subCategory id" });
+  }
+  try {
+    const deletedSubCategory = await SubCategory.findById(id);
+    if (deletedSubCategory) {
+      deletedSubCategory.remove().then(() => {
+        return res.status(200).send(deletedSubCategory);
+      });
+    } else {
+      return res.status(404).json({ msg: "subCategory not found" });
+    }
+  } catch (error) {
+    return res.status(500).json(error);
+  }
 };

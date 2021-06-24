@@ -112,7 +112,15 @@ module.exports = async function (data) {
   if (data.status !== "true" && data.status !== "false") {
     errors.status = "item status should be a true false statement";
   }
-
+// if (!errors.category && !errors.subCategory) {
+//   const includeSubCheck = await Category.find({ _id: data.category });
+//   if (includeSubCheck.length === 1) {
+//     if (includeSubCheck[0].subcategory.indexOf(data.subCategory) === -1) {
+//       errors.subCategory =
+//         "subset error, the provided SubCategory is not part of the provided Category";
+//     }
+//   }
+// }
   return {
     errors,
     isValid: Object.keys(errors).length === 0,

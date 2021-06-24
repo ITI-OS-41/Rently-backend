@@ -4,8 +4,14 @@ const Category = mongoose.model("Category");
 
 // * Create and Save a new Category
 exports.createOneCategory = async (req, res) => {
-  req.body.createdBy = req.user.id;
-  const category = await new Category(req.body);
+  const { photo, name, description, model } = req.body;
+  const category = await new Category({
+    createdBy: req.user.id,
+    name,
+    photo,
+    description,
+    model,
+  });
   try {
     const savedCategory = await category.save();
     if (savedCategory) {
@@ -38,7 +44,7 @@ exports.getOneCategory = async (req, res) => {
 
 //* Get ALL
 exports.getAllCategories = async (req, res) => {
-  let { name, model, subCategory, createdBy } = req.query;
+  let { name, model, subCategory, description, createdBy } = req.query;
   const sortBy = req.query.sortBy || "createdAt";
   const orderBy = req.query.orderBy || "asc";
   const sortQuery = {
@@ -51,6 +57,7 @@ exports.getAllCategories = async (req, res) => {
   const queryObj = {
     ...(model && { model: new RegExp(`${model}`) }),
     ...(name && { name: new RegExp(`${name}`) }),
+    ...(description && { description: new RegExp(`${description}`) }),
     ...(subCategory && { subCategory }),
     ...(createdBy && { createdBy }),
   };
@@ -59,7 +66,9 @@ exports.getAllCategories = async (req, res) => {
       .limit(limit)
       .skip(skip)
       .sort(sortQuery);
-    res.status(200).send({ getCategories, pagination: { limit, skip, page } });
+    return res
+      .status(200)
+      .send({ res: getCategories, pagination: { limit, skip, page } });
   } catch (err) {
     res.status(500).json(err);
   }
@@ -68,7 +77,6 @@ exports.getAllCategories = async (req, res) => {
 exports.updateOneCategory = async (req, res) => {
   const { photo, name, description, model } = req.body;
   try {
-    const category = await Category.findById(req.params.id);
     const updatedCategory = await Category.findOneAndUpdate(
       { _id: req.params.id },
       { createdBy: req.user.id, name, photo, description, model },
@@ -80,7 +88,7 @@ exports.updateOneCategory = async (req, res) => {
     if (updatedCategory) {
       return res.status(200).send(updatedCategory);
     } else {
-      return res.status(403).json({ msg: "category not updated" });
+      return res.status(404).json({ msg: "category not updated" });
     }
   } catch (err) {
     return res.status(500).json(err);

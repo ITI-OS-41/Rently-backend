@@ -25,6 +25,7 @@ module.exports = async (req, res, next) => {
   errors = assignErrorsToMissingFields(missingFields);
 
   let difference = getTwoArraysDifferences(requiredFields, missingFields);
+  
   if (!Object.keys(errors).length) {
     const duplicationCheck = await Category.find({
       name: data.name,
@@ -49,7 +50,6 @@ module.exports = async (req, res, next) => {
   };
 
   if (Object.keys(errors).length > 0) {
-    // console.log(data, errors);
     return res.status(404).json(errors);
   } else {
     return next();
