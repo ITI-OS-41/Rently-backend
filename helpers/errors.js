@@ -8,6 +8,7 @@ const Comment = require("../models/Comment");
 const Conversation = require("../models/Conversation");
 const User = require("../models/User");
 const Faq = require("../models/Faq");
+const Item = require("../models/Item");
 
 const catchErrors = (fn) => {
   return function (req, res, next) {
@@ -18,18 +19,21 @@ const catchErrors = (fn) => {
   };
 };
 
-const receiverIdCheck = async (id, res) => {
+const userIdCheck = async (id, res) => {
   let errors = {};
-  if (!validator.isMongoId(id)) {
-    errors.id = "this is not a valid user id";
-  } else {
-    const idCheck = await User.findById(id);
-    if (!idCheck) {
-      errors.id = "this user is not found in our database ";
+  if (id) {
+    if (!validator.isMongoId(id)) {
+      errors.id = "this is not a valid user id";
+    } else {
+      const idCheck = await User.findById(id);
+      if (!idCheck) {
+        errors.id = "this user is not found in our database ";
+      }
     }
   }
   return errors;
 };
+
 const faqIdCheck = async (id, res) => {
   let errors = {};
   if (id) {
@@ -119,7 +123,21 @@ const commentIdCheck = async (id, res) => {
   return errors;
 };
 
-const validateId = (id,res) => {
+const itemIdCheck = async (id, res) => {
+  let errors = {};
+  if (id) {
+    if (!validator.isMongoId(id)) {
+      errors.id = "invalid item id";
+    } else {
+      const idCheck = await Item.findById(id);
+      if (!idCheck) {
+        errors.id = "item not found";
+      }
+    }
+  }
+  return errors;
+};
+const validateId = (id) => {
   let errors = {};
   if (!validator.isMongoId(id)) {
     return (errors.id = "invalid id");
@@ -153,8 +171,16 @@ const assignEmptyErrorsToFields = (data, fields) => {
 
   if (fields) {
     fields.forEach((field) => {
-      if (!data[field].trim().length) {
-        errors[field] = `${field} field is empty`;
+      if (data[field] == null) {
+        errors[field] = `${field} field can't be null`;
+      } else if (
+        typeof data[field] != "number" &&
+        typeof data[field] != "boolean" &&
+        typeof data[field] != "object"
+      ) {
+        if (!data[field].trim().length) {
+          errors[field] = `${field} field is empty`;
+        }
       }
     });
   }
@@ -230,8 +256,9 @@ module.exports = {
   catchErrors,
   validateId,
   conversationIdCheck,
+  itemIdCheck,
   faqIdCheck,
-  receiverIdCheck,
+  userIdCheck,
   categoryIdCheck,
   blogIdCheck,
   subCategoryIdCheck,

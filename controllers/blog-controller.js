@@ -29,7 +29,7 @@ exports.createOneBlog = async (req, res) => {
       return res.status(404).json({ msg: "blog not saved" });
     }
   } catch (err) {
-    res.status(500).json(err);
+    return res.status(500).json(err);
   }
 };
 
@@ -55,7 +55,7 @@ exports.createOneComment = async (req, res) => {
 exports.getOneBlog = async (req, res) => {
   const id = req.params.id;
 
-  if (validateId(id, res)) {
+  if (validateId(id)) {
     return res.status(404).json({ msg: "invalid blog id" });
   }
   try {
@@ -73,7 +73,7 @@ exports.getOneBlog = async (req, res) => {
 exports.getOneComment = async (req, res) => {
   const id = req.params.id;
 
-  if (validateId(id, res)) {
+  if (validateId(id)) {
     return res.status(404).json({ msg: "invalid comment id" });
   }
   try {
@@ -225,7 +225,7 @@ exports.updateOneComment = async (req, res) => {
 };
 exports.deleteOneBlog = async (req, res) => {
   const id = req.params.id;
-  if (validateId(id, res)) {
+  if (validateId(id)) {
     return res.status(404).json({ msg: "invalid blog id" });
   }
   try {
@@ -254,7 +254,7 @@ exports.deleteOneBlog = async (req, res) => {
 
 exports.deleteOneComment = async (req, res) => {
   const id = req.params.id;
-  if (validateId(id, res)) {
+  if (validateId(id)) {
     return res.status(404).json({ msg: "invalid comment id" });
   }
   try {
@@ -270,7 +270,7 @@ exports.deleteOneComment = async (req, res) => {
         });
       } else {
         return res
-          .status(404)
+          .status(403)
           .json({ msg: "you are not authorized to perform this operation" });
       }
     } else {

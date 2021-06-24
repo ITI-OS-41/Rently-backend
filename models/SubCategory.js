@@ -69,6 +69,10 @@ subcategorySchema.statics.requiredFields = function () {
 let autoPopulateLead = function (next) {
   this.populate("faq", "-subCategory -category -createdAt -updatedAt -__v");
   this.populate("createdBy", "-email -password -createdAt -updatedAt -__v");
+	this.populate(
+    "category",
+    "-subCategory -description -slug -photo -blogs -createdAt -updatedAt -__v"
+  );
   next();
 };
 

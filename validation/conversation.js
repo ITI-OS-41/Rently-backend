@@ -1,7 +1,7 @@
 /** @format */
 
 const {
-  receiverIdCheck,
+  userIdCheck,
   assignEmptyErrorsToFields,
   assignErrorsToMissingFields,
   getTwoArraysDifferences,
@@ -28,7 +28,7 @@ module.exports = async (req, res, next) => {
   };
 
   if (data.members && !errors.members) {
-    const idreceiverCheck = await receiverIdCheck(data.members, res);
+    const idreceiverCheck = await userIdCheck(data.members, res);
     if (Object.keys(idreceiverCheck).length > 0) {
       return res.status(404).json(idreceiverCheck);
     }

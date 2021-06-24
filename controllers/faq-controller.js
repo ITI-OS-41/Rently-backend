@@ -27,7 +27,7 @@ exports.createOneFaq = async (req, res) => {
 exports.getOneFaq = async (req, res) => {
   const id = req.params.id;
 
-  if (validateId(id, res)) {
+  if (validateId(id)) {
     return res.status(404).json({ msg: "invalid faq id" });
   }
 
@@ -94,7 +94,7 @@ exports.updateOneFaq = async (req, res) => {
 
 exports.deleteOneFaq = async (req, res) => {
   const id = req.params.id;
-  if (validateId(id, res)) {
+  if (validateId(id)) {
     return res.status(404).json({ msg: "invalid faq id" });
   }
   try {

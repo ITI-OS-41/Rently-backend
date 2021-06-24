@@ -67,7 +67,7 @@ exports.getAll = async (req, res) => {
 
 exports.deleteOne = async (req, res) => {
   const id = req.params.id;
-  if (validateId(id, res)) {
+  if (validateId(id)) {
     return res.status(404).json({ msg: "invalid id" });
   }
   try {

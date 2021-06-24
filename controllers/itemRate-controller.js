@@ -18,7 +18,7 @@ exports.create = async (req, res) => {
 
 exports.getOne = async (req, res) => {
 	const id = req.params.id;
-	if (!validateId(id, res)) {
+	if (!validateId(id)) {
 		await ItemRate.findById(id).then((itemRate) => {
 			if (itemRate) {
 				return res.json(itemRate);
@@ -62,7 +62,7 @@ exports.update = async (req, res) => {
 
 exports.deleteOne = async (req, res) => {
 	const id = req.params.id;
-	if (!validateId(id, res)) {
+	if (!validateId(id)) {
 		ItemRate.findById(req.params.id).then((itemRate) => {
 			if (itemRate) {
 				itemRate.remove().then(() => {

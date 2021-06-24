@@ -20,7 +20,7 @@ exports.getAll = async (req, res) => {
 
 exports.getOne = (req, res) => {
   const id = req.params.id;
-  validateId(id, res);
+  validateId(id);
 
   Rent.findById(id)
     .then((rent) => {
@@ -60,7 +60,7 @@ exports.update = async (req, res) => {
 
 exports.deleteOne = async (req, res) => {
   const id = req.params.id;
-  validateId(id, res);
+  validateId(id);
 
   Rent.findById(id)
     .then((rent) => {

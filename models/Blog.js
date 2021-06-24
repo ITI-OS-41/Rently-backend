@@ -37,15 +37,13 @@ const blogSchema = new mongoose.Schema(
       type: String,
       required: [true, "Header photo is required"],
     },
-    bodyPhotos: [{ type: String, default: [] }],
+    bodyPhotos: [String],
     comments: [{ type: ObjectId, ref: "Comment" }],
   },
   { timestamps: true }
 );
 
-// blogSchema.statics.getCategoryList = function () {
-//   return this.aggregate([{ $group: { _id: "$category" } }]);
-// };
+
 blogSchema.pre("remove", function (next) {
   Comment.deleteMany({ blogPost: this._id }).exec();
   next();

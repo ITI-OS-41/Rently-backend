@@ -27,7 +27,7 @@ exports.createOneCategory = async (req, res) => {
 //* Get One
 exports.getOneCategory = async (req, res) => {
   const id = req.params.id;
-  if (validateId(id, res)) {
+  if (validateId(id)) {
     return res.status(404).json({ msg: "invalid category id" });
   }
   try {
@@ -97,7 +97,7 @@ exports.updateOneCategory = async (req, res) => {
 
 exports.deleteOneCategory = async (req, res) => {
   const id = req.params.id;
-  if (validateId(id, res)) {
+  if (validateId(id)) {
     return res.status(404).json({ msg: "invalid category id" });
   }
   try {
