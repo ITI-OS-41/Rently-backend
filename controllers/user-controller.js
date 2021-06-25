@@ -101,9 +101,9 @@ const user = {
       console.log("user refresh token", user._id);
 
       const accessToken = createAccessToken({ id: user._id })
-
+      console.log(user)
       res.json({
-        ...user,
+        ...user._doc,
         token: accessToken
       });
     } catch (err) {
