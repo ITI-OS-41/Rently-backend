@@ -43,7 +43,7 @@ let autoPopulateLead = function (next) {
   this.populate("renter", "-email -password -createdAt -updatedAt -__v");
   this.populate(
     "item",
-    "-isAvailable -isPublished -deliverable -createdAt -updatedAt -__v -location -category -subcategory -description -photo -stock -condition -deposit -cancellation -instructionalVideo"
+    "-isAvailable -isPublished -isDeliverable -createdAt -updatedAt -__v -location -category -subcategory -description -photo -stock -condition -deposit -cancellation -instructionalVideo"
   );
   this.populate("owner", "-email -password -createdAt -updatedAt -__v");
   next();

@@ -29,6 +29,11 @@ const itemSchema = new Schema(
       trim: true,
       required: [true, "item availability status is required"],
     },
+    isSubmitted: {
+      type: Boolean,
+      trim: true,
+      required: [true, "item submission status is required"],
+    },
     isPublished: {
       type: Boolean,
       trim: true,
@@ -112,7 +117,7 @@ const itemSchema = new Schema(
         default: 0,
       },
     },
-    deliverable: {
+    isDeliverable: {
       type: Boolean,
       trim: true,
       required: [true, "item delivery option required"],
@@ -153,7 +158,7 @@ itemSchema.statics.requiredFields = function () {
       arr.push(required);
     }
   }
-  arr.push("price")
+  arr.push("price");
   return arr;
 };
 
