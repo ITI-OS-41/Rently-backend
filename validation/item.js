@@ -132,12 +132,20 @@ module.exports = async (req, res, next) => {
     }
   }
 
-  if (!errors.deliverable &&
-    data.deliverable.toString().trim() !== "true" &&
-    data.deliverable.toString().trim() !== "false"
+  if (!errors.isDeliverable &&
+    data.isDeliverable.toString().trim() !== "true" &&
+    data.isDeliverable.toString().trim() !== "false"
   ) {
-    errors.deliverable = "item delivery should be a true false value";
+    errors.isDeliverable = "item delivery should be a true false value";
   }
+
+    if (
+      !errors.isSubmitted &&
+      data.isSubmitted.toString().trim() !== "true" &&
+      data.isSubmitted.toString().trim() !== "false"
+    ) {
+      errors.isSubmitted = "item submission status should be a true false value";
+    }
 
   if (!errors.isAvailable &&
     data.isAvailable.toString().trim() !== "true" &&

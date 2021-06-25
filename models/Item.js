@@ -117,7 +117,7 @@ const itemSchema = new Schema(
         default: 0,
       },
     },
-    deliverable: {
+    isDeliverable: {
       type: Boolean,
       trim: true,
       required: [true, "item delivery option required"],
@@ -158,7 +158,7 @@ itemSchema.statics.requiredFields = function () {
       arr.push(required);
     }
   }
-  arr.push("price")
+  arr.push("price");
   return arr;
 };
 
