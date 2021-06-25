@@ -27,7 +27,11 @@ exports.getOneRent = async (req, res) => {
     if (foundRent) {
       console.log({ foundRent });
       const loggedUser = await User.findById(req.user.id);
-      if (foundRent.renter._id == req.user.id || loggedUser.role === "admin") {
+      if (
+        foundRent.renter._id == req.user.id ||
+        foundRent.owner._id == req.user.id ||
+        loggedUser.role === "admin"
+      ) {
         return res.status(200).json(foundRent);
       } else {
         return res
