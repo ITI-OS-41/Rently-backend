@@ -14,7 +14,7 @@ const userSchema = new Schema(
       },
       default: "user",
     },
-    photo: {
+    profilePhoto: {
       type: String,
       // required: true,
     },
@@ -68,6 +68,7 @@ const userSchema = new Schema(
         type: String,
       },
     },
+    verificationPhotos:[String],
     resetPasswordToken: String,
     resetPasswordExpires: Date,
   },
