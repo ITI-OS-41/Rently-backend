@@ -1,5 +1,4 @@
 const {
-  userIdCheck,
   appRateIdCheck,
   assignEmptyErrorsToFields,
   assignErrorsToMissingFields,

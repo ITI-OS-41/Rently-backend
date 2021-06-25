@@ -105,7 +105,7 @@ exports.getAllBlogs = async (req, res) => {
   };
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 5;
-  const skip = page * limit - limit;
+  const skip = (page * limit) - limit;
 
   try {
     const getPosts = await Blog.find(queryObj)

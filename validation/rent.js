@@ -87,11 +87,12 @@ module.exports = async (req, res, next) => {
     } else if (data.status && !status.includes(data.status)) {
       errors.status = `${data.status} is not an accepted value for status`;
     }
-  } else {
-    if (data.status !== "pending") {
-      errors.status = `${data.status} is not an accepted value for making a rent`;
-    }
-  }
+  } 
+  // else {
+  //   if (data.status !== "pending") {
+  //     errors.status = `${data.status} is not an accepted value for making a rent`;
+  //   }
+  // }
 
   if (Object.keys(errors).length > 0) {
     console.log(data, "err => ", errors);

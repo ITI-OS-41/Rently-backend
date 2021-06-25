@@ -1,31 +1,30 @@
 /** @format */
-
+const auth = require("../middleware/auth");
 const router = require("express").Router();
 const validateUserRate = require("../validation/userRate");
-const { catchErrors } = require("../helpers/errors");
 
 // Import controllers
 const {
-	getOne,
-	getAll,
-	create,
-	update,
-	deleteOne,
+	getOneUserRate,
+	getAllUserRates,
+	createOneUserRate,
+	updateOneUserRate,
+	deleteOneUserRate,
 } = require("../controllers/userRate-controller");
 
 // * CREATE
-router.post("/", validateUserRate, catchErrors(create));
-
-// * GET ALL
-router.get("/", catchErrors(getAll));
+router.post("/", auth, validateUserRate, createOneUserRate);
 
 // * GET ONE
-router.get("/:id", catchErrors(getOne));
+router.get("/:id", getOneUserRate);
+
+// * GET ALL
+router.get("/", getAllUserRates);
 
 // * UPDATE
-router.post("/:id", validateUserRate, catchErrors(update));
+router.post("/:id", auth, validateUserRate, updateOneUserRate);
 
 // * DELETE
-router.delete("/:id", catchErrors(deleteOne));
+router.delete("/:id", auth, deleteOneUserRate)
 
 module.exports = router;

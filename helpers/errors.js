@@ -10,6 +10,7 @@ const User = require("../models/User");
 const Faq = require("../models/Faq");
 const Item = require("../models/Item");
 const AppRate= require("../models/AppRate")
+const UserRate = require("../models/UserRate");
 
 const catchErrors = (fn) => {
   return function (req, res, next) {
@@ -37,11 +38,26 @@ const userIdCheck = async (id, res) => {
   let errors = {};
   if (id) {
     if (!validator.isMongoId(id)) {
-      errors.id = "user id not valid";
+      errors.id = "invalid user id";
     } else {
       const idCheck = await User.findById(id);
       if (!idCheck) {
         errors.id = "user not found ";
+      }
+    }
+  }
+  return errors;
+};
+
+const userRateIdCheck = async (id, res) => {
+  let errors = {};
+  if (id) {
+    if (!validator.isMongoId(id)) {
+      errors.id = "invalid user id";
+    } else {
+      const idCheck = await UserRate.findById(id);
+      if (!idCheck) {
+        errors.id = "userRate not found ";
       }
     }
   }
@@ -70,7 +86,7 @@ const conversationIdCheck = async (id, res) => {
     } else {
       const idCheck = await Conversation.findById(id);
       if (!idCheck) {
-        errors.id = "convresation not found";
+        errors.id = "conversation not found";
       }
     }
   }
@@ -270,6 +286,7 @@ module.exports = {
   catchErrors,
   validateId,
   conversationIdCheck,
+  userRateIdCheck,
   itemIdCheck,
   appRateIdCheck,
   faqIdCheck,
