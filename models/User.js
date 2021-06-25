@@ -55,6 +55,7 @@ const userSchema = new Schema(
     isVerified: {
       type: Boolean,
       trim: true,
+      default:false,
     },
     store: {
       name: {
@@ -79,16 +80,4 @@ userSchema.virtual("name").get(function () {
   }
   return this.username;
 });
-
-// Ensure virtual fields are serialised.
-userSchema.set("toJSON", {
-  virtuals: true,
-});
-if (Rent.status === "returned") {
-  userSchema.pre("remove", function (next) {
-    Category.deleteMany({ createdBy: this._id }).exec();
-
-    next();
-  });
-}
 module.exports = mongoose.model("User", userSchema);
