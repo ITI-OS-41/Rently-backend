@@ -1,30 +1,30 @@
-const router = require("express").Router()
+/** @format */
 
+const router = require("express").Router();
 // Import controllers
 const {
-  getOne,
-  getAll,
-  create,
-  update,
-  deleteOne,
-} = require("../controllers/itemRate-controller")
+	getOneItemRate,
+	getAllItemRates,
+	createOneItemRate,
+	updateOneItemRate,
+	deleteOneItemRate,
+} = require("../controllers/itemRate-controller");
+const validateItemRate = require("../validation/itemRate");
+const auth = require("../middleware/auth");
 
-// * GET ALL
-router.get("/", getAll)
+// * CREATEOneItemRate
+router.post("/", auth, validateItemRate, createOneItemRate);
 
+// * GET ALL ItemRates
+router.get("/", getAllItemRates);
 
-// * GET ONE
-router.get("/:id", getOne)
+// * GET ONE ItemRate
+router.get("/:id", getOneItemRate);
 
+// * UPDATEOneItemRate
+router.post("/:id",auth, validateItemRate, updateOneItemRate);
 
-// * UPDATE
-router.post("/", create)
+// * DELETE One ItemRate
+router.delete("/:id", auth, deleteOneItemRate);
 
-// * UPDATE
-router.post("/:id", update)
-
-// * DELETE
-router.delete("/:id", deleteOne)
-
-
-module.exports = router
+module.exports = router;

@@ -1,139 +1,282 @@
 /** @format */
-const { validateId } = require('../helpers/errors');
-const mongoose = require('mongoose');
-const Blog = mongoose.model('Blog');
-const multer = require('multer');
-const jimp = require('jimp');
-const uuid = require('uuid');
+const { validateId } = require("../helpers/errors");
+const Comment = require("../models/Comment");
+const Blog = require("../models/Blog");
+const User = require("../models/User");
+const Category = require("../models/Category");
 
-const { BLOG_POST, SLUG } = require('../helpers/errors');
-
-const multerOptions = {
-	storage: multer.memoryStorage(),
-	fileFilter(req, file, next) {
-		const isPhoto = file.mimetype.startsWith('image/');
-		if (isPhoto) {
-			next(null, true);
-		} else {
-			next({ message: "That filetype isn't allowed!" }, false);
-		}
-	},
+exports.createOneBlog = async (req, res) => {
+  const { category, title, description, tags, headerPhoto, bodyPhotos } =
+    req.body;
+  const blog = await new Blog({
+    author: req.user.id,
+    category,
+    title,
+    description,
+    tags,
+    headerPhoto,
+    bodyPhotos,
+  });
+  try {
+    const savedBlog = await blog.save();
+    if (savedBlog) {
+      await Category.updateMany(
+        { _id: savedBlog.category },
+        { $push: { blogs: savedBlog._id } }
+      );
+      return res.status(200).json(savedBlog);
+    } else {
+      return res.status(404).json({ msg: "blog not saved" });
+    }
+  } catch (err) {
+    return res.status(500).json(err);
+  }
 };
 
-exports.upload = multer(multerOptions).single('photo');
-
-exports.resize = async (req, res, next) => {
-	// check if there is no new file to resize
-	if (!req.file) {
-		next(); // skip to the next middleware
-		return;
-	}
-	const extension = req.file.mimetype.split('/')[1];
-	req.body.photo = `${uuid.v4()}.${extension}`;
-	// now we resize
-	const photo = await jimp.read(req.file.buffer);
-	await photo.resize(800, jimp.AUTO);
-	await photo.write(`./public/uploads/${req.body.photo}`);
-	// once we have written the photo to our filesystem, keep going!
-	next();
+exports.createOneComment = async (req, res) => {
+  req.body.commenter = req.user.id;
+  const comment = await new Comment(req.body);
+  try {
+    const savedComment = await comment.save();
+    if (savedComment) {
+      await Blog.updateMany(
+        { _id: savedComment.blogPost },
+        { $push: { comments: savedComment._id } }
+      );
+      return res.status(200).json(savedComment);
+    } else {
+      return res.status(404).json({ msg: "Comment not saved" });
+    }
+  } catch (err) {
+    return res.status(500).json(err);
+  }
 };
 
-exports.create = async (req, res) => {
-	const blogPost = await new Blog(req.body).save();
-	res.status(200).send(blogPost);
+exports.getOneBlog = async (req, res) => {
+  const id = req.params.id;
+
+  if (validateId(id)) {
+    return res.status(404).json({ msg: "invalid blog id" });
+  }
+  try {
+    const foundBlog = await Blog.findById(id);
+    if (foundBlog) {
+      return res.status(200).json(foundBlog);
+    } else {
+      return res.status(404).json({ msg: "blog not found" });
+    }
+  } catch (err) {
+    return res.status(500).json(err);
+  }
 };
 
-exports.getOne = async (req, res) => {
-	const id = req.params.id;
-	validateId(id, res);
-	await Blog.findById(id)
-		.then((blogPost) => {
-			if (blogPost) {
-				return res.json(blogPost);
-			} else {
-				return res.status(404).json({ msg: BLOG_POST.notFound });
-			}
-		})
-		.catch((err) => {
-			console.log(err);
-			return res.status(500).json({ msg: POST.invalidId });
-		});
+exports.getOneComment = async (req, res) => {
+  const id = req.params.id;
+
+  if (validateId(id)) {
+    return res.status(404).json({ msg: "invalid comment id" });
+  }
+  try {
+    const foundComment = await Comment.findById(id);
+    if (foundComment) {
+      return res.status(200).json(foundComment);
+    } else {
+      return res.status(404).json({ msg: "comment not found" });
+    }
+  } catch (err) {
+    return res.status(500).json(err);
+  }
 };
 
-exports.getAll = async (req, res) => {
-	const page = parseInt(req.query.page);
-	const limit = parseInt(req.query.limit);
-	const skip = page * limit - limit;
+exports.getAllBlogs = async (req, res) => {
+  let { author, title, category, slug, tags, description } = req.query;
+  const queryObj = {
+    ...(title && { title: new RegExp(`${title}`) }),
+    ...(description && { description: new RegExp(`${description}`) }),
+    ...(category && { category }),
+    ...(author && { author }),
+    ...(slug && { slug }),
+    ...(tags && { tags: new RegExp(tags.replace(/,/g, "|")) }),
+  };
+  const sortBy = req.query.sortBy || "createdAt";
+  const orderBy = req.query.orderBy || "asc";
+  const sortQuery = {
+    [sortBy]: orderBy,
+  };
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 5;
+  const skip = (page * limit) - limit;
 
-	let { _id, slug } = req.query;
-	const queryObj = {
-		...(_id && { _id }),
-		...(slug && { slug }),
-	};
-	await Blog.find(queryObj)
-		.skip(skip)
-		.limit(limit)
-		.then((objects) => {
-			res.status(200).send(objects);
-		});
+  try {
+    const getPosts = await Blog.find(queryObj)
+      .limit(limit)
+      .skip(skip)
+      .sort(sortQuery);
+    return res
+      .status(200)
+      .send({ res: getPosts, pagination: { limit, skip, page } });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
 };
 
-exports.update = async (req, res) => {
-	await Blog.findOneAndUpdate({ _id: req.params.id }, req.body, {
-		new: true,
-		runValidators: true,
-		useFindAndModify: false,
-	})
-		.then((response) => {
-			res.status(200).send(response);
-		})
-		.catch((error) => {
-			console.log(error);
-			return res.status(500).send({ msg: error.message });
-		});
+exports.getAllComments = async (req, res) => {
+  let { body, commenter, blogPost } = req.query;
+
+  const queryObj = {
+    ...(body && { body: new RegExp(`${body}`) }),
+    ...(blogPost && { blogPost }),
+    ...(commenter && { commenter }),
+  };
+  const sortBy = req.query.sortBy || "createdAt";
+  const orderBy = req.query.orderBy || "asc";
+  const sortQuery = {
+    [sortBy]: orderBy,
+  };
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 5;
+  const skip = page * limit - limit;
+
+  try {
+    const getComments = await Comment.find(queryObj)
+      .limit(limit)
+      .skip(skip)
+      .sort(sortQuery);
+
+    return res
+      .status(200)
+      .send({ res: getComments, pagination: { limit, skip, page } });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
 };
 
-exports.deleteOne = async (req, res) => {
-	const id = req.params.id;
-	validateId(id, res);
+exports.updateOneBlog = async (req, res) => {
+  const { category, title, description, tags, headerPhoto, bodyPhotos } =
+    req.body;
+  try {
+    const blog = await Blog.findById(req.params.id);
 
-	Blog.findById(req.params.id)
-		.then((blogPost) => {
-			if (blogPost) {
-				blogPost.remove().then(() => {
-					return res.status(200).send(blogPost);
-				});
-			} else {
-				return res.status(404).json({ msg: BLOG_POST.notFound });
-			}
-		})
-		.catch((error) => {
-			console.log(error);
-			return res.status(500).send({ msg: BLOG_POST.invalidId });
-		});
+    const updatedBlog = await Blog.findOneAndUpdate(
+      {
+        _id: req.params.id,
+      },
+      {
+        author: req.user.id,
+        category,
+        title,
+        description,
+        tags: req.body.tags || blog.tags,
+        headerPhoto,
+        bodyPhotos: req.body.bodyPhotos || blog.bodyPhotos,
+      },
+      {
+        new: true,
+      }
+    );
+    if (updatedBlog) {
+      const loggedUser = await User.findById(req.user.id);
+      if (
+        updatedBlog.author._id == req.user.id ||
+        loggedUser.role === "admin"
+      ) {
+        return res.status(200).send(updatedBlog);
+      } else {
+        return res
+          .status(403)
+          .json({ msg: "you are not authorized to perform this operation" });
+      }
+    } else {
+      return res.status(404).json({ msg: "blog not updated" });
+    }
+  } catch (error) {
+    return res.status(500).json(err);
+  }
 };
 
-exports.getBySlug = async (req, res, next) => {
-	Blog.findOne({ slug: req.params.slug })
-		.then((blogPost) => {
-			if (blogPost) {
-				return res.status(200).json(blogPost);
-			} else {
-				return res.status(404).json({ msg: SLUG.notFound });
-			}
-		})
-		.catch((err) => {
-			console.log(err);
-			return res.status(500).json({ msg: SLUG.invalidSlug });
-		});
+exports.updateOneComment = async (req, res) => {
+  try {
+    const updatedComment = await Comment.findOneAndUpdate(
+      { _id: req.params.id },
+      req.body,
+      {
+        new: true,
+      }
+    );
+    if (updatedComment) {
+      const loggedUser = await User.findById(req.user.id);
+
+      if (
+        updatedComment.commenter == req.user.id ||
+        loggedUser.role === "admin"
+      ) {
+        return res.status(200).send(updatedComment);
+      } else {
+        return res
+          .status(403)
+          .json({ msg: "you are not authorized to perform this operation" });
+      }
+    } else {
+      return res.status(404).json({ msg: "comment not updated" });
+    }
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
+exports.deleteOneBlog = async (req, res) => {
+  const id = req.params.id;
+  if (validateId(id)) {
+    return res.status(404).json({ msg: "invalid blog id" });
+  }
+  try {
+    const deletedBlog = await Blog.findById(id);
+    if (deletedBlog) {
+      const loggedUser = await User.findById(req.user.id);
+      if (
+        deletedBlog.author._id == req.user.id ||
+        loggedUser.role === "admin"
+      ) {
+        deletedBlog.remove().then(() => {
+          return res.status(200).send(deletedBlog);
+        });
+      } else {
+        return res
+          .status(403)
+          .json({ msg: "you are not authorized to perform this operation" });
+      }
+    } else {
+      return res.status(404).json({ msg: "blog not deleted" });
+    }
+  } catch (error) {
+    return res.status(500).json(error);
+  }
 };
 
-exports.getByTag = async (req, res) => {
-	const tag = req.params.tag;
-	const tagQuery = tag || { $exists: true, $ne: [] };
-	const tagsPromise = Blog.getTagList();
-	const postsPromise = Blog.find({ tags: tagQuery });
-	const [tags, posts] = await Promise.all([tagsPromise, postsPromise]);
-	console.log('tags ', tags);
-	res.status(200).send([tags, posts]);
+exports.deleteOneComment = async (req, res) => {
+  const id = req.params.id;
+  if (validateId(id)) {
+    return res.status(404).json({ msg: "invalid comment id" });
+  }
+  try {
+    const deletedComment = await Comment.findById(id);
+    if (deletedComment) {
+      const loggedUser = await User.findById(req.user.id);
+      if (
+        deletedComment.commenter == req.user.id ||
+        loggedUser.role === "admin"
+      ) {
+        deletedComment.remove().then(() => {
+          return res.status(200).send(deletedComment);
+        });
+      } else {
+        return res
+          .status(403)
+          .json({ msg: "you are not authorized to perform this operation" });
+      }
+    } else {
+      return res.status(404).json({ msg: "comment not found" });
+    }
+  } catch (error) {
+    return res.status(500).json(error);
+  }
 };

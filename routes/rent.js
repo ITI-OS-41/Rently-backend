@@ -1,32 +1,29 @@
-const router = require("express").Router()
-// Import controllers
+const auth = require("../middleware/auth");
+const router = require("express").Router();
+const validateRent = require("../validation/rent");
+
+//Import Rent Controllers
 const {
-  getOne,
-  getAll,
-  create,
-  update,
-  deleteOne,
-} = require("../controllers/rent-controller")
-
-const validateRent = require("../validation/rent")
-const {catchErrors} = require("../helpers/errors")
-
-// * GET ALL
-router.get("/", getAll)
-
-
-// * GET ONE
-router.get("/:id", getOne)
-
+  createOneRent,
+  getOneRent,
+  getAllRents,
+  updateOneRent,
+  deleteOneRent,
+} = require("../controllers/rent-controller");
 
 // * create
-router.post("/",validateRent,catchErrors(create))
+router.post("/", auth, validateRent, createOneRent);
+
+// * GET ALL
+router.get("/", auth, getAllRents);
+
+// * GET ONE
+router.get("/:id", auth, getOneRent);
 
 // * UPDATE
-router.post("/:id",validateRent, update)
+router.post("/:id", auth, validateRent, updateOneRent);
 
 // * DELETE
-router.delete("/:id", deleteOne)
+router.delete("/:id", auth, deleteOneRent);
 
-
-module.exports = router
+module.exports = router;

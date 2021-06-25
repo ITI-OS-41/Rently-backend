@@ -1,125 +1,121 @@
+/** @format */
+const { validateId } = require("../helpers/errors");
 const ItemRate = require("../models/ItemRate");
-const { ITEMRATE, ID } = require("../helpers/errors");
-const ObjectId = require("mongoose").Types.ObjectId;
+const Item = require("../models/Item");
+const User = require("../models/User");
 
-const validateItemRate = require("../validation/itemRate");
-
-exports.create = async (req, res) => {
-  const { isValid, errors } = await validateItemRate(req.body);
-
-  //   ItemRate.collection.getIndexes({key: rater_1_item_1}).then(indexes => {
-  //     console.log("indexes:", indexes);
-  // }).catch(console.error);
-
-  if (!isValid) {
-    return res.status(404).json(errors);
+exports.createOneItemRate = async (req, res) => {
+  req.body.rater = req.user.id;
+  const itemRate = await new ItemRate(req.body);
+  try {
+    const savedItemRate = await itemRate.save();
+    if (savedItemRate) {
+      return res.status(200).send(itemRate);
+    } else {
+      return res.status(404).json({ msg: "itemRate not saved" });
+    }
+  } catch (error) {
+    return res.status(500).json(error);
   }
-
-  const itemRate = new ItemRate({
-    ...req.body,
-  });
-
-  await itemRate
-    .save()
-    .then((itemRate) => {
-      res.json({ itemRate });
-    })
-    .catch((err) => {
-      return res.status(500).send({ msg: ITEMRATE.badRequest });
-    });
 };
 
-exports.getAll = async (req, res) => {
-  let { _id, item, rater, rating } = req.query;
+exports.getOneItemRate = async (req, res) => {
+  const id = req.params.id;
+  if (validateId(id)) {
+    return res.status(404).json({ msg: "invalid itemRate id" });
+  }
+  try {
+    const foundItemRate = await ItemRate.findById(id);
+    if (foundItemRate) {
+      return res.status(200).json(foundItemRate);
+    } else {
+      return res.status(404).json({ msg: "itemRate not found" });
+    }
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+};
+
+exports.getAllItemRates = async (req, res) => {
+  let { rating, comment, item, rater } = req.query;
+
   const queryObj = {
-    ...(_id && { _id }),
+    ...(rating && { rating }),
+    ...(comment && { comment: new RegExp(`${comment}`) }),
     ...(item && { item }),
     ...(rater && { rater }),
-    ...(rating && { rating }),
+  };
+  const sortBy = req.query.sortBy || "createdAt";
+  const orderBy = req.query.orderBy || "asc";
+  const sortQuery = {
+    [sortBy]: orderBy,
   };
 
-  await ItemRate.find(queryObj).then((objects) => {
-    res.status(200).send(objects);
-  });
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 5;
+  const skip = page * limit - limit;
+  try {
+    const getItemRates = await ItemRate.find(queryObj)
+      .limit(limit)
+      .skip(skip)
+      .sort(sortQuery);
+    return res
+      .status(200)
+      .send({ res: getItemRates, pagination: { limit, skip, page } });
+  } catch (error) {
+    return res.status(500).json(error);
+  }
 };
 
-exports.getOne = (req, res) => {
-  const id = req.params.id;
-  if (!ObjectId.isValid(id)) {
-    return res.status(404).json({
-      id: ID.invalid,
-    });
-  }
-
-  ItemRate.findById(id)
-    .then((itemRate) => {
-      if (itemRate) {
-        return res.json({
-          _id: itemRate._id,
-          item: itemRate.item,
-          rater: itemRate.rater,
-          rating: itemRate.rating,
-          comment: itemRate.comment,
-        });
-      } else {
-        return res.status(404).json({ msg: ITEMRATE.notFound });
+exports.updateOneItemRate = async (req, res) => {
+  try {
+    const updatedItemRate = await ItemRate.findOneAndUpdate(
+      { _id: req.params.id },
+      req.body,
+      {
+        new: true,
       }
-    })
-    .catch((err) => {
-      console.log(err);
-      return res.status(500).json({ msg: ITEMRATE.invalidId });
-    });
-};
-
-exports.update = async (req, res) => {
-  const id = req.params.id;
-  if (!ObjectId.isValid(id)) {
-    return res.status(404).json({
-      id: ID.invalid,
-    });
-  }
-
-  const { isValid, errors } = await validateItemRate(req.body);
-
-  if (!isValid) {
-    return res.status(404).json(errors);
-  }
-  await ItemRate.findOneAndUpdate({ _id: req.params.id }, req.body, {
-    new: true,
-    runValidators: true,
-    useFindAndModify: false,
-  })
-    .select({ item: 0, rater: 0 })
-    .then((response) => {
-      res.status(200).send(response);
-    })
-    .catch((error) => {
-      console.log(error);
-      return res.status(500).send({ msg: error.message });
-    });
-};
-
-exports.deleteOne = async (req, res) => {
-  const id = req.params.id;
-
-  if (!ObjectId.isValid(id)) {
-    return res.status(404).json({
-      id: ID.invalid,
-    });
-  }
-
-  ItemRate.findById(req.params.id)
-    .then((itemRate) => {
-      if (itemRate) {
-        itemRate.remove().then(() => {
-          return res.status(200).send(itemRate);
-        });
+    );
+    if (updatedItemRate) {
+      console.log({ updatedItemRate });
+      const loggedUser = await User.findById(req.user.id);
+      if (updatedItemRate.rater == req.user.id || loggedUser.role === "admin") {
+        return res.status(200).send(updatedItemRate);
       } else {
-        return res.status(404).json({ msg: ITEMRATE.notFound });
+        return res
+          .status(403)
+          .json({ msg: "you are not authorized to perform this operation" });
       }
-    })
-    .catch((error) => {
-      console.log(error);
-      return res.status(500).send({ msg: ITEMRATE.notFound });
-    });
+    } else {
+      return res.status(404).json({ msg: "itemRate not updated" });
+    }
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+};
+
+exports.deleteOneItemRate = async (req, res) => {
+  const id = req.params.id;
+  if (validateId(id)) {
+    return res.status(404).json({ msg: "invalid blog id" });
+  }
+  try {
+    const deletedItemRate = await ItemRate.findById(id);
+    if (deletedItemRate) {
+      console.log({ deletedItemRate });
+      const loggedUser = await User.findById(req.user.id);
+      if (
+        deletedItemRate.rater._id == req.user.id ||
+        loggedUser.role === "admin"
+      ) {
+        deletedItemRate.remove().then(() => {
+          return res.status(200).send(deletedItemRate);
+        });
+      }
+    } else {
+      return res.status(404).json({ msg: "itemRate not found" });
+    }
+  } catch (error) {
+    return res.status(500).json(error);
+  }
 };

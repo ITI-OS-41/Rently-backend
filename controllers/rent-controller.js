@@ -1,79 +1,148 @@
 const Rent = require("../models/Rent");
-const { validateId,RENT, ID } = require("../helpers/errors"); ;
+const User = require("../models/User");
+const { validateId } = require("../helpers/errors");
 
-exports.getAll = async (req, res) => {
-  let { id, owner, renter, status, rating } = req.query;
+exports.createOneRent = async (req, res) => {
+  req.body.renter = req.user.id;
+  const rent = await new Rent(req.body);
+  try {
+    const savedRent = await rent.save();
+    if (savedRent) {
+      return res.status(200).json(savedRent);
+    } else {
+      return res.status(404).json({ msg: "rent not saved" });
+    }
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+};
+
+exports.getOneRent = async (req, res) => {
+  const id = req.params.id;
+  if (validateId(id)) {
+    return res.status(404).json({ msg: "invalid rent id" });
+  }
+  try {
+    const foundRent = await Rent.findById(id);
+    if (foundRent) {
+      console.log({ foundRent });
+      const loggedUser = await User.findById(req.user.id);
+      if (foundRent.renter._id == req.user.id || loggedUser.role === "admin") {
+        return res.status(200).json(foundRent);
+      } else {
+        return res
+          .status(403)
+          .json({ msg: "you are not authorized to perform this operation" });
+      }
+    } else {
+      return res.status(404).json({ msg: "rent not found" });
+    }
+  } catch (error) {
+    return res.status(500).json(error);
+  } 
+};
+exports.getAllRents = async (req, res) => {
+  let { owner, renter, status, insurance, totalPrice, item, from, to } =
+    req.query;
   const queryObj = {
-    ...(id && { id }),
     ...(owner && { owner }),
     ...(renter && { renter }),
+    ...(item && { item }),
     ...(status && { status }),
-    ...(rating && { rating }),
+    ...(insurance && { insurance }),
+    ...(totalPrice && { totalPrice }),
+    ...(from && { from }),
+    ...(to && { to }),
   };
+  const sortBy = req.query.sortBy || "createdAt";
+  const orderBy = req.query.orderBy || "asc";
+  const sortQuery = {
+    [sortBy]: orderBy,
+  };
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 5;
+  const skip = page * limit - limit;
 
-  // * ...(email && { email: /regex here/ }),
-
-  await Rent.find(queryObj).then((objects) => {
-    res.status(200).set("X-Total-Count", objects.length).json(objects);
-  });
+  try {
+    const getRents = await Rent.find(queryObj)
+      // res.status(200).set("X-Total-Count", objects.length).json(objects);
+      .limit(limit)
+      .skip(skip)
+      .sort(sortQuery);
+    //Handle Rent with authorization
+    if (getRents) {
+      // const loggedUser = await User.findById(req.user.id);
+      // if (foundRent.renter._id == req.user.id || loggedUser.role === "admin") {
+      return res
+        .status(200)
+        .send({ res: getRents, pagination: { limit, skip, page } });
+      // } else {
+      //   return res
+      //     .status(403)
+      //     .json({ msg: "you are not authorized to perform this operation" });
+      // }
+    } else {
+      return res.status(404).json({ msg: "no rents found" });
+    }
+  } catch (err) {
+    return res.status(500).json(err);
+  }
 };
 
-exports.getOne = (req, res) => {
-  const id = req.params.id;
-  validateId(id, res);
-
-  Rent.findById(id)
-    .then((rent) => {
-      if (rent) {
-        return res.json(rent);
-      } else {
-        return res.status(404).json({ msg: RENT.notFound });
+exports.updateOneRent = async (req, res) => {
+  try {
+    const updatedRent = await Rent.findOneAndUpdate(
+      { _id: req.params.id },
+      req.body,
+      {
+        new: true,
       }
-    })
-    .catch((err) => {
-      console.log({ err });
-      return res.status(500).json({ msg: ID.invalid });
-    });
+    );
+    if (updatedRent) {
+      console.log(updatedRent);
+      const loggedUser = await User.findById(req.user.id);
+      if (
+        updatedRent.renter._id == req.user.id ||
+        loggedUser.role === "admin"
+      ) {
+        return res.status(200).send(updatedRent);
+      } else {
+        return res
+          .status(403)
+          .json({ msg: "you are not authorized to perform this operation" });
+      }
+    } else {
+      return res.status(404).json({ msg: "rent not updated" });
+    }
+  } catch (error) {
+    return res.status(500).json(error);
+  }
 };
-
-exports.create = async (req, res) => {
-  const rent = await new Rent(req.body).save();
-  res.status(200).send(rent);
-
- 
-};
-
-exports.update = async (req, res) => {
-  await Rent.findOneAndUpdate({ _id: req.params.id }, req.body, {
-    new: true,
-    runValidators: true,
-    useFindAndModify: false,
-  })
-    .then((response) => {
-      res.status(200).send(response);
-    })
-    .catch((error) => {
-      console.log(error);
-      return res.status(500).send({ msg: error.message });
-    });
-};
-
-exports.deleteOne = async (req, res) => {
+exports.deleteOneRent = async (req, res) => {
   const id = req.params.id;
-  validateId(id, res);
-
-  Rent.findById(id)
-    .then((rent) => {
-      if (rent) {
-        rent.remove().then(() => {
-          return res.status(200).send(rent);
+  if (validateId(id)) {
+    return res.status(404).json({ msg: "invalid rent id" });
+  }
+  try {
+    const deletedRent = await Rent.findById(id);
+    if (deletedRent) {
+      const loggedUser = await User.findById(req.user.id);
+      if (
+        deletedRent.renter._id == req.user.id ||
+        loggedUser.role === "admin"
+      ) {
+        deletedRent.remove().then(() => {
+          return res.status(200).send(deletedRent);
         });
       } else {
-        return res.status(404).json({ msg: RENT.notFound });
+        return res
+          .status(403)
+          .json({ msg: "you are not authorized to perform this operation" });
       }
-    })
-    .catch((error) => {
-      console.log(error);
-      return res.status(500).send({ msg: error.message });
-    });
+    } else {
+      return res.status(404).json({ msg: "rent not found" });
+    }
+  } catch (error) {
+    return res.status(500).json(error);
+  }
 };

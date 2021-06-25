@@ -1,96 +1,100 @@
 /** @format */
 
-const mongoose = require('mongoose');
-const slug = require('slugs');
+const mongoose = require("mongoose");
+const slug = require("slugs");
 const { ObjectId } = mongoose.Schema.Types;
+const Comment = require("../models/Comment");
 
 const blogSchema = new mongoose.Schema(
-	{
-		author: {
-			type: ObjectId,
-			ref: 'User',
-			required: 'author is required',
-		},
-		title: {
-			type: String,
-			trim: true,
-			required: 'title is required',
-		},
-		slug: String,
-		description: {
-			type: String,
-			trim: true,
-			required: true,
-		},
-		tags: [String],
-
-		photo: {
-			data: Buffer,
-			type: String,
-			// required: true
-		},
-	},
-	{ timestamps: true }
+  {
+    author: {
+      type: ObjectId,
+      ref: "User",
+      required: [true, "author is required"],
+    },
+    category: {
+      type: ObjectId,
+      ref: "Category",
+      required: [true, "faq category is required"],
+    },
+    title: {
+      type: String,
+      trim: true,
+      required: [true, "title is required"],
+      minlength: [4, "title is really short, needed to be 4, got {VALUE}"],
+    },
+    slug: {
+      type: String,
+      index: true,
+    },
+    description: {
+      type: String,
+      trim: true,
+      required: [true, "description is required"],
+    },
+    tags: [String],
+    headerPhoto: {
+      type: String,
+      required: [true, "Header photo is required"],
+    },
+    bodyPhotos: [String],
+    comments: [{ type: ObjectId, ref: "Comment" }],
+  },
+  { timestamps: true }
 );
 
 
+blogSchema.pre("remove", function (next) {
+  Comment.deleteMany({ blogPost: this._id }).exec();
+  next();
+});
 
-// loop 3la el required fields and send them as an array
+blogSchema.post("findOneAndUpdate", async function () {
+  const docToUpdate = await this.model.findOne(this.getQuery());
+  docToUpdate.slug = slug(docToUpdate.title);
+  docToUpdate.save();
+  // The document that `findOneAndUpdate()` will modify
+});
 
+blogSchema.pre("save", async function (next) {
+  if (!this.isModified("title")) {
+    next(); // skip it
+    return; // stop this function from running
+  }
+  this.slug = slug(this.title);
+  // find other stores that have a slug of wes, wes-1, wes-2
+  // const slugRegEx = new RegExp(`^(${this.slug})((-[0-9]*$)?)$`, "i");
+  // const postWithSlug = await this.constructor.find({ slug: slugRegEx });
+  // if (postWithSlug.length) {
+  //   this.slug = `${this.slug}-${postWithSlug.length + 1}`;
+  // }
+  next();
+  // TODO make more resiliant so slugs are unique
+});
+// loop over el required fields and return an array
 blogSchema.statics.requiredFields = function () {
-	let arr = [];
-	for (let required in blogSchema.obj) {
-		if (blogSchema.obj[required].required) {
-			arr.push(required);
-		}
-	}
-	return arr;
+  let arr = [];
+  for (let required in blogSchema.obj) {
+    if (blogSchema.obj[required].required && required !== "author") {
+      arr.push(required);
+    }
+  }
+  return arr;
 };
 
-blogSchema.pre('save', async function (next) {
-	if (!this.isModified('title')) {
-		next(); // skip it
-		return; // stop this function from running
-	}
-	this.slug = slug(this.title);
-	// find other stores that have a slug of wes, wes-1, wes-2
-	const slugRegEx = new RegExp(`^(${this.slug})((-[0-9]*$)?)$`, 'i');
-	const postWithSlug = await this.constructor.find({ slug: slugRegEx });
-	if (postWithSlug.length) {
-		this.slug = `${this.slug}-${postWithSlug.length + 1}`;
-	}
-	next();
-	// TODO make more resiliant so slugs are unique
-});
+let autoPopulateLead = function (next) {
+  this.populate(
+    "category",
+    "-subcategory -blogs -description -photo -createdAt -updatedAt -__v"
+  );
+  this.populate("author", "-email -password -createdAt -updatedAt -__v");
+  this.populate("comments", "-blogPost -createdAt -updatedAt -__v");
 
-
-
-var autoPopulateLead = function (next) {
-	this.populate('author');
-	next();
+  next();
 };
 
-blogSchema.
-	pre('findOne', autoPopulateLead).
-	pre('find', autoPopulateLead);
+blogSchema.pre("findOne", autoPopulateLead).pre("find", autoPopulateLead);
 
+blogSchema.index({ title: 1, category: 1, slug: 1 }, { unique: true });
 
-// Duplicate the ID field.
-blogSchema.virtual('id').get(function () {
-	return this._id.toHexString();
-});
-// Ensure virtual fields are serialised.
-blogSchema.set('toJSON', {
-	virtuals: true,
-});
-
-
-blogSchema.statics.getTagList = function () {
-	return this.aggregate([
-		{ $unwind: '$tags' },
-		{ $group: { _id: '$tags', count: { $sum: 1 } } },
-		{ $sort: { count: -1 } },
-	]);
-};
-
-module.exports = mongoose.model('Blog', blogSchema);
+module.exports = mongoose.model("Blog", blogSchema);

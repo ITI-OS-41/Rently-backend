@@ -2,30 +2,29 @@ const router = require("express").Router()
 
 // Import controllers
 const {
-  getOne,
-  getAll,
-  create,
-  update,
-  deleteOne,
+  createOneItem,
+  getOneItem,
+  getAllItems,
+  updateOneItem,
+  deleteOneItem,
 } = require("../controllers/item-controller")
+const validateItem = require("../validation/item");
+const auth = require("../middleware/auth");
 
-
-// * GET ALL
-router.get("/", getAll)
-
+// * CREATE
+router.post("/", auth,validateItem, createOneItem);
 
 // * GET ONE
-router.get("/:id", getOne)
+router.get("/:id", getOneItem);
 
+// * GET ALL
+router.get("/", getAllItems);
 
 // * UPDATE
-router.post("/", create)
-
-// * UPDATE
-router.post("/:id", update)
+router.post("/:id", auth, validateItem, updateOneItem);
 
 // * DELETE
-router.delete("/:id", deleteOne,)
+router.delete("/:id", auth, deleteOneItem);
 
 
 module.exports = router

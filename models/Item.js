@@ -1,124 +1,177 @@
+/** @format */
+
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const slug = require("slugs");
 const { ObjectId } = mongoose.Schema.Types;
-
 const itemSchema = new Schema(
   {
     owner: {
       type: ObjectId,
       ref: "User",
-      required: true
+      required: [true, "owner is required"],
     },
     category: {
       type: ObjectId,
       ref: "Category",
-      required: true,
+      required: [true, "category is required"],
     },
     condition: {
       type: String,
       enum: {
         values: ["perfect", "very good", "descent", "good", "fair"],
-        message: '{VALUE} is not supported'
+        message: "{VALUE} is not supported",
       },
-      default: "descent"
-
+      required: [true, "item condition is required"],
     },
-    status: {
+    isAvailable: {
       type: Boolean,
-      required: true
+      trim: true,
+      required: [true, "item availability status is required"],
+    },
+    isPublished: {
+      type: Boolean,
+      trim: true,
+      required: [true, "item published status is required"],
     },
     subcategory: {
       type: ObjectId,
       ref: "SubCategory",
-      required: true,
+      required: [true, "subCategory is required"],
     },
     name: {
       type: String,
-      required: true,
+      trim: true,
+      required: [true, "item name is required"],
     },
     stock: {
       type: Number,
-      required: true,
-      default: 1,
+      trim: true,
+      required: [true, "stock is required"],
     },
     description: {
       type: String,
-      required: true,
+      required: [true, "item description is required"],
     },
     photo: {
-      // data: Buffer,
-      type: String,
-      required: true
+      type: [String],
+      required: [true, "item photos are required"],
     },
     instructionalVideo: {
-      data: Buffer,
-      contentType: String,
+      type: [String],
     },
     location: {
       type: {
         type: String,
         enum: {
           values: ["Point"],
-          message: '{VALUE} is not supported',
+          message: "{VALUE} is not supported",
         },
-        default: "Point"
+        default: "Point",
       },
       coordinates: [
         {
           type: Number,
-          required: [true, "You must supply coordinates!"],
+          trim: true,
+          //   required: [true, "You must supply coordinates!"],
         },
       ],
       address: {
         type: String,
-        required: [true, "You must supply an address!"],
+        // required: [true, "You must supply an address!"],
       },
     },
     cancellation: {
       type: String,
+      trim: true,
       enum: {
-        values: ["Easygoing", "Reasonable", "Strict"],
-        message: '{VALUE} is not supported'
+        values: ["easygoing", "reasonable", "strict"],
+        message: "{VALUE} is not supported",
       },
-      default: "Reasonable"
-
+      required: [true, "item cancellation is required"],
     },
     price: {
       hour: {
         type: Number,
+        trim: true,
+        default: 0,
       },
       day: {
         type: Number,
+        trim: true,
+        default: 0,
       },
       week: {
         type: Number,
+        trim: true,
+        default: 0,
       },
       month: {
         type: Number,
+        trim: true,
+        default: 0,
       },
     },
     deliverable: {
       type: Boolean,
-      required: true,
+      trim: true,
+      required: [true, "item delivery option required"],
     },
     deposit: {
       type: Number,
+      trim: true,
+      required: [true, "item deposit is required"],
+    },
+    // itemRate: [{ type: ObjectId, ref: "ItemRate" }],
+    slug: {
+      type: String,
+      index: true,
     },
   },
   { timestamps: true }
 );
 
+itemSchema.post("findOneAndUpdate", async function () {
+  const docToUpdate = await this.model.findOne(this.getQuery());
+  docToUpdate.slug = slug(docToUpdate.name);
+  docToUpdate.save(); // The document that `findOneAndUpdate()` will modify
+});
+itemSchema.pre("save", async function (next) {
+  if (!this.isModified("name")) {
+    next(); // skip it
+    return; // stop this function from running
+  }
+  this.slug = slug(this.name);
+  next();
+  // TODO make more resiliant so slugs are unique
+});
 
+itemSchema.statics.requiredFields = function () {
+  let arr = [];
+  for (let required in itemSchema.obj) {
+    if (itemSchema.obj[required].required && required !== "owner") {
+      arr.push(required);
+    }
+  }
+  arr.push("price")
+  return arr;
+};
 
-var autoPopulateLead = function (next) {
+let autoPopulateLead = function (next) {
   this.populate("owner", "-email -password -createdAt -updatedAt -__v");
-  this.populate('category');
-  this.populate('subcategory');
+  this.populate(
+    "category",
+    "-subcategory -blogs -description -photo -createdAt -updatedAt -__v"
+  );
+  this.populate(
+    "subcategory",
+    "-category -description -slug -createdAt -updatedAt -__v"
+  );
+
   next();
 };
 
-itemSchema.
-  pre('findOne', autoPopulateLead).
-  pre('find', autoPopulateLead);
+itemSchema.pre("findOne", autoPopulateLead).pre("find", autoPopulateLead);
 
+itemSchema.index({ name: 1, owner: 1, slug: 1 }, { unique: true });
 module.exports = mongoose.model("Item", itemSchema);

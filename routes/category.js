@@ -1,26 +1,33 @@
+/** @format */
+const auth = require("../middleware/auth");
+const authAdmin = require("../middleware/authAdmin");
 const router = require("express").Router();
-const Category = require("../models/Category");
-// const {categories} = require("../controllers/category-controller");
-// Import controllers
+const validateCategory = require("../validation/category");
+
+// Import category controllers
 const {
-	getOne,
-	getAll,
-	update,
-	deleteOne,
-	create
+  createOneCategory,
+  getOneCategory,
+  getAllCategories,
+  updateOneCategory,
+  deleteOneCategory,
 } = require("../controllers/category-controller");
+
+
+//*******************
+//* category routes
+//*******************
+
 //  * Create New
-router.post('/',create);
+
+router.post("/", auth,authAdmin, validateCategory, createOneCategory);
 // * GET ONE
-router.get("/:id", getOne);
-
+router.get("/:id", getOneCategory);
 // * GET ALL
-router.get("/",getAll);
-
+router.get("/",getAllCategories);
 // * UPDATE
-router.post("/:id", update);
-
+router.post("/:id", auth,authAdmin, validateCategory, updateOneCategory);
 // * DELETE
-router.delete("/:id",deleteOne);
+router.delete("/:id", auth, authAdmin, deleteOneCategory);
 
 module.exports = router;

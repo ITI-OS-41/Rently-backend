@@ -1,40 +1,37 @@
 /** @format */
+const auth = require("../middleware/auth");
+const router = require("express").Router();
+const validateBlog = require("../validation/blog");
 
-const router = require('express').Router();
-const Blog = require('../models/Blog');
-const passport = require('passport');
-const { catchErrors } = require('../helpers/errors');
-const validateBlog = require('../validation/blog');
-// Import controllers
+
+// Import blog controllers
 const {
-	create,
-	upload,
-	getAll,
-	getOne,
-	update,
-	deleteOne,
-	getBySlug,
-	getByTag,
-} = require('../controllers/blog-controller');
+  createOneBlog,
+  getAllBlogs,
+  getOneBlog,
+  updateOneBlog,
+  deleteOneBlog,
+} = require("../controllers/blog-controller");
+
+
+
+//****************** 
+//*blog routes
+//****************
+
 // * create blog
+router.post("/", auth, validateBlog, createOneBlog);
+// * GET ONE Blog
+router.get("/:id",getOneBlog);
+// * GET ALL Blogs
+router.get("/",getAllBlogs);
+// * UPDATE Blog
+router.post("/:id", auth, validateBlog, updateOneBlog);
+// * DELETE Blog
+router.delete("/:id", auth, deleteOneBlog);
 
-router.post('/', validateBlog, catchErrors(create));
-// * GET ONE
-router.get('/:id', getOne);
 
-// * GET ALL
-router.get('/', catchErrors(getAll));
 
-// * UPDATE
-router.post('/:id', validateBlog, catchErrors(update));
 
-// * DELETE
-router.delete('/:id', deleteOne);
 
-// * Find by slug name
-router.get('/slug/:slug', getBySlug);
-
-// * Find by  tag
-// router.get('/tag', getByTag);
-// router.get('/tag/:tag', getByTag);
 module.exports = router;
