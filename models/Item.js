@@ -29,6 +29,11 @@ const itemSchema = new Schema(
       trim: true,
       required: [true, "item availability status is required"],
     },
+    isSubmitted: {
+      type: Boolean,
+      trim: true,
+      required: [true, "item submission status is required"],
+    },
     isPublished: {
       type: Boolean,
       trim: true,
