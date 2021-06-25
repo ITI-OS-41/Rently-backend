@@ -38,6 +38,7 @@ const user = {
       const passwordHash = await bcrypt.hash(password, 12);
 
       const newUser = {
+        ...req.body,
         email,
         password: passwordHash,
         username,
@@ -62,15 +63,14 @@ const user = {
         process.env.ACTIVATION_TOKEN_SECRET
       );
 
-      const { email, password } = user;
+      // const { firstname, lastname, username, email, password } = user;
 
       // const check = await User.findOne({ email });
       // if (check)
       //   return res.status(400).json({ msg: "This email already exists." });
 
       const newUser = new User({
-        email,
-        password,
+        ...user,
       });
 
       await newUser.save();
@@ -186,11 +186,10 @@ const user = {
   },
   updateUser: async (req, res) => {
     try {
-      const { name, avatar } = req.body;
-      await Users.findOneAndUpdate(
+      await User.findOneAndUpdate(
         { _id: req.user.id },
         {
-         ...req.body,
+          ...req.body,
         }
       );
 
@@ -342,7 +341,7 @@ function validateEmail(email) {
 
 const createActivationToken = (payload) => {
   return jwt.sign(payload, process.env.ACTIVATION_TOKEN_SECRET, {
-    expiresIn: "5m",
+    expiresIn: "1d",
   });
 };
 
