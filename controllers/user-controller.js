@@ -46,7 +46,7 @@ const user = {
 
       const activation_token = createActivationToken(newUser);
 
-      const url = `${CLIENT_URL}/user/activate/${activation_token}`;
+      const url = `${CLIENT_URL}/login/${activation_token}`;
       sendMail(email, url, "Verify your email address", res);
       res.json({
         msg: "Register Success! Please activate your email to start.",
