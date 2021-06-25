@@ -100,11 +100,9 @@ const user = {
       console.log({ refresh_token });
       console.log("user refresh token", user._id);
 
-      res.json({ user }
-        .select({
-          password: 0
-        })
-      );
+      res.json({
+        user
+      });
     } catch (err) {
       return res.status(500).json({ msg: err.message });
     }
