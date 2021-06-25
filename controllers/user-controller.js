@@ -100,8 +100,11 @@ const user = {
       console.log({ refresh_token });
       console.log("user refresh token", user._id);
 
+      const accessToken = createAccessToken({ id: user._id })
+
       res.json({
-        user
+        ...user,
+        token: accessToken
       });
     } catch (err) {
       return res.status(500).json({ msg: err.message });
