@@ -256,6 +256,7 @@ const user = {
         });
 
         res.json({ msg: "Login success!" });
+
       } else {
         const newUser = new User({
           email,

@@ -167,6 +167,7 @@ let autoPopulateLead = function (next) {
     "subcategory",
     "-category -description -slug -createdAt -updatedAt -__v"
   );
+
   next();
 };
 
