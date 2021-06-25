@@ -48,8 +48,8 @@ module.exports = async (req, res, next) => {
     errors.owner = idOwnerCheck;
   }
 
-  if (data.renter == req.user.id) {
-    errors.renter =
+  if (data.owner == req.user.id) {
+    errors.owner =
       "you can't be the owner and the renter at the same operation";
   }
 
@@ -101,7 +101,7 @@ module.exports = async (req, res, next) => {
       verifiedRents.forEach((rent) => {
         if (rent.status !== "returned") {
           errors.owner =
-            "renter can't request another rent from the item owner on this item, while ongoing renting between both on the same item";
+            "you can't request another rent from the item owner on this item, while ongoing renting between both on the same item";
         }
       });
     }

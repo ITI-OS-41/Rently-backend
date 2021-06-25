@@ -29,7 +29,7 @@ const categorySchema = new Schema(
     },
     model: {
       type: String,
-      default: "item",
+      required: [true, "model is required"],
     },
     slug: {
       type: String,
