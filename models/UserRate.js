@@ -30,6 +30,7 @@ const userRateSchema = new Schema(
     },
     rating: {
       type: Number,
+      trim: true,
       required: [true, "rating is required"],
       min: 1,
       max: 5,

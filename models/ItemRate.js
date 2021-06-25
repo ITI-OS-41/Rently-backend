@@ -6,36 +6,37 @@ const { ObjectId } = mongoose.Schema.Types;
 //module.exports = mongoose.model('Item', itemSchema);
 
 const itemRateSchema = new Schema(
-	{
-		item: {
-			type: ObjectId,
-			ref: "Item",
-			required: true,
-			index: true,
-		},
-		rater: {
-			type: ObjectId,
-			ref: "User",
-			required: true,
-			index: true,
-		},
-		comment: {
-			type: String,
-			required: true,
-			trim: true,
-		},
-		rating: {
-			type: Number,
-			required: true,
-			min: 1,
-			max: 5,
-		},
-	},
-	{ timestamps: true },
-	{
-		toJSON: { virtuals: true },
-		toObject: { virtuals: true },
-	}
+  {
+    item: {
+      type: ObjectId,
+      ref: "Item",
+      required: true,
+      index: true,
+    },
+    rater: {
+      type: ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
+    comment: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    rating: {
+      type: Number,
+      required: true,
+      trim: true,
+      min: 1,
+      max: 5,
+    },
+  },
+  { timestamps: true },
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
 );
 
 let autoPopulateLead = function (next) {

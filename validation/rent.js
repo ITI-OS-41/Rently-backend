@@ -1,101 +1,113 @@
 /** @format */
-
-const User = require("../models/User");
+const {
+  rentIdCheck,
+  userIdCheck,
+  itemIdCheck,
+  assignEmptyErrorsToFields,
+  assignErrorsToMissingFields,
+  getTwoArraysDifferences,
+  missingFieldsChecker,
+} = require("../helpers/errors");
 const Item = require("../models/Item");
-const { ID } = require("../helpers/errors");
-const Validator = require("validator");
-
-//joi library for validation
+const validator = require("validator");
+const Rent = require("../models/Rent");
 
 module.exports = async (req, res, next) => {
   let errors = {};
-  let data = req.body;
   const id = req.params.id;
+  const data = req.body;
+  const requiredFields = Rent.requiredFields();
+  const requestBody = Object.keys(data);
   const from = new Date(data.from).getTime();
   const to = new Date(data.to).getTime();
   const status = ["pending", "approved", "delivered", "returned", "declined"];
 
-  if (Validator.isEmpty(data.owner)) {
-    errors.owner = "owner is required";
-  } else if (!Validator.isMongoId(data.owner)) {
-    errors.owner = "this is not a valid owner id";
-  } else {
-    const owner = await User.findById(data.owner);
-    if (!owner) {
-      errors.owner = "this user is not found";
-    }
+  const idRentCheck = await rentIdCheck(id, res);
+  if (Object.keys(idRentCheck).length > 0) {
+    return res.status(404).json(idRentCheck);
   }
 
-  if (Validator.isEmpty(data.renter)) {
-    errors.renter = "renter is required";
-  } else if (!Validator.isMongoId(data.renter)) {
-    errors.renter = "this is not valid user id";
-  } else {
-    const renter = await User.findById(data.renter);
-    if (!renter) {
-      errors.renter = "this user is not found";
-    }
+  let missingFields = missingFieldsChecker(requestBody, requiredFields);
+
+  errors = assignErrorsToMissingFields(missingFields);
+
+  let difference = getTwoArraysDifferences(requiredFields, missingFields);
+
+  errors = {
+    ...errors,
+    ...assignEmptyErrorsToFields(data, difference),
+  };
+
+  const idItemCheck = await itemIdCheck(data.item, res);
+  if (Object.keys(idItemCheck).length > 0) {
+    errors.item = idItemCheck;
   }
 
-  if (data.renter === data.owner) {
+  const idOwnerCheck = await userIdCheck(data.owner, res);
+  if (Object.keys(idOwnerCheck).length > 0) {
+    errors.owner = idOwnerCheck;
+  }
+
+  if (data.renter == req.user.id) {
     errors.renter =
       "you can't be the owner and the renter at the same operation";
   }
 
-  if (Validator.isEmpty(data.item)) {
-    errors.item = "item is required";
-  } else if (!Validator.isMongoId(data.item)) {
-    errors.item = "this is not valid item id";
-  } else {
+  if (!errors.item) {
     const item = await Item.findById(data.item);
-    if (!item) {
-      errors.item = "this item is not found in our database ";
-    } else if (item.stock === 0) {
+    if (item.stock === 0) {
       errors.item = "this item is out of stock";
     }
   }
 
-
-
   // from should be before to
+  // if(!errors.to && !validator.isDate(data.to)){
+  //   console.log("elhamd wlshokr leek")
+  // }
+
   if (from > to) {
     errors.time = "start date should be before end date";
   }
 
- 
-  if (data.insurance && data.insurance < 1) {
-    errors.insurance = "insurance must be greater than 1";
+  if (!errors.insurance) {
+    if (data.insurance < 1 || isNaN(data.insurance)) {
+      errors.insurance = "item insurance is invalid";
+    }
   }
 
-  if (Validator.isEmpty(data.price)) {
-    errors.price = "price is required";
-  }
-  if (data.price && data.price < 1) {
-    errors.price = "price must be greater than 1";
-  }
-
-  // Status check validation and controller
-  if (Validator.isEmpty(data.status)) {
-    errors.status = "rent status is required";
+  if (!errors.totalPrice) {
+    if (data.totalPrice < 1 || isNaN(data.totalPrice)) {
+      errors.totalPrice = "item totalPrice is invalid";
+    }
   }
 
+  // Status check validation
   if (id) {
-    if (!Validator.isMongoId(id)) {
-      return res.status(404).json({
-        id: ID.invalid,
-      });
-    } else if (data.status && !status.includes(data.status)) {
+    if (!errors.status && !status.includes(data.status)) {
       errors.status = `${data.status} is not an accepted value for status`;
     }
-  } 
-  // else {
-  //   if (data.status !== "pending") {
-  //     errors.status = `${data.status} is not an accepted value for making a rent`;
-  //   }
-  // }
+  } else if (!errors.status && data.status !== "pending") {
+    errors.status = `${data.status} is not an accepted value for making a rent`;
+  }
+
+  if (Object.keys(errors).length === 0) {
+    const verifiedRents = await Rent.find({
+      renter: req.user.id,
+      item: data.item,
+      owner: data.owner,
+    });
+
+    if (verifiedRents.length) {
+      verifiedRents.forEach((rent) => {
+        if (rent.status !== "returned") {
+          errors.owner =
+            "renter can't request another rent from the item owner on this item, while ongoing renting between both on the same item";
+        }
+      });
+    }
+  }
 
   if (Object.keys(errors).length > 0) {
-    console.log(data, "err => ", errors);
     return res.status(404).json(errors);
   } else {
     return next();

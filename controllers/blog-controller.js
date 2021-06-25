@@ -245,7 +245,7 @@ exports.deleteOneBlog = async (req, res) => {
           .json({ msg: "you are not authorized to perform this operation" });
       }
     } else {
-      return res.status(404).json({ msg: "blog not found" });
+      return res.status(404).json({ msg: "blog not deleted" });
     }
   } catch (error) {
     return res.status(500).json(error);

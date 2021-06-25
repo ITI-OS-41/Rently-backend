@@ -54,6 +54,7 @@ const userSchema = new Schema(
     },
     isVerified: {
       type: Boolean,
+      trim:true,
     },
     resetPasswordToken: String,
     resetPasswordExpires: Date,

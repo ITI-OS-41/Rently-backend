@@ -26,12 +26,12 @@ const itemSchema = new Schema(
     },
     isAvailable: {
       type: Boolean,
-      trim:true,
+      trim: true,
       required: [true, "item availability status is required"],
     },
     isPublished: {
       type: Boolean,
-      trim:true,
+      trim: true,
       required: [true, "item published status is required"],
     },
     subcategory: {
@@ -72,6 +72,7 @@ const itemSchema = new Schema(
       coordinates: [
         {
           type: Number,
+          trim: true,
           //   required: [true, "You must supply coordinates!"],
         },
       ],
@@ -107,6 +108,7 @@ const itemSchema = new Schema(
       },
       month: {
         type: Number,
+        trim: true,
         default: 0,
       },
     },

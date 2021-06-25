@@ -18,6 +18,7 @@ const appRateSchema = new Schema(
     rating: {
       type: Number,
       required: true,
+      trim:true,
       min: 1,
       max: 5,
     },
