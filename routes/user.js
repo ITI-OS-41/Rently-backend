@@ -19,6 +19,9 @@ router.get("/infor", auth, user.getUserInfor);
 
 router.get("/all_infor", auth, authAdmin, user.getUsersAllInfor);
 
+//! Make function to return top users
+router.get("/top", user.getUsersAllInfor);
+
 router.get("/logout", user.logout);
 
 router.patch("/update", auth, user.updateUser);
