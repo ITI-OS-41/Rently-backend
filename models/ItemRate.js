@@ -3,14 +3,13 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const { ObjectId } = mongoose.Schema.Types;
-//module.exports = mongoose.model('Item', itemSchema);
 
 const itemRateSchema = new Schema(
   {
     item: {
       type: ObjectId,
       ref: "Item",
-      required: true,
+      required: [true, "item is required"],
       index: true,
     },
     rater: {
@@ -33,40 +32,26 @@ const itemRateSchema = new Schema(
     },
   },
   { timestamps: true },
-  {
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
-  }
 );
 
+
+
+itemRateSchema.statics.requiredFields = function () {
+  let arr = [];
+  for (let required in itemRateSchema.obj) {
+    if (itemRateSchema.obj[required].required && required !== "rater") {
+      arr.push(required);
+    }
+  }
+  return arr;
+};
+
 let autoPopulateLead = function (next) {
-	this.populate("rater");
-	next();
+  this.populate("rater", "-email -password -createdAt -updatedAt -__v");
+  next();
 };
 
 itemRateSchema.pre("findOne", autoPopulateLead).pre("find", autoPopulateLead);
-
-itemRateSchema.statics.requiredFields = function () {
-	let arr = [];
-	for (let required in itemRateSchema.obj) {
-		if (
-			itemRateSchema.obj[required].required &&
-			required !== "rater" &&
-			required !== "item"
-		) {
-			arr.push(required);
-		}
-	}
-	return arr;
-};
-
-// let autoPopulateLead = function (next) {
-// 	this.populate("rater");
-// 	this.populate("item");
-// 	next();
-// };
-
-// itemRateSchema.pre("findOne", autoPopulateLead).pre("find", autoPopulateLead);
 
 itemRateSchema.index({ rater: 1, item: 1 }, { unique: true });
 

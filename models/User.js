@@ -54,7 +54,18 @@ const userSchema = new Schema(
     },
     isVerified: {
       type: Boolean,
-      trim:true,
+      trim: true,
+    },
+    store: {
+      name: {
+        type: String,
+      },
+      description: {
+        type: String,
+      },
+      photo: {
+        type: String,
+      },
     },
     resetPasswordToken: String,
     resetPasswordExpires: Date,
@@ -73,11 +84,11 @@ userSchema.virtual("name").get(function () {
 userSchema.set("toJSON", {
   virtuals: true,
 });
-if (Rent.status==="returned"){
+if (Rent.status === "returned") {
   userSchema.pre("remove", function (next) {
     Category.deleteMany({ createdBy: this._id }).exec();
 
     next();
   });
-};
+}
 module.exports = mongoose.model("User", userSchema);

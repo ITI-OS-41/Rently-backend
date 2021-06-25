@@ -12,6 +12,7 @@ const Item = require("../models/Item");
 const AppRate= require("../models/AppRate")
 const UserRate = require("../models/UserRate");
 const Rent = require("../models/Rent");
+const ItemRate= require("../models/ItemRate")
 
 const catchErrors = (fn) => {
   return function (req, res, next) {
@@ -65,12 +66,27 @@ const userIdCheck = async (id, res) => {
   }
   return errors;
 };
+const itemRateIdCheck = async (id, res) => {
+  let errors = {};
+  if (id) {
+    if (!validator.isMongoId(id)) {
+      errors.id = "invalid itemRate id";
+    } else {
+      const idCheck = await ItemRate.findById(id);
+      if (!idCheck) {
+        errors.id = "itemRate not found ";
+      }
+    }
+  }
+  return errors;
+};
+
 
 const userRateIdCheck = async (id, res) => {
   let errors = {};
   if (id) {
     if (!validator.isMongoId(id)) {
-      errors.id = "invalid user id";
+      errors.id = "invalid userRate id";
     } else {
       const idCheck = await UserRate.findById(id);
       if (!idCheck) {
@@ -304,6 +320,7 @@ module.exports = {
   validateId,
   conversationIdCheck,
   userRateIdCheck,
+  itemRateIdCheck,
   itemIdCheck,
   appRateIdCheck,
   faqIdCheck,

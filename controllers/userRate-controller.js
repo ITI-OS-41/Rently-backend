@@ -4,7 +4,7 @@ const UserRate = require("../models/UserRate");
 const User = require("../models/User");
 
 exports.createOneUserRate = async (req, res) => {
-	req.body.owner= req.user.id
+  req.body.owner = req.user.id;
   const userRate = await new UserRate(req.body);
   try {
     const savedUserRate = await userRate.save();
@@ -79,12 +79,9 @@ exports.updateOneUserRate = async (req, res) => {
       }
     );
     if (updatedUserRate) {
-		console.log({ updatedUserRate });
+      console.log({ updatedUserRate });
       const loggedUser = await User.findById(req.user.id);
-      if (
-        updatedUserRate.owner == req.user.id ||
-        loggedUser.role === "admin"
-      ) {
+      if (updatedUserRate.owner == req.user.id || loggedUser.role === "admin") {
         return res.status(200).send(updatedUserRate);
       } else {
         return res
@@ -102,12 +99,12 @@ exports.deleteOneUserRate = async (req, res) => {
   const id = req.params.id;
   if (validateId(id)) {
     return res.status(404).json({ msg: "invalid blog id" });
-  } 
-  try{
-	const deletedUserRate=await UserRate.findById(id)
-      if (deletedUserRate) {
-		  console.log({deletedUserRate})
-		  const loggedUser = await User.findById(req.user.id);
+  }
+  try {
+    const deletedUserRate = await UserRate.findById(id);
+    if (deletedUserRate) {
+      console.log({ deletedUserRate });
+      const loggedUser = await User.findById(req.user.id);
       if (
         deletedUserRate.owner._id == req.user.id ||
         loggedUser.role === "admin"
@@ -116,10 +113,10 @@ exports.deleteOneUserRate = async (req, res) => {
           return res.status(200).send(deletedUserRate);
         });
       }
-	 } else {
-        return res.status(404).json({ msg: "userRate not found" });
-      }
-    }catch (error) {
+    } else {
+      return res.status(404).json({ msg: "userRate not found" });
+    }
+  } catch (error) {
     return res.status(500).json(error);
   }
-  }
+};

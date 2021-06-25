@@ -122,7 +122,7 @@ const itemSchema = new Schema(
       trim: true,
       required: [true, "item deposit is required"],
     },
-    itemRate: [{ type: ObjectId, ref: "ItemRate" }],
+    // itemRate: [{ type: ObjectId, ref: "ItemRate" }],
     slug: {
       type: String,
       index: true,

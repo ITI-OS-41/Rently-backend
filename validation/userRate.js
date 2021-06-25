@@ -38,6 +38,7 @@ module.exports = async (req, res, next) => {
   if (Object.keys(idUserCheck).length > 0) {
     errors.renter = idUserCheck;
   }
+  
   const idItemCheck = await itemIdCheck(data.item, res);
   if (Object.keys(idItemCheck).length > 0) {
     errors.item = idItemCheck;
