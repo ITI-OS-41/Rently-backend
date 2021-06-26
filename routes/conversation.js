@@ -11,7 +11,7 @@ const {
 
 //new conv
 
-router.put("/",auth,validateConversation, create);
+router.post("/",auth,validateConversation, create);
 
 //get conv of a user
 

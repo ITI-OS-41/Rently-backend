@@ -5,19 +5,16 @@ const { validateId } = require("../helpers/errors");
 
 exports.create = async (req, res) => {
   req.body.sender = req.user.id;
-  const newConversation = new Conversation({
-    members: [req.body.sender, req.body.members],
-  });
-  try {
-    const savedConversation = await newConversation.save();
-    if (savedConversation) {
-      return res.status(200).json(savedConversation);
+  
+    const newConversation = await Conversation.findOneAndUpdate({
+      members: { $all: [req.user.id, req.body.members] },
+    }, { upsert: true })
+    if (newConversation) {
+      return res.status(200).json(newConversation);
     } else {
       return res.status(404).json({ msg: "conversation not saved" });
     }
-  } catch (err) {
-    return res.status(500).json(err);
-  }
+ 
 };
 
 // exports.getConversationId=async(req, res) => {
