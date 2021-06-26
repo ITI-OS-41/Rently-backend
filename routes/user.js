@@ -17,8 +17,6 @@ router.post("/reset", auth, user.resetPassword);
 
 router.get("/infor", auth, user.getUserInfor);
 
-router.get("/:id",  user.getUser);
-
 router.get("/all_infor", auth, authAdmin, user.getUsersAllInfor);
 
 //! Make function to return top users
@@ -36,5 +34,7 @@ router.delete("/delete/:id", auth, authAdmin, user.deleteUser);
 router.post("/google_login", user.googleLogin);
 
 router.post("/facebook_login", user.facebookLogin);
+
+router.get("/:id",  user.getUser);
 
 module.exports = router;
