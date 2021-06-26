@@ -48,11 +48,11 @@ itemRateSchema.statics.requiredFields = function () {
 
 let autoPopulateLead = function (next) {
   this.populate("rater", "-email -password -createdAt -updatedAt -__v");
-  next();
   this.populate(
     "item",
     "-isAvailable -isPublished -isDeliverable -createdAt -updatedAt -__v -location -category -subcategory -description -photo -stock -condition -deposit -cancellation -instructionalVideo"
-  );
+    );
+    next();
 };
 
 itemRateSchema.pre("findOne", autoPopulateLead).pre("find", autoPopulateLead);
