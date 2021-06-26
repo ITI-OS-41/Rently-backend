@@ -7,7 +7,7 @@ exports.create = async (req, res) => {
   req.body.sender = req.user.id;
   
     const newConversation = await Conversation.findOneAndUpdate({
-      members: { $all: [req.user.id, req.body.members] },
+      members: { $all: [req.body.sender, req.body.receiver] },
     }, { upsert: true })
     if (newConversation) {
       return res.status(200).json(newConversation);

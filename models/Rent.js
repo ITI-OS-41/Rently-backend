@@ -30,7 +30,7 @@ const rentSchema = new Schema(
     insurance: {
       type: Number,
       trim: true,
-      required: [true, "insurance is required"],
+      // required: [true, "insurance is required"],
     },
     totalPrice: {
       type: Number,

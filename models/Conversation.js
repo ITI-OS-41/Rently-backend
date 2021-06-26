@@ -38,15 +38,15 @@ conversationSchema.pre("remove", function (next) {
   next();
 });
 
-conversationSchema.statics.requiredFields = function () {
-  let arr = [];
-  for (let required in conversationSchema.obj) {
-    if (conversationSchema.obj[required][0].required) {
-      arr.push(required);
-    }
-  }
-  return arr;
-};
+// conversationSchema.statics.requiredFields = function () {
+//   let arr = [];
+//   for (let required in conversationSchema.obj) {
+//     if (conversationSchema.obj[required][0].required) {
+//       arr.push(required);
+//     }
+//   }
+//   return arr;
+// };
 
 let autoPopulateLead = function (next) {
   this.populate("members", "-email -password -createdAt -updatedAt -__v");
