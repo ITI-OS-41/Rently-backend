@@ -8,7 +8,7 @@ const conversationSchema = new mongoose.Schema(
       {
         type: ObjectId,
         ref: "User",
-        required: [true, "should define conversation participants"],
+        // required: [true, "should define conversation participants"],
       },
     ],
     // sender: {
