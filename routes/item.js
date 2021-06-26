@@ -12,7 +12,7 @@ const validateItem = require("../validation/item");
 const auth = require("../middleware/auth");
 
 // * CREATE
-router.post("/", auth,validateItem, createOneItem);
+router.post("/", validateItem, createOneItem);
 
 // * GET ONE
 router.get("/:id", getOneItem);
