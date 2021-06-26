@@ -37,15 +37,15 @@ module.exports = async (req, res, next) => {
     }
   }
   
-  if (!errors.members) {
-    req.body.sender = req.user.id;
-    const findDuplication = await Conversation.find({
-      members: [req.body.sender, req.body.members],
-    });
-    if (findDuplication.length) {
-      errors.duplication = "a conversation between these participants already exists";
-    }
-  }
+  // if (!errors.members) {
+  //   req.body.sender = req.user.id;
+  //   const findDuplication = await Conversation.find({
+  //     members: [req.body.sender, req.body.members],
+  //   });
+  //   if (findDuplication.length) {
+  //     errors.duplication = "a conversation between these participants already exists";
+  //   }
+  // }
   if (Object.keys(errors).length > 0) {
     return res.status(404).json(errors);
   } else {
