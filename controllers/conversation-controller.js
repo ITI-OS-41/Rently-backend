@@ -77,7 +77,9 @@ exports.getAll = async (req, res) => {
   try {
     const conversation = await Conversation.find({
       members: { $in: [req.user.id] },
-    });
+    })
+      .sort("-updatedAt");
+
     if (conversation.length) {
       return res.status(200).json(conversation);
     } else {
