@@ -17,6 +17,8 @@ router.post("/reset", auth, user.resetPassword);
 
 router.get("/infor", auth, user.getUserInfor);
 
+router.get("/:id",  user.getUser);
+
 router.get("/all_infor", auth, authAdmin, user.getUsersAllInfor);
 
 //! Make function to return top users

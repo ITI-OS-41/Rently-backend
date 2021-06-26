@@ -12,6 +12,19 @@ const client = new OAuth2(process.env.MAILING_SERVICE_CLIENT_ID);
 const { CLIENT_URL } = process.env;
 
 const user = {
+  getUser :async  (req, res) => {
+    const userId = req.params.id;
+    await User.findById(userId).exec((err, user) => {
+        if (err || !user) {
+            return res.status(404).json({
+                error: 'User not found'
+            });
+        }
+        user.password = undefined;
+        user.salt = undefined;
+        return res.status(200).json(user);
+    });
+},
   register: async (req, res) => {
     try {
       const { username, email, password } = req.body;

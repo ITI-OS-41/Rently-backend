@@ -52,6 +52,11 @@ blogSchema.pre("remove", function (next) {
 blogSchema.post("findOneAndUpdate", async function () {
   const docToUpdate = await this.model.findOne(this.getQuery());
   docToUpdate.slug = slug(docToUpdate.title);
+  const slugRegEx = new RegExp(`^(${docToUpdate.slug})((-[0-9]*$)?)$`, "i");
+  const postWithSlug = await docToUpdate.constructor.find({ slug: slugRegEx });
+  if (postWithSlug.length) {
+    docToUpdate.slug = `${docToUpdate.slug}-${postWithSlug.length + 1}`;
+  }
   docToUpdate.save();
   // The document that `findOneAndUpdate()` will modify
 });
@@ -63,11 +68,11 @@ blogSchema.pre("save", async function (next) {
   }
   this.slug = slug(this.title);
   // find other stores that have a slug of wes, wes-1, wes-2
-  // const slugRegEx = new RegExp(`^(${this.slug})((-[0-9]*$)?)$`, "i");
-  // const postWithSlug = await this.constructor.find({ slug: slugRegEx });
-  // if (postWithSlug.length) {
-  //   this.slug = `${this.slug}-${postWithSlug.length + 1}`;
-  // }
+  const slugRegEx = new RegExp(`^(${this.slug})((-[0-9]*$)?)$`, "i");
+  const postWithSlug = await this.constructor.find({ slug: slugRegEx });
+  if (postWithSlug.length) {
+    this.slug = `${this.slug}-${postWithSlug.length + 1}`;
+  }
   next();
   // TODO make more resiliant so slugs are unique
 });
