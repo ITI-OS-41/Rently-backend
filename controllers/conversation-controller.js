@@ -5,16 +5,26 @@ const { validateId } = require("../helpers/errors");
 
 exports.create = async (req, res) => {
   req.body.sender = req.user.id;
-  
-    const newConversation = await Conversation.findOneAndUpdate({
-      members: { $all: [req.body.sender, req.body.receiver] },
-    }, { upsert: true })
-    if (newConversation) {
-      return res.status(200).json(newConversation);
-    } else {
-      return res.status(404).json({ msg: "conversation not saved" });
+  const duplicateConversation= await Conversation.findOne({
+    members: [req.body.sender, req.body.receiver],
+  })
+  if(duplicateConversation){
+    return res.status(200).json(duplicateConversation)
+  }else{
+    const newConversation = new Conversation({
+      members: [req.body.sender, req.body.members],
+    });
+    try {
+      const savedConversation = await newConversation.save();
+      if (savedConversation) {
+        return res.status(200).json(savedConversation);
+      } else {
+        return res.status(404).json({ msg: "conversation not saved" });
+      }
+    } catch (err) {
+      return res.status(500).json(err);
     }
- 
+  }
 };
 
 // exports.getConversationId=async(req, res) => {
@@ -74,8 +84,8 @@ exports.getAll = async (req, res) => {
   try {
     const conversation = await Conversation.find({
       members: { $in: [req.user.id] },
-    })
-      .sort("-updatedAt");
+    }).sort("-updatedAt");
+      
 
     if (conversation.length) {
       return res.status(200).json(conversation);
