@@ -20,15 +20,38 @@ exports.create = async (req, res) => {
   }
 };
 
+// exports.getConversationId=async(req, res) => {
+//   try {
+//     const conversation = await Conversation.findOne({
+//       members: { $all: [req.params.firstUserId, req.params.secondUserId] },
+//     });
+//     if (conversation) {
+//       if (
+//         conversation.members[0]._id == req.user.id ||
+//         conversation.members[1]._id == req.user.id ||
+//         loggedUser.role === "admin"
+//       ) {
+//         return res.status(200).json(conversation);
+//       } else {
+//         return res.status(403).json({ msg: "unauthorized resources access" });
+//       }
+//     } else {
+//       return res.status(404).json({ msg: "conversation not found" });
+//     }
+//   } catch (err) {
+//     return res.status(500).json(err);
+//   }
+// };
+
 // get conv includes two userId
 exports.getOne = async (req, res) => {
   if (validateId(req.params.id, res)) {
-    return res.status(404).json({ msg: "invalid conversation id" });
+    return res.status(404).json({ msg: "invalid user id" });
   }
   const loggedUser = await User.findById(req.user.id);
   try {
-    const conversation = await Conversation.findById({
-      _id: req.params.id,
+    const conversation = await Conversation.findOne({
+      members: { $all: [req.params.id, req.user.id] },
     });
 
     if (conversation) {

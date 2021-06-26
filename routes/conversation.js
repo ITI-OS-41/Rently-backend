@@ -19,7 +19,6 @@ router.post("/",auth,validateConversation, create);
 router.get("/",auth, getAll);
 
 // get conv includes two userId
-
 router.get("/:id", auth, getOne);
 
 router.delete("/:id", auth, deleteOne );
