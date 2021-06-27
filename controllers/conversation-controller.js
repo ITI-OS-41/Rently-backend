@@ -12,7 +12,7 @@ exports.create = async (req, res) => {
     return res.status(200).json(duplicateConversation)
   }else{
     const newConversation = new Conversation({
-      members: [req.body.sender, req.body.members],
+      members: [req.body.sender, req.body.receiver],
     });
     try {
       const savedConversation = await newConversation.save();
