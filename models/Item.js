@@ -176,7 +176,7 @@ let autoPopulateLead = function (next) {
   next();
 };
 
-itemSchema.pre("findOne", autoPopulateLead).pre("find", autoPopulateLead);
+itemSchema.pre("findOne", autoPopulateLead).pre("find", autoPopulateLead).pre("new", autoPopulateLead);
 
 itemSchema.index({ name: 1, owner: 1, slug: 1 }, { unique: true });
 module.exports = mongoose.model("Item", itemSchema);
