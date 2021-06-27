@@ -11,11 +11,20 @@ const notificationSchema = new Schema(
 			ref: 'User',
 			required: true,
 		},
-		sender: {
-			type: ObjectId,
-			ref: 'User',
-			required: true,
+		type: {
+			type: String,
+			// required: true,
+			default:"rent",
 		},
+		conversation: {
+			type: ObjectId,
+			ref: 'Conversation',
+		},
+		isRead:{
+			type:Boolean,
+			default:false,
+		},
+
 		content: {
 			type: String,
 			required: true,
