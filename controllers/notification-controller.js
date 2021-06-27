@@ -5,28 +5,44 @@ const ObjectId = require("mongoose").Types.ObjectId;
 const validateNotification = require("../validation/notification");
 
 exports.getAll = async (req, res) => {
-  let { _id, receiver, sender, content } = req.query;
+  let { receiver, conversation, type,isRead, content } = req.query;
   const queryObj = {
     ...(_id && { _id }),
     ...(receiver && { receiver }),
-    ...(sender && { sender }),
+    ...(type && { type }),
+    ...(isRead && { isRead }),
+    ...(conversation && { conversation }),
     ...(content && { content: new RegExp(`${content}`) }),
   };
   // * ...(email && { email: /regex here/ }),
+const sortBy = req.query.sortBy || "createdAt";
+  const orderBy = req.query.orderBy || "asc";
+  const sortQuery = {
+    [sortBy]: orderBy,
+  };
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 5;
+  const skip = page * limit - limit;
+  try {
 
-  await Notification.find(queryObj).then((objects) => {
-    res.status(200).set("X-Total-Count", objects.length).json(objects);
-  });
+  const getNotifications= await Notification.find(queryObj)
+   .limit(limit)
+      .skip(skip)
+      .sort(sortQuery);
+   if (getNotifications) {
+      return res
+        .status(200)
+        .send({ res: getNotifications, pagination: { limit, skip, page } })
+    } else {
+      return res.status(404).json({ msg: "no notifications found" });
+    }
+  }catch(err) {
+    return res.status(500).json(err);
+  }
 };
 
 exports.getOne = (req, res) => {
   const id = req.params.id;
-
-  if (!ObjectId.isValid(id)) {
-    return res.status(404).json({
-      id: ID.invalid,
-    });
-  }
 
   Notification.findById(id)
     .then((notification) => {
@@ -43,26 +59,19 @@ exports.getOne = (req, res) => {
 };
 
 exports.create = async (req, res) => {
-  const { isValid, errors } = await validateNotification(req.body);
+  
+  const notification = new Notification(
+   ...req.body
+  );
+try{
+  const savedNotification = await notification.save()
+    if(savedNotification){
 
-  if (!isValid) {
-    return res.status(404).json(errors);
-  }
-
-  const notification = new Notification({
-    receiver: req.body.receiver,
-    sender: req.body.sender,
-    content: req.body.content,
-  });
-
-  await notification
-    .save()
-    .then((result) => {
-      res.json({ notification });
-    })
-    .catch((err) => {
+      return res.status(200).json({ notification });
+    }
+    }catch(err) {
       return res.status(500).send({ msg: err.message });
-    });
+    };
 };
 
 exports.update = async (req, res) => {

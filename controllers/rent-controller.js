@@ -5,16 +5,13 @@ const { validateId } = require("../helpers/errors");
 exports.createOneRent = async (req, res) => {
   req.body.renter = req.user.id;
   const rent = await new Rent(req.body);
-  try {
-    const savedRent = await rent.save();
+      const savedRent = await rent.save();
     if (savedRent) {
       return res.status(200).json(savedRent);
     } else {
       return res.status(404).json({ msg: "rent not saved" });
     }
-  } catch (error) {
-    return res.status(500).json(error);
-  }
+  
 };
 
 exports.getOneRent = async (req, res) => {
