@@ -56,6 +56,7 @@ const itemSchema = new Schema(
     },
     description: {
       type: String,
+      trim:true,
       required: [true, "item description is required"],
     },
     photo: {
