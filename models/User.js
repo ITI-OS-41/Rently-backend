@@ -75,10 +75,17 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
+
 userSchema.virtual("name").get(function () {
   if (this.firstname || this.lastname) {
     return (this.firstname || "") + " " + this.lastname;
   }
   return this.username;
 });
+
+// Ensure virtual fields are serialised.
+userSchema.set("toJSON", {
+  virtuals: true,
+});
+
 module.exports = mongoose.model("User", userSchema);
