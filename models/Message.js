@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const ObjectId = require("mongoose").Types.ObjectId;
-
+const Notification = require("./Notification")
 const messageSchema = new mongoose.Schema(
   {
     conversationId: {
@@ -38,6 +38,28 @@ messageSchema.statics.requiredFields = function () {
   }
   return arr;
 };
+
+// messageSchema.post("save", async function (next) {
+//  console.log(this.sender)
+
+//   const notification = new Notification({
+//     receiver: this.sender,
+//     content: "you have a new renting request",
+//     type:"rent",
+//     isRead:false,
+//   });
+// try{
+//  const savedNotification= await notification.save()
+//     if(savedNotification){
+//       console.log("saved",{savedNotification})
+//     }else{
+//       console.log("Failed")
+//     }
+//   }catch(error){
+//        console.log({error} );
+//   }
+// });
+
 
 let autoPopulateLead = function (next) {
   this.populate("conversationId");

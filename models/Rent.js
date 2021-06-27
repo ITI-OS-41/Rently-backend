@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const { ObjectId } = mongoose.Schema.Types;
-
+const Notification = require("./Notification")
 const rentSchema = new Schema(
   {
     owner: {
@@ -58,6 +58,29 @@ rentSchema.statics.requiredFields = function () {
   }
   return arr;
 };
+
+rentSchema.post("save", async function (next) {
+ console.log(this.renter)
+ console.log(this.owner)
+
+  const notification = new Notification({
+    receiver: this.owner,
+    content: "you have a new renting request",
+    type:"rent",
+    isRead:false,
+  });
+try{
+ const savedNotification= await notification.save()
+    if(savedNotification){
+      console.log("saved",{savedNotification})
+    }else{
+      console.log("Failed")
+    }
+  }catch(error){
+       console.log({error} );
+  }
+});
+
 
 let autoPopulateLead = function (next) {
   this.populate("renter", "-email -password -createdAt -updatedAt -__v");
