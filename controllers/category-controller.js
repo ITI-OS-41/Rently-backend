@@ -51,8 +51,8 @@ exports.getAllCategories = async (req, res) => {
     [sortBy]: orderBy,
   };
 
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 5;
+  const page = parseInt(req.query.page) ;
+  const limit = parseInt(req.query.limit) ;
   const skip = page * limit - limit;
   const queryObj = {
     ...(model && { model: new RegExp(`${model}`) }),
