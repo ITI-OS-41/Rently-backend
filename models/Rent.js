@@ -87,7 +87,7 @@ let autoPopulateLead = function (next) {
   this.populate("owner", "-email -password -createdAt -updatedAt -__v");
   this.populate(
     "item",
-    "-isAvailable -isPublished -isDeliverable -createdAt -updatedAt -__v -location -category -subcategory -description -photo -stock -condition -deposit -cancellation -instructionalVideo"
+    "-isAvailable -isPublished -isDeliverable -createdAt -updatedAt -__v -subcategory -description -instructionalVideo"
   );
   next();
 };
