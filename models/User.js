@@ -48,6 +48,9 @@ const userSchema = new Schema(
     referralCode: {
       type: String,
     },
+    wallet: {
+      type: Number,
+    },
     dateOfBirth: {
       type: Date,
       // required: [true, "date of birth is required"],
@@ -55,7 +58,12 @@ const userSchema = new Schema(
     isVerified: {
       type: Boolean,
       trim: true,
-      default:false,
+      default: false,
+    },
+    isBlocked: {
+      type: Boolean,
+      trim: true,
+      default: false,
     },
     store: {
       name: {
@@ -68,7 +76,7 @@ const userSchema = new Schema(
         type: String,
       },
     },
-    verificationPhotos:[String],
+    verificationPhotos: [String],
     resetPasswordToken: String,
     resetPasswordExpires: Date,
   },
