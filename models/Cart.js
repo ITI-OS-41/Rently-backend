@@ -31,33 +31,10 @@ const cartSchema = new Schema(
   { timestamps: true }
 );
 
-cartSchema.post("findOneAndUpdate", async function () {
-  const docToUpdate = await this.model.findOne(this.getQuery());
-  docToUpdate.slug = slug(docToUpdate.name);
-  docToUpdate.save(); // The document that `findOneAndUpdate()` will modify
-});
-cartSchema.pre("save", async function (next) {
-  if (!this.isModified("name")) {
-    next(); // skip it
-    return; // stop this function from running
-  }
-  this.slug = slug(this.name);
-  next();
-  // TODO make more resiliant so slugs are unique
-});
-
-cartSchema.pre("remove", async function (next) {
-  await Item.deleteMany({ category: this._id }).exec();
-  await Faq.deleteMany({ category: this._id }).exec();
-  await Blog.deleteMany({ category: this._id }).exec();
-  await SubCategory.deleteMany({ category: this._id }).exec();
-  next();
-});
-
 cartSchema.statics.requiredFields = function () {
   let arr = [];
   for (let required in cartSchema.obj) {
-    if (cartSchema.obj[required].required && required !== "createdBy") {
+    if (cartSchema.obj[required].required && required !== "renter") {
       arr.push(required);
     }
   }
@@ -65,17 +42,17 @@ cartSchema.statics.requiredFields = function () {
 };
 
 let autoPopulateLead = function (next) {
-  this.populate("createdBy", "-email -password -createdAt -updatedAt -__v");
-  this.populate("subCategory", "-category -createdAt -updatedAt -__v");
+  this.populate("renter", "-email -password -createdAt -updatedAt -__v");
   this.populate(
-    "blogs",
-    "-comments -bodyPhotos -description -slug -tags -headerPhoto -category -createdAt -updatedAt -__v"
+    "item",
+    "-isAvailable -isPublished -isDeliverable -createdAt -updatedAt -__v -location -category -subcategory -description -photo -condition -deposit -cancellation -instructionalVideo"
   );
+  this.populate("rent", "-insurance -status -createdAt -updatedAt -__v");
   next();
 };
 
 cartSchema.pre("findOne", autoPopulateLead).pre("find", autoPopulateLead);
 
-cartSchema.index({ name: 1, model: 1, slug: 1 }, { unique: true });
+cartSchema.index({ item: 1, renter: 1 }, { unique: true });
 
 module.exports = mongoose.model("Cart", cartSchema);
