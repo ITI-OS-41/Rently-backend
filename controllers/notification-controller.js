@@ -7,7 +7,6 @@ const validateNotification = require("../validation/notification");
 exports.getAll = async (req, res) => {
   let { receiver, conversation, type,isRead, content } = req.query;
   const queryObj = {
-    ...(_id && { _id }),
     ...(receiver && { receiver }),
     ...(type && { type }),
     ...(isRead && { isRead }),
