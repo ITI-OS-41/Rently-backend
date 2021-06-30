@@ -34,7 +34,7 @@ const rentSchema = new Schema(
     },
     quantity: {
       type: Number,
-      trim,
+      trim:true,
     },
     totalPrice: {
       type: Number,
