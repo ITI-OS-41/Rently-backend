@@ -26,11 +26,6 @@ const faqSchema = new Schema({
     ref: "Category",
     required: [true, "faq category is required"],
   },
-  subCategory: {
-    type: ObjectId,
-    ref: "SubCategory",
-    required: [true, "faq Subcategory is required"],
-  },
 
   slug: {
     type: String,
@@ -70,10 +65,6 @@ let autoPopulateLead = function (next) {
   this.populate(
     "category",
     "-subcategory -blogs -description -photo -createdAt -updatedAt -__v"
-  );
-  this.populate(
-    "subCategory",
-    "-faq -description -photo -category -createdAt -updatedAt -__v "
   );
   next();
 };

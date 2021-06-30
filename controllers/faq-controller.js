@@ -1,7 +1,7 @@
 /** @format */
 const { validateId } = require("../helpers/errors");
 const Faq = require("../models/Faq");
-const SubCategory = require("../models/SubCategory");
+const Category = require("../models/Category");
 const User = require("../models/User");
 
 exports.createOneFaq = async (req, res) => {
@@ -11,8 +11,8 @@ exports.createOneFaq = async (req, res) => {
   try {
     const savedQuestion = await question.save();
     if (savedQuestion) {
-      await SubCategory.updateMany(
-        { _id: savedQuestion.subCategory },
+      await Category.updateMany(
+        { _id: savedQuestion.Category },
         { $push: { faq: savedQuestion._id } }
       );
       return res.status(200).json(savedQuestion);

@@ -61,7 +61,6 @@ const itemSchema = new Schema(
     },
     photo: {
       type: [String],
-      required: [true, "item photos are required"],
     },
     instructionalVideo: {
       type: [String],
@@ -97,11 +96,6 @@ const itemSchema = new Schema(
       required: [true, "item cancellation is required"],
     },
     price: {
-      hour: {
-        type: Number,
-        trim: true,
-        default: 0,
-      },
       day: {
         type: Number,
         trim: true,

@@ -37,6 +37,13 @@ module.exports = async (req, res, next) => {
   const idCategoryCheck = await categoryIdCheck(data.category, res);
   if (Object.keys(idCategoryCheck).length > 0) {
     errors.category = idCategoryCheck;
+  } else {
+    const modelCheck = await Category.findById(data.category);
+    if (modelCheck) {
+      if (modelCheck.model !== "blog") {
+        errors.category = "provided category is not of type blog";
+      }
+    }
   }
 
   if (

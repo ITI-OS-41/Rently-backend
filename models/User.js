@@ -101,7 +101,6 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
-
 userSchema.virtual("name").get(function () {
   if (this.firstname || this.lastname) {
     return (this.firstname || "") + " " + this.lastname;
@@ -119,6 +118,9 @@ let autoPopulateLead = function (next) {
     "favoriteItems",
     " -isPublished -createdAt -updatedAt -__v -location -category -subcategory -description -stock -deposit -cancellation -instructionalVideo"
   );
+    this.populate("blockedUsers", "-email -password -createdAt -updatedAt -__v");
+
+
   next();
 };
 

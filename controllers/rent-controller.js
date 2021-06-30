@@ -5,13 +5,12 @@ const { validateId } = require("../helpers/errors");
 exports.createOneRent = async (req, res) => {
   req.body.renter = req.user.id;
   const rent = await new Rent(req.body);
-      const savedRent = await rent.save();
-    if (savedRent) {
-      return res.status(200).json(savedRent);
-    } else {
-      return res.status(404).json({ msg: "rent not saved" });
-    }
-  
+  const savedRent = await rent.save();
+  if (savedRent) {
+    return res.status(200).json(savedRent);
+  } else {
+    return res.status(404).json({ msg: "rent not saved" });
+  }
 };
 
 exports.getOneRent = async (req, res) => {
@@ -40,14 +39,12 @@ exports.getOneRent = async (req, res) => {
     }
   } catch (error) {
     return res.status(500).json(error);
-  } 
+  }
 };
 exports.getAllRents = async (req, res) => {
-  let { owner, renter, status, insurance, totalPrice, item, from, to } =
-    req.query;
+  let { owner, status, insurance, totalPrice, item, from, to } = req.query;
   const queryObj = {
     ...(owner && { owner }),
-    ...(renter && { renter }),
     ...(item && { item }),
     ...(status && { status }),
     ...(insurance && { insurance }),
@@ -64,29 +61,34 @@ exports.getAllRents = async (req, res) => {
   const limit = parseInt(req.query.limit) || 5;
   const skip = page * limit - limit;
 
-  try {
-    const getRents = await Rent.find(queryObj)
-      // res.status(200).set("X-Total-Count", objects.length).json(objects);
-      .limit(limit)
-      .skip(skip)
-      .sort(sortQuery);
-    //Handle Rent with authorization
-    if (getRents) {
-      // const loggedUser = await User.findById(req.user.id);
-      // if (foundRent.renter._id == req.user.id || loggedUser.role === "admin") {
-      return res
-        .status(200)
-        .send({ res: getRents, pagination: { limit, skip, page } });
-      // } else {
-      //   return res
-      //     .status(403)
-      //     .json({ msg: "you are not authorized to perform this operation" });
-      // }
-    } else {
-      return res.status(404).json({ msg: "no rents found" });
-    }
-  } catch (err) {
-    return res.status(500).json(err);
+  const loggedUser = await User.findById(req.user.id);
+  const getRents = await Rent.find(
+    loggedUser.role !== "admin"
+      ? {
+          ...queryObj,
+          renter: req.user.id,
+        }
+      : { queryObj }
+  )
+    // res.status(200).set("X-Total-Count", objects.length).json(objects);
+    .limit(limit)
+    .skip(skip)
+    .sort(sortQuery);
+  //Handle Rent with authorization
+  if (getRents) {
+    // const loggedUser = await User.findById(req.user.id);
+    // if (foundRent.renter._id == req.user.id || loggedUser.role === "admin") {
+    console.log(req.user.id);
+    return res
+      .status(200)
+      .send({ res: getRents, pagination: { limit, skip, page } });
+    // } else {
+    //   return res
+    //     .status(403)
+    //     .json({ msg: "you are not authorized to perform this operation" });
+    // }
+  } else {
+    return res.status(404).json({ msg: "no rents found" });
   }
 };
 
