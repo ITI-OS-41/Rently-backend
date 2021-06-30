@@ -137,14 +137,6 @@ module.exports = async (req, res, next) => {
   ) {
     errors.isDeliverable = "item delivery status should be a true false value";
   }
-  if (
-    data.isFavorite &&
-    !errors.isFavorite &&
-    data.isFavorite.toString().trim() !== "true" &&
-    data.isFavorite.toString().trim() !== "false"
-  ) {
-    errors.isFavorite = "item favorite status should be a true false value";
-  }
 
   if (
     !errors.isSubmitted &&

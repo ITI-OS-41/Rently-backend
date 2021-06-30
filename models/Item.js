@@ -39,10 +39,6 @@ const itemSchema = new Schema(
       trim: true,
       required: [true, "item published status is required"],
     },
-    isFavorite: {
-      type: Boolean,
-      trim: true,
-    },
     subcategory: {
       type: ObjectId,
       ref: "SubCategory",

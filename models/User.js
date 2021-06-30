@@ -2,7 +2,7 @@
 
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const Rent = require("./Rent");
+const { ObjectId } = mongoose.Schema.Types;
 
 const userSchema = new Schema(
   {
@@ -76,14 +76,13 @@ const userSchema = new Schema(
         type: String,
       },
     },
-    
+    favoriteItems: [{ type: ObjectId, ref: "Item" }],
     verificationPhotos: [String],
     resetPasswordToken: String,
     resetPasswordExpires: Date,
   },
   { timestamps: true }
 );
-
 
 userSchema.virtual("name").get(function () {
   if (this.firstname || this.lastname) {
@@ -96,5 +95,15 @@ userSchema.virtual("name").get(function () {
 userSchema.set("toJSON", {
   virtuals: true,
 });
+
+let autoPopulateLead = function (next) {
+  this.populate(
+    "favoriteItems",
+    " -isPublished -createdAt -updatedAt -__v -location -category -subcategory -description -stock -deposit -cancellation -instructionalVideo"
+  );
+  next();
+};
+
+userSchema.pre("findOne", autoPopulateLead).pre("find", autoPopulateLead);
 
 module.exports = mongoose.model("User", userSchema);
