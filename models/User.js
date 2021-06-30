@@ -76,6 +76,7 @@ const userSchema = new Schema(
         type: String,
       },
     },
+    
     verificationPhotos: [String],
     resetPasswordToken: String,
     resetPasswordExpires: Date,
