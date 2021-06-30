@@ -37,6 +37,13 @@ module.exports = async (req, res, next) => {
   const idCategoryCheck = await categoryIdCheck(data.category, res);
   if (Object.keys(idCategoryCheck).length > 0) {
     errors.category = idCategoryCheck;
+  } else {
+    const modelCheck = await Category.findById(data.category);
+    if (modelCheck) {
+      if (modelCheck.model !== "item") {
+        errors.category = "provided category is not of type item";
+      }
+    }
   }
 
   const idSubCategoryCheck = await subCategoryIdCheck(data.subcategory, res);
@@ -58,34 +65,26 @@ module.exports = async (req, res, next) => {
   if (!errors.cancellation && !cancellation.includes(data.cancellation)) {
     errors.cancellation = `${data.cancellation} is not an accepted value for cancellation`;
   }
-  if(!data.price){
-    errors.price = "price is required"
-  }
-  else if (typeof data.price != "object") {
-    errors.price = "price should be determined as per hour/day/week/month";
+  if (!data.price) {
+    errors.price = "price is required";
+  } else if (typeof data.price != "object") {
+    errors.price = "price should be determined as per day/week/month";
   } else {
     if (
       data.price &&
       Object.keys(data.price).length !== 0 &&
       data.price.constructor === Object
     ) {
-      if (
-        !data["price"].hour &&
-        !data["price"].day &&
-        !data["price"].week &&
-        !data["price"].month
-      ) {
-        errors.price = "determine price per hour/day/week/month";
+      if (!data["price"].day && !data["price"].week && !data["price"].month) {
+        errors.price = "determine price per day/week/month";
       } else {
         if (
-          (data.price.hour && isNaN(data.price.hour)) ||
           (data.price.day && isNaN(data.price.day)) ||
           (data.price.week && isNaN(data.price.week)) ||
           (data.price.month && isNaN(data.price.month))
         ) {
           errors.price = "item price should be a number";
         } else if (
-          data.price.hour < 0 ||
           data.price.day < 0 ||
           data.price.week < 0 ||
           data.price.month < 0
@@ -108,9 +107,8 @@ module.exports = async (req, res, next) => {
       errors.deposit = "item deposit is invalid";
     }
   }
-  if(data.location){
-
-    if ( typeof data.location != "object") {
+  if (data.location) {
+    if (typeof data.location != "object") {
       errors.location =
         "location should be determined as per coordinates/address";
     } else {
@@ -132,34 +130,45 @@ module.exports = async (req, res, next) => {
     }
   }
 
-  if (!errors.isDeliverable &&
+  if (
+    !errors.isDeliverable &&
     data.isDeliverable.toString().trim() !== "true" &&
     data.isDeliverable.toString().trim() !== "false"
   ) {
-    errors.isDeliverable = "item delivery should be a true false value";
+    errors.isDeliverable = "item delivery status should be a true false value";
+  }
+  if (
+    data.isFavorite &&
+    !errors.isFavorite &&
+    data.isFavorite.toString().trim() !== "true" &&
+    data.isFavorite.toString().trim() !== "false"
+  ) {
+    errors.isFavorite = "item favorite status should be a true false value";
   }
 
-    if (
-      !errors.isSubmitted &&
-      data.isSubmitted.toString().trim() !== "true" &&
-      data.isSubmitted.toString().trim() !== "false"
-    ) {
-      errors.isSubmitted = "item submission status should be a true false value";
-    }
+  if (
+    !errors.isSubmitted &&
+    data.isSubmitted.toString().trim() !== "true" &&
+    data.isSubmitted.toString().trim() !== "false"
+  ) {
+    errors.isSubmitted = "item submission status should be a true false value";
+  }
 
-  if (!errors.isAvailable &&
+  if (
+    !errors.isAvailable &&
     data.isAvailable.toString().trim() !== "true" &&
     data.isAvailable.toString().trim() !== "false"
   ) {
     errors.isAvailable = "item availablility should be a true false value";
   }
-  if (!errors.isPublished &&
+  if (
+    !errors.isPublished &&
     data.isPublished.toString().trim() !== "true" &&
     data.isPublished.toString().trim() !== "false"
   ) {
     errors.isPublished = "item publish status should be a true false value";
   }
-  if (Object.keys(errors).length==0) {
+  if (Object.keys(errors).length == 0) {
     const includeSubCheck = await Category.find({ _id: data.category });
     if (includeSubCheck.length === 1) {
       if (includeSubCheck[0].subcategory.indexOf(data.subcategory) === -1) {
@@ -169,7 +178,7 @@ module.exports = async (req, res, next) => {
     }
   }
 
-  if (Object.keys(errors).length==0) {
+  if (Object.keys(errors).length == 0) {
     const duplicationCheck = await Item.find({
       name: data.name,
       owner: req.user.id,

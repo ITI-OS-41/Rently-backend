@@ -19,6 +19,7 @@ const categorySchema = new Schema(
     },
     subcategory: [{ type: ObjectId, ref: "SubCategory" }],
     blogs: [{ type: ObjectId, ref: "Blog" }],
+    faq: [{ type: ObjectId, ref: "Faq" }],
     description: {
       type: String,
       required: [true, "description is required"],
@@ -75,7 +76,14 @@ categorySchema.statics.requiredFields = function () {
 let autoPopulateLead = function (next) {
   this.populate("createdBy", "-email -password -createdAt -updatedAt -__v");
   this.populate("subCategory", "-category -createdAt -updatedAt -__v");
-  this.populate("blogs", "-comments -bodyPhotos -description -slug -tags -headerPhoto -category -createdAt -updatedAt -__v");
+  this.populate(
+    "blogs",
+    "-comments -bodyPhotos -description -slug -tags -headerPhoto -category -createdAt -updatedAt -__v"
+  );
+  this.populate(
+    "faq",
+    "-category -slug -createdAt -updatedAt -__v"
+  );
   next();
 };
 

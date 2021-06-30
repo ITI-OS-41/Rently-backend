@@ -39,6 +39,10 @@ const itemSchema = new Schema(
       trim: true,
       required: [true, "item published status is required"],
     },
+    isFavorite: {
+      type: Boolean,
+      trim: true,
+    },
     subcategory: {
       type: ObjectId,
       ref: "SubCategory",
@@ -96,11 +100,6 @@ const itemSchema = new Schema(
       required: [true, "item cancellation is required"],
     },
     price: {
-      hour: {
-        type: Number,
-        trim: true,
-        default: 0,
-      },
       day: {
         type: Number,
         trim: true,

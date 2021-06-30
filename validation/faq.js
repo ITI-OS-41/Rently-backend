@@ -3,7 +3,6 @@
 const {
   faqIdCheck,
   categoryIdCheck,
-  subCategoryIdCheck,
   assignEmptyErrorsToFields,
   assignErrorsToMissingFields,
   getTwoArraysDifferences,
@@ -46,23 +45,27 @@ module.exports = async (req, res, next) => {
   const idCategoryCheck = await categoryIdCheck(data.category, res);
   if (Object.keys(idCategoryCheck).length > 0) {
     errors.category = idCategoryCheck;
-  }
-
-  const idSubCategoryCheck = await subCategoryIdCheck(data.subCategory, res);
-  if (Object.keys(idSubCategoryCheck).length > 0) {
-    errors.subCategory = idSubCategoryCheck;
-  }
-
-  if(!errors.category && !errors.subCategory){
-    const includeSubCheck= await Category.find({_id:data.category})
-    if (includeSubCheck.length===1){
-      if(includeSubCheck[0].subcategory.indexOf(data.subCategory)===-1){
-        errors.subCategory= "subset error, the provided SubCategory is not part of the provided Category"
+  } else {
+    const modelCheck = await Category.findById(data.category);
+    if (modelCheck) {
+      if (modelCheck.model !== "faq") {
+        errors.category = "provided category is not of type faq";
       }
     }
   }
 
-  if (!errors.category && !errors.subCategory) {
+
+
+  // if(!errors.category && !errors.subCategory){
+  //   const includeSubCheck= await Category.find({_id:data.category})
+  //   if (includeSubCheck.length===1){
+  //     if(includeSubCheck[0].subcategory.indexOf(data.subCategory)===-1){
+  //       errors.subCategory= "subset error, the provided SubCategory is not part of the provided Category"
+  //     }
+  //   }
+  // }
+
+  if (!errors.category ) {
     const duplicationCheck = await Faq.find({
       category: data.category,
       "questions.question": data["questions"].question,
