@@ -107,28 +107,6 @@ module.exports = async (req, res, next) => {
       errors.deposit = "item deposit is invalid";
     }
   }
-  if (data.location) {
-    if (typeof data.location != "object") {
-      errors.location =
-        "location should be determined as per coordinates/address";
-    } else {
-      if (
-        Object.keys(data.location).length !== 0 &&
-        data.location.constructor === Object
-      ) {
-        if (data.location.coordinates) {
-          if (
-            data.location.coordinates.length !== 2 ||
-            data.location.coordinates.constructor !== Array
-          ) {
-            errors.location = "item location coordinates are invalid";
-          }
-        }
-      } else {
-        errors.location = "item location is empty";
-      }
-    }
-  }
 
   if (
     !errors.isDeliverable &&
@@ -160,6 +138,52 @@ module.exports = async (req, res, next) => {
   ) {
     errors.isPublished = "item publish status should be a true false value";
   }
+
+  if (!data.location) {
+    errors.location = "location is required";
+  } else if (data.location.constructor !== Object) {
+    errors.location = "location type is invalid";
+  } else {
+    if (Object.keys(data.location).length !== 0) {
+      if (data.location.coordinates) {
+        if (
+          data.location.coordinates.length !== 2 ||
+          data.location.coordinates.constructor !== Array
+        ) {
+          errors.location = "item location coordinates are invalid";
+        } else {
+          for (let i = 0; i < data.location.coordinates.length; i++) {
+            if (isNaN(data.location.coordinates[i])) {
+              // or use this alternative typeof arr[i]  == 'number'}
+              errors.location = "item location coordinates should be numbers";
+            }
+          }
+        }
+      } else {
+        errors.location = "item location coordinates are required";
+      }
+    } else {
+      errors.location = "item location is empty";
+    }
+  }
+
+  if (!data.photo) {
+    errors.photo = "photo is required";
+  } else if (data.photo.constructor !== Array) {
+    errors.photo = "photo should be an array of strings";
+  } else {
+    if (data.photo.length === 0) {
+      errors.photo = "item photo is empty";
+    } else {
+      for (let i = 0; i < data.photo.length; i++) {
+        if (typeof data.photo[i] !== "string") {
+          // or use this alternative typeof arr[i]  == 'number'}
+          errors.photo = "item photo data should be string";
+        }
+      }
+    }
+  }
+
   if (Object.keys(errors).length == 0) {
     const includeSubCheck = await Category.find({ _id: data.category });
     if (includeSubCheck.length === 1) {

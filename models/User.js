@@ -60,11 +60,7 @@ const userSchema = new Schema(
       trim: true,
       default: false,
     },
-    isBlocked: {
-      type: Boolean,
-      trim: true,
-      default: false,
-    },
+    blockedUsers: [{ type: ObjectId, ref: "User" }],
     store: {
       name: {
         type: String,
@@ -101,6 +97,8 @@ let autoPopulateLead = function (next) {
     "favoriteItems",
     " -isPublished -createdAt -updatedAt -__v -location -category -subcategory -description -stock -deposit -cancellation -instructionalVideo"
   );
+    this.populate("blockedUsers", "-email -password -createdAt -updatedAt -__v");
+
   next();
 };
 
