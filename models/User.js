@@ -60,11 +60,6 @@ const userSchema = new Schema(
       trim: true,
       default: false,
     },
-    isBlocked: {
-      type: Boolean,
-      trim: true,
-      default: false,
-    },
     store: {
       name: {
         type: String,
@@ -76,7 +71,7 @@ const userSchema = new Schema(
         type: String,
       },
     },
-        location: {
+    location: {
       type: {
         type: String,
         enum: {
@@ -97,6 +92,7 @@ const userSchema = new Schema(
         // required: [true, "You must supply an address!"],
       },
     },
+    blockedUsers: [{ type: ObjectId, ref: "User" }],
     favoriteItems: [{ type: ObjectId, ref: "Item" }],
     verificationPhotos: [String],
     resetPasswordToken: String,
