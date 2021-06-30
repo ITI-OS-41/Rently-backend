@@ -47,6 +47,7 @@ const itemRate = require("./routes/itemRate.js");
 const userRate = require("./routes/userRate.js");
 const conversation = require("./routes/conversation");
 const message = require("./routes/message");
+const payment = require("./routes/payment");
 
 
 /*
@@ -106,7 +107,7 @@ app.use("/api/itemrate", itemRate);
 app.use("/api/userrate", userRate);
 app.use("/api/conversation", conversation);
 app.use("/api/message", message);
-
+app.use("/api", payment);
 /*
  ** RUN APP
  */

@@ -14,7 +14,7 @@ const userSchema = new Schema(
       },
       default: "user",
     },
-    profilePhoto: {
+    photo: {
       type: String,
       // required: true,
     },
@@ -60,7 +60,6 @@ const userSchema = new Schema(
       trim: true,
       default: false,
     },
-    blockedUsers: [{ type: ObjectId, ref: "User" }],
     store: {
       name: {
         type: String,
@@ -72,6 +71,28 @@ const userSchema = new Schema(
         type: String,
       },
     },
+    location: {
+      type: {
+        type: String,
+        enum: {
+          values: ["Point"],
+          message: "{VALUE} is not supported",
+        },
+        default: "Point",
+      },
+      coordinates: [
+        {
+          type: Number,
+          trim: true,
+          //   required: [true, "You must supply coordinates!"],
+        },
+      ],
+      address: {
+        type: String,
+        // required: [true, "You must supply an address!"],
+      },
+    },
+    blockedUsers: [{ type: ObjectId, ref: "User" }],
     favoriteItems: [{ type: ObjectId, ref: "Item" }],
     verificationPhotos: [String],
     resetPasswordToken: String,
@@ -99,9 +120,9 @@ let autoPopulateLead = function (next) {
   );
     this.populate("blockedUsers", "-email -password -createdAt -updatedAt -__v");
 
+
   next();
 };
 
 userSchema.pre("findOne", autoPopulateLead).pre("find", autoPopulateLead);
-
 module.exports = mongoose.model("User", userSchema);
