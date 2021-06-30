@@ -1,23 +1,14 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const slug = require("slugs");
 const ObjectId = require("mongoose").Types.ObjectId;
-const SubCategory = require("./SubCategory");
-const Item = require("./Item");
-const Faq = require("./Faq");
-const Blog = require("./Blog");
 const cartSchema = new Schema(
   {
-    item: {
-      type: ObjectId,
-      ref: "Item",
-      required: [true, "item is required"],
-    },
-    rent: {
+    
+    rent: [{
       type: ObjectId,
       ref: "Rent",
       required: [true, "rent is required"],
-    },
+    }],
     renter: {
       type: ObjectId,
       ref: "User",
