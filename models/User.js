@@ -92,7 +92,6 @@ const userSchema = new Schema(
         // required: [true, "You must supply an address!"],
       },
     },
-    blockedUsers: [{ type: ObjectId, ref: "User" }],
     favoriteItems: [{ type: ObjectId, ref: "Item" }],
     verificationPhotos: [String],
     resetPasswordToken: String,
@@ -118,8 +117,6 @@ let autoPopulateLead = function (next) {
     "favoriteItems",
     " -isPublished -createdAt -updatedAt -__v -location -category -subcategory -description -stock -deposit -cancellation -instructionalVideo"
   );
-    this.populate("blockedUsers", "-email -password -createdAt -updatedAt -__v");
-
 
   next();
 };
