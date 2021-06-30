@@ -76,6 +76,27 @@ const userSchema = new Schema(
         type: String,
       },
     },
+        location: {
+      type: {
+        type: String,
+        enum: {
+          values: ["Point"],
+          message: "{VALUE} is not supported",
+        },
+        default: "Point",
+      },
+      coordinates: [
+        {
+          type: Number,
+          trim: true,
+          //   required: [true, "You must supply coordinates!"],
+        },
+      ],
+      address: {
+        type: String,
+        // required: [true, "You must supply an address!"],
+      },
+    },
     
     verificationPhotos: [String],
     resetPasswordToken: String,
