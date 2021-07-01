@@ -76,7 +76,7 @@ module.exports = async (req, res, next) => {
   }
 
   if (!errors.totalPrice) {
-    if (data.totalPrice < 1 || isNaN(data.totalPrice)) {
+    if (data.totalPrice < 0|| isNaN(data.totalPrice)) {
       errors.totalPrice = "item totalPrice is invalid";
     }
   }
