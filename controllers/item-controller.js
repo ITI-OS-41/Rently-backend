@@ -59,7 +59,7 @@ exports.getAllItems = async (req, res) => {
     slug,
   } = req.query;
   const queryObj = {
-    ...(name && { name: new RegExp(`${name}`) }),
+    ...(name && { name: new RegExp(`${name}`,'i') }),
     ...(description && { description: new RegExp(`${description}`) }),
     ...(owner && { owner }),
     ...(category && { category }),
