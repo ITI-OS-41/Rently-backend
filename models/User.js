@@ -50,6 +50,7 @@ const userSchema = new Schema(
     },
     wallet: {
       type: Number,
+      default:0
     },
     dateOfBirth: {
       type: Date,
