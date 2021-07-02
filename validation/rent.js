@@ -47,17 +47,15 @@ module.exports = async (req, res, next) => {
   if (Object.keys(idOwnerCheck).length > 0) {
     errors.owner = idOwnerCheck;
   }
-  if(id){
-
+  if (id) {
     if (data.owner == data.renter) {
       errors.owner =
         "you can't be the owner and the renter at the same operation";
     }
-  } else if( data.owner == req.user.id){
-      errors.owner =
-        "you can't be the owner and the renter at the same operation";
-    }
-  
+  } else if (data.owner == req.user.id) {
+    errors.owner =
+      "you can't be the owner and the renter at the same operation";
+  }
 
   if (!errors.item) {
     const item = await Item.findById(data.item);
@@ -82,7 +80,7 @@ module.exports = async (req, res, next) => {
   }
 
   if (!errors.totalPrice) {
-    if (data.totalPrice < 0|| isNaN(data.totalPrice)) {
+    if (data.totalPrice < 0 || isNaN(data.totalPrice)) {
       errors.totalPrice = "item totalPrice is invalid";
     }
   }
@@ -97,38 +95,19 @@ module.exports = async (req, res, next) => {
   }
 
   if (Object.keys(errors).length === 0) {
-    if(id){
-      const verifiedRents = await Rent.find({
-        renter: data.renter,
-        item: data.item,
-        owner: data.owner,
+    const verifiedRents = await Rent.find({
+      renter: req.user.id,
+      item: data.item,
+      owner: data.owner,
+    });
+    if (verifiedRents.length) {
+      verifiedRents.forEach((rent) => {
+        if (rent.status !== "returned") {
+          errors.owner =
+            "you can't request another rent from the item owner on this item, while ongoing renting between both on the same item";
+        }
       });
-      if (verifiedRents.length) {
-        verifiedRents.forEach((rent) => {
-          if (rent.status !== "returned") {
-            errors.owner =
-              "you can't request another rent from the item owner on this item, while ongoing renting between both on the same item";
-          }
-        });
-      }
-    }else{
-
-      const verifiedRents = await Rent.find({
-        renter: req.user.id,
-        item: data.item,
-        owner: data.owner,
-      });
-      if (verifiedRents.length) {
-        verifiedRents.forEach((rent) => {
-          if (rent.status !== "returned") {
-            errors.owner =
-              "you can't request another rent from the item owner on this item, while ongoing renting between both on the same item";
-          }
-        });
-      }
     }
-
-    
   }
 
   if (Object.keys(errors).length > 0) {
