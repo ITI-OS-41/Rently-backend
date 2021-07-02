@@ -19,30 +19,29 @@ exports.getOneRent = async (req, res) => {
     return res.status(404).json({ msg: "invalid rent id" });
   }
   try {
-    const foundRent = await Rent.findById(id);
-    if (foundRent) {
-      console.log({ foundRent });
-      const loggedUser = await User.findById(req.user.id);
-      if (
-        foundRent.renter._id == req.user.id ||
-        foundRent.owner._id == req.user.id ||
-        loggedUser.role === "admin"
-      ) {
-        return res.status(200).json(foundRent);
-      } else {
-        return res
-          .status(403)
-          .json({ msg: "you are not authorized to perform this operation" });
-      }
-    } else {
+    const foundRent = await Rent.find({ _id: id });
+    if (!foundRent) {
       return res.status(404).json({ msg: "rent not found" });
+    }
+    const loggedUser = await User.findById(req.user.id);
+    if (
+      foundRent.renter._id == req.user.id ||
+      foundRent.owner._id == req.user.id ||
+      loggedUser.role === "admin"
+    ) {
+      return res.status(200).json(foundRent);
+    } else {
+      return res
+        .status(403)
+        .json({ msg: "you are not authorized to perform this operation" });
     }
   } catch (error) {
     return res.status(500).json(error);
   }
 };
 exports.getAllRents = async (req, res) => {
-  let { owner, status, insurance,renter, totalPrice, item, from, to } = req.query;
+  let { owner, status, insurance, renter, totalPrice, item, from, to } =
+    req.query;
   const queryObj = {
     ...(owner && { owner }),
     ...(renter && { renter }),
@@ -99,7 +98,8 @@ exports.updateOneRent = async (req, res) => {
       console.log(updatedRent);
       const loggedUser = await User.findById(req.user.id);
       if (
-        updatedRent.renter._id == req.user.id ||
+        foundRent.renter._id == req.user.id ||
+        foundRent.owner._id == req.user.id ||
         loggedUser.role === "admin"
       ) {
         return res.status(200).send(updatedRent);
@@ -125,7 +125,8 @@ exports.deleteOneRent = async (req, res) => {
     if (deletedRent) {
       const loggedUser = await User.findById(req.user.id);
       if (
-        deletedRent.renter._id == req.user.id ||
+        foundRent.renter._id == req.user.id ||
+        foundRent.owner._id == req.user.id ||
         loggedUser.role === "admin"
       ) {
         deletedRent.remove().then(() => {
