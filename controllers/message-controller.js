@@ -11,7 +11,7 @@ exports.createOneMessage = async (req, res) => {
     const savedMessage = await newMessage.save();
     await Conversation.findOneAndUpdate(
       { _id: req.body.conversationId },
-      { updatedAt: new Date.now() },
+      { updatedAt: Date.now() },
       { new: true }
     );
     return res.status(200).json(savedMessage);
