@@ -6,19 +6,19 @@ const { validateId } = require("../helpers/errors");
 exports.create = async (req, res) => {
   req.body.sender = req.user.id;
   const duplicateConversation = await Conversation.findOne({
-    members:{ $all:[req.body.sender, req.body.receiver]},
+    members: { $all: [req.body.sender, req.body.receiver] },
   });
-  if(duplicateConversation){
-    console.log("duplicateConversation")
-    return res.status(200).json(duplicateConversation)
-  }else{
+  if (duplicateConversation) {
+    console.log("duplicateConversation");
+    return res.status(200).json(duplicateConversation);
+  } else {
     const newConversation = new Conversation({
       members: [req.body.sender, req.body.receiver],
     });
     try {
       const savedConversation = await newConversation.save();
       if (savedConversation) {
-        console.log("SavedConversation")
+        console.log("SavedConversation");
         return res.status(200).json(savedConversation);
       } else {
         return res.status(404).json({ msg: "conversation not saved" });
@@ -87,12 +87,11 @@ exports.getAll = async (req, res) => {
     const conversation = await Conversation.find({
       members: { $in: [req.user.id] },
     }).sort("-updatedAt");
-      
 
     if (conversation.length) {
       return res.status(200).json(conversation);
     } else {
-      return res.status(404).json({ msg: "no conversation found for this user" });
+      return res.status(200).json([]);
     }
   } catch (err) {
     return res.status(500).json(err);
