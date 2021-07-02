@@ -47,11 +47,17 @@ module.exports = async (req, res, next) => {
   if (Object.keys(idOwnerCheck).length > 0) {
     errors.owner = idOwnerCheck;
   }
+  if(id){
 
-  if (data.owner == req.user.id) {
-    errors.owner =
-      "you can't be the owner and the renter at the same operation";
-  }
+    if (data.owner == data.renter) {
+      errors.owner =
+        "you can't be the owner and the renter at the same operation";
+    }
+  } else if( data.owner == req.user.id){
+      errors.owner =
+        "you can't be the owner and the renter at the same operation";
+    }
+  
 
   if (!errors.item) {
     const item = await Item.findById(data.item);
