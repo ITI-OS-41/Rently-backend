@@ -168,7 +168,6 @@ const user = {
         return res.status(400).json({ msg: "Password is incorrect." });  
 
       const passwordHash = await bcrypt.hash(password, 12);
-
     
       if (isMatch) {
         await User.findOneAndUpdate(
