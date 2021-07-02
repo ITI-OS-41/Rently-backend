@@ -42,9 +42,10 @@ exports.getOneRent = async (req, res) => {
   }
 };
 exports.getAllRents = async (req, res) => {
-  let { owner, status, insurance, totalPrice, item, from, to } = req.query;
+  let { owner, status, insurance,renter, totalPrice, item, from, to } = req.query;
   const queryObj = {
     ...(owner && { owner }),
+    ...(renter && { renter }),
     ...(item && { item }),
     ...(status && { status }),
     ...(insurance && { insurance }),
@@ -62,14 +63,7 @@ exports.getAllRents = async (req, res) => {
   const skip = page * limit - limit;
 
   const loggedUser = await User.findById(req.user.id);
-  const getRents = await Rent.find(
-    loggedUser.role !== "admin"
-      ? {
-          ...queryObj,
-          renter: req.user.id,
-        }
-      : { queryObj }
-  )
+  const getRents = await Rent.find({ ...queryObj })
     // res.status(200).set("X-Total-Count", objects.length).json(objects);
     .limit(limit)
     .skip(skip)
