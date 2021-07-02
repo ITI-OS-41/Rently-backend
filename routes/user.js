@@ -30,11 +30,14 @@ router.patch("/update_role/:id", auth, authAdmin, user.updateUsersRole);
 
 router.delete("/delete/:id", auth, authAdmin, user.deleteUser);
 
+router.post("/contact-us", user.contactUsForm);
+
 // Social Login
 router.post("/google_login", user.googleLogin);
 
 router.post("/facebook_login", user.facebookLogin);
 
 router.get("/:id",  user.getUser);
+
 
 module.exports = router;

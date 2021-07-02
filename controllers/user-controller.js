@@ -2,6 +2,7 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const sendMail = require("../helpers/sendMail");
+const sendContact = require("../helpers/contactForm");
 
 const { google } = require("googleapis");
 const { OAuth2 } = google.auth;
@@ -60,8 +61,8 @@ const user = {
       const activation_token = createActivationToken(newUser);
 
       const url = `${CLIENT_URL}/login/${activation_token}`;
-      sendMail(email, url, "Verify your email address", res);
-      res.json({
+      sendMail(email, url, "Verify your email address");
+      return res.json({
         msg: "Register Success! Please activate your email to start.",
       });
     } catch (err) {
@@ -153,7 +154,7 @@ const user = {
       const url = `${CLIENT_URL}/user/reset/${access_token}`;
 
       sendMail(email, url, "Reset your password");
-      res.json({ msg: "Re-send the password, please check your email." });
+      return res.json({ msg: "Re-send the password, please check your email." });
     } catch (err) {
       return res.status(500).json({ msg: err.message });
     }
@@ -297,6 +298,17 @@ const user = {
 
         res.json({ msg: "Login success!" });
       }
+    } catch (err) {
+      return res.status(500).json({ msg: err.message });
+    }
+  },
+  contactUsForm: async (req,res) =>{
+    try{
+    const data ={...req.body};
+    sendContact(data, "Contact Us Form Received from User", res)
+    return res.json({
+        msg: "contact us sent  Successfully! Please wait for one of our customers to reach out to you",
+      });
     } catch (err) {
       return res.status(500).json({ msg: err.message });
     }
