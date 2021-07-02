@@ -159,16 +159,17 @@ const user = {
     }
   },
   resetPassword: async (req, res) => {
+    
     try {
+      const user = await User.findById(req.user.id );
       const { oldPassword,password } = req.body;
-      const oldPasswordHash = await bcrypt.hash(oldPassword, 12);
+      const isMatch = await bcrypt.compare(oldPassword, user.password);
+      if (!isMatch)
+        return res.status(400).json({ msg: "Password is incorrect." });  
+
       const passwordHash = await bcrypt.hash(password, 12);
-      console.log({oldPasswordHash})
-      const oldPasswordCheck = await User.findOne({
-        _id: req.user.id,
-        password: oldPasswordHash,
-      });
-      if (oldPasswordCheck) {
+    
+      if (isMatch) {
         await User.findOneAndUpdate(
           { _id: req.user.id },
           {
@@ -176,9 +177,7 @@ const user = {
           }
         );
         return res.status(200).json({ msg: "Password successfully changed!" });
-      } else {
-        return res.status(404).json({ msg: "old password incorrect" });
-      }
+      } 
     } catch (err) {
       return res.status(500).json({ msg: err.message });
     }
