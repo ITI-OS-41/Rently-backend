@@ -163,7 +163,7 @@ const user = {
       const { oldPassword,password } = req.body;
       const oldPasswordHash = await bcrypt.hash(oldPassword, 12);
       const passwordHash = await bcrypt.hash(password, 12);
-
+      console.log({oldPasswordHash})
       const oldPasswordCheck = await User.findOne({
         _id: req.user.id,
         password: oldPasswordHash,
