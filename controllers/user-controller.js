@@ -12,19 +12,19 @@ const client = new OAuth2(process.env.MAILING_SERVICE_CLIENT_ID);
 const { CLIENT_URL } = process.env;
 
 const user = {
-  getUser :async  (req, res) => {
+  getUser: async (req, res) => {
     const userId = req.params.id;
     await User.findById(userId).exec((err, user) => {
-        if (err || !user) {
-            return res.status(404).json({
-                error: 'User not found'
-            });
-        }
-        user.password = undefined;
-        user.salt = undefined;
-        return res.status(200).json(user);
+      if (err || !user) {
+        return res.status(404).json({
+          error: "User not found",
+        });
+      }
+      user.password = undefined;
+      user.salt = undefined;
+      return res.status(200).json(user);
     });
-},
+  },
   register: async (req, res) => {
     try {
       const { username, email, password } = req.body;
@@ -113,11 +113,11 @@ const user = {
       console.log({ refresh_token });
       console.log("user refresh token", user._id);
 
-      const accessToken = createAccessToken({ id: user._id })
-      console.log(user)
+      const accessToken = createAccessToken({ id: user._id });
+      console.log(user);
       res.json({
         ...user._doc,
-        token: accessToken
+        token: accessToken,
       });
     } catch (err) {
       return res.status(500).json({ msg: err.message });
@@ -160,18 +160,25 @@ const user = {
   },
   resetPassword: async (req, res) => {
     try {
-      const { password } = req.body;
-      console.log(password);
+      const { oldPassword,password } = req.body;
+      const oldPasswordHash = await bcrypt.hash(oldPassword, 12);
       const passwordHash = await bcrypt.hash(password, 12);
 
-      await User.findOneAndUpdate(
-        { _id: req.user.id },
-        {
-          password: passwordHash,
-        }
-      );
-
-      res.json({ msg: "Password successfully changed!" });
+      const oldPasswordCheck = await User.findOne({
+        _id: req.user.id,
+        password: oldPasswordHash,
+      });
+      if (oldPasswordCheck) {
+        await User.findOneAndUpdate(
+          { _id: req.user.id },
+          {
+            password: passwordHash,
+          }
+        );
+        return res.status(200).json({ msg: "Password successfully changed!" });
+      } else {
+        return res.status(404).json({ msg: "old password incorrect" });
+      }
     } catch (err) {
       return res.status(500).json({ msg: err.message });
     }
@@ -274,7 +281,6 @@ const user = {
         });
 
         res.json({ msg: "Login success!" });
-
       } else {
         const newUser = new User({
           email,
