@@ -9,6 +9,8 @@ exports.createOneMessage = async (req, res) => {
   const newMessage = new Message(req.body);
   try {
     const savedMessage = await newMessage.save();
+    const conversation = await Conversation.findById(req.body.conversationId);
+    conversation.save();
     return res.status(200).json(savedMessage);
   } catch (err) {
     return res.status(500).json(err);
