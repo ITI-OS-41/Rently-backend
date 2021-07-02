@@ -108,6 +108,7 @@ exports.updateOneItem = async (req, res) => {
     }
   );
   if (updatedItem) {
+    console.log({updatedItem})
     const loggedUser = await User.findById(req.user.id);
     if (updatedItem.owner == req.user.id || loggedUser.role === "admin") {
       return res.status(200).send(updatedItem);
@@ -130,6 +131,7 @@ exports.deleteOneItem = async (req, res) => {
     const deletedItem = await Item.findById(id);
     console.log(deletedItem);
     if (deletedItem) {
+      console.log({deletedItem})
       const loggedUser = await User.findById(req.user.id);
       if (deletedItem.owner._id == req.user.id || loggedUser.role === "admin") {
         deletedItem.remove().then(() => {

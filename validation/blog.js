@@ -10,6 +10,7 @@ const {
 } = require("../helpers/errors");
 const validator = require("validator");
 const Blog = require("../models/Blog");
+const Category = require("../models/Category");
 
 module.exports = async (req, res, next) => {
   let errors = {};
