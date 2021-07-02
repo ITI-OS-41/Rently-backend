@@ -5,10 +5,11 @@ const { validateId } = require("../helpers/errors");
 
 exports.create = async (req, res) => {
   req.body.sender = req.user.id;
-  const duplicateConversation= await Conversation.findOne({
-    members: [req.body.sender, req.body.receiver],
-  })
+  const duplicateConversation = await Conversation.findOne({
+    members:{ $all:[req.body.sender, req.body.receiver]},
+  });
   if(duplicateConversation){
+    console.log("duplicateConversation")
     return res.status(200).json(duplicateConversation)
   }else{
     const newConversation = new Conversation({
@@ -17,6 +18,7 @@ exports.create = async (req, res) => {
     try {
       const savedConversation = await newConversation.save();
       if (savedConversation) {
+        console.log("SavedConversation")
         return res.status(200).json(savedConversation);
       } else {
         return res.status(404).json({ msg: "conversation not saved" });
