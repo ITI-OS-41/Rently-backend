@@ -86,10 +86,12 @@ exports.getAllRents = async (req, res) => {
 };
 
 exports.updateOneRent = async (req, res) => {
-  try {
+
     const updatedRent = await Rent.findOneAndUpdate(
       { _id: req.params.id },
-      req.body,
+      
+        req.body,
+      
       {
         new: true,
       }
@@ -98,8 +100,8 @@ exports.updateOneRent = async (req, res) => {
       console.log(updatedRent);
       const loggedUser = await User.findById(req.user.id);
       if (
-        foundRent.renter._id == req.user.id ||
-        foundRent.owner._id == req.user.id ||
+        updatedRent.renter._id == req.user.id ||
+        updatedRent.owner._id == req.user.id ||
         loggedUser.role === "admin"
       ) {
         return res.status(200).send(updatedRent);
@@ -111,9 +113,6 @@ exports.updateOneRent = async (req, res) => {
     } else {
       return res.status(404).json({ msg: "rent not updated" });
     }
-  } catch (error) {
-    return res.status(500).json(error);
-  }
 };
 exports.deleteOneRent = async (req, res) => {
   const id = req.params.id;
@@ -125,8 +124,8 @@ exports.deleteOneRent = async (req, res) => {
     if (deletedRent) {
       const loggedUser = await User.findById(req.user.id);
       if (
-        foundRent.renter._id == req.user.id ||
-        foundRent.owner._id == req.user.id ||
+        deletedRent.renter._id == req.user.id ||
+        deletedRent.owner._id == req.user.id ||
         loggedUser.role === "admin"
       ) {
         deletedRent.remove().then(() => {

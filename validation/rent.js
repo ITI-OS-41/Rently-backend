@@ -95,18 +95,20 @@ module.exports = async (req, res, next) => {
   }
 
   if (Object.keys(errors).length === 0) {
-    const verifiedRents = await Rent.find({
-      renter: req.user.id,
-      item: data.item,
-      owner: data.owner,
-    });
-    if (verifiedRents.length) {
-      verifiedRents.forEach((rent) => {
-        if (rent.status !== "returned") {
-          errors.owner =
-            "you can't request another rent from the item owner on this item, while ongoing renting between both on the same item";
-        }
+    if(!id){
+      const verifiedRents = await Rent.find({
+        renter: req.user.id,
+        item: data.item,
+        owner: data.owner,
       });
+      if (verifiedRents.length) {
+        verifiedRents.forEach((rent) => {
+          if (rent.status !== "returned") {
+            errors.owner =
+              "you can't request another rent from the item owner on this item, while ongoing renting between both on the same item";
+          }
+        });
+      }
     }
   }
 
