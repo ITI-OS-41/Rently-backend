@@ -8,6 +8,7 @@ const {
   getOneRent,
   getAllRents,
   updateOneRent,
+  updateRentStatus,
   deleteOneRent,
 } = require("../controllers/rent-controller");
 
@@ -22,6 +23,9 @@ router.get("/:id", auth, getOneRent);
 
 // * UPDATE
 router.post("/:id", auth, validateRent, updateOneRent);
+
+// * UPDATE STATUS
+router.patch("/:id", auth, updateRentStatus);
 
 // * DELETE
 router.delete("/:id", auth, deleteOneRent);

@@ -46,7 +46,7 @@ exports.getAllRents = async (req, res) => {
     ...(owner && { owner }),
     ...(renter && { renter }),
     ...(item && { item }),
-    ...(status && { status }),
+    ...(status && { status: new RegExp(status.replace(/,/g, "|")) }),
     ...(insurance && { insurance }),
     ...(totalPrice && { totalPrice }),
     ...(from && { from }),
@@ -114,6 +114,60 @@ exports.updateOneRent = async (req, res) => {
       return res.status(404).json({ msg: "rent not updated" });
     }
 };
+
+exports.updateRentStatus = async (req, res) => {
+  const updatedRentStatus = await Rent.findOne(
+    { _id: req.params.id },
+  );
+  if (updatedRentStatus) {
+    console.log({ updatedRentStatus });
+    const loggedUser = await User.findById(req.user.id);
+    if (
+      updatedRentStatus.renter._id == req.user.id ||
+      updatedRentStatus.owner._id == req.user.id) {
+        if (updatedRentStatus.status==="returned"){
+          return res.status(400).json({msg:"bad request, status is already returned"})
+        }
+          if (updatedRentStatus.status === "approved") {
+            console.log(updatedRentStatus.deliveryStatus.includes(req.user.id));
+            console.log(updatedRentStatus.deliveryStatus);
+            if (updatedRentStatus.deliveryStatus.includes(req.user.id)) {
+              return res
+                .status(404)
+                .json({ msg: "you have already changed the rent status" });
+            } else {
+              updatedRentStatus.deliveryStatus.push(req.user.id);
+              if (updatedRentStatus.deliveryStatus.length == 2) {
+                updatedRentStatus.status = "delivered";
+              }
+            }
+          } else if (updatedRentStatus.status === "delivered") {
+            if (updatedRentStatus.returnedStatus.includes(req.user.id)) {
+              return res
+                .status(404)
+                .json({ msg: "you have already changed the rent status" });
+            } else {
+              updatedRentStatus.returnedStatus.push(req.user.id);
+              if (updatedRentStatus.returnedStatus.length == 2) {
+                updatedRentStatus.status = "returned";
+              }
+            }
+          }
+        updatedRentStatus.save();
+      return res.status(200).send(updatedRentStatus);
+    } else {
+      return res
+        .status(403)
+        .json({ msg: "you are not authorized to perform this operation" });
+    }
+  } else {
+    return res.status(404).json({ msg: "rent status not updated" });
+  }
+};
+
+
+
+
 exports.deleteOneRent = async (req, res) => {
   const id = req.params.id;
   if (validateId(id)) {

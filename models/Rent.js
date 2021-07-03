@@ -19,12 +19,8 @@ const rentSchema = new Schema(
       ref: "Item",
       required: [true, "item is required"],
     },
-    deliveryStatus:{
-     type: [String],
-    }, 
-    returnedStatus:{
-     type: [String],
-    },
+    deliveryStatus: [{ type: ObjectId, ref: "User" }],
+    returnedStatus: [{ type: ObjectId, ref: "User" }],
     from: {
       type: Date,
       required: [true, "start date is required"],
@@ -40,7 +36,7 @@ const rentSchema = new Schema(
     },
     quantity: {
       type: Number,
-      trim:true,
+      trim: true,
     },
     totalPrice: {
       type: Number,
