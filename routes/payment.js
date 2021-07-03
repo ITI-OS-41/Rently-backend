@@ -1,31 +1,27 @@
-const router = require("express").Router()
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const stripe = require('stripe')('sk_test_4eC39HqLyjWDarjtT1zdp7dc');
+const YOUR_DOMAIN = 'http://localhost:3000/checkout';
+const router = require("express").Router();
 
-
-
-router.post("/payment", async (req, res) => {
-  console.log("stripe-routes.js 9 | route reached", req.body);
-  let { amount, id } = req.body;
-  console.log("stripe-routes.js 10 | amount and id", amount, id);
-  try {
-    const payment = await stripe.paymentIntents.create({
-      amount: amount,
-      currency: "USD",
-      description: "Your Company Description",
-      payment_method: id,
-      confirm: true,
-    });
-    console.log("stripe-routes.js 19 | payment", payment);
-    res.json({
-      message: "Payment Successful",
-      success: true,
-    });
-  } catch (error) {
-    console.log("stripe-routes.js 17 | error", error);
-    res.json({
-      message: "Payment Failed",
-      success: false,
-    });
-  }
+router.post('/create-checkout-session', async (req, res) => {
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ['card'],
+    line_items: [
+      {
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: 'Stubborn Attachments',
+            images: ['https://i.imgur.com/EHyR2nP.png'],
+          },
+          unit_amount: 2000,
+        },
+        quantity: 1,
+      },
+    ],
+    mode: 'payment',
+    success_url: `${YOUR_DOMAIN}?success=true`,
+    cancel_url: `${YOUR_DOMAIN}?canceled=true`,
+  });
+  res.redirect(303, session.url)
 });
-module.exports = router
+
