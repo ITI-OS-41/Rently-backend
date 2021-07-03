@@ -22,7 +22,7 @@ router.get("/:id", getOne)
 router.post("/", create)
 
 // * UPDATE
-router.put("/:id", update)
+router.post("/:id", update)
 
 // * DELETE
 router.delete("/:id", deleteOne,)
