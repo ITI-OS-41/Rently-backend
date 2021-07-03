@@ -59,8 +59,8 @@ module.exports = async (req, res, next) => {
 
   if (!errors.item) {
     const item = await Item.findById(data.item);
-    if (item.stock === 0) {
-      errors.item = "this item is out of stock";
+    if (data.quantity>item.stock) {
+      errors.quantity = "the quantity requested for rent is larger than the item stock";
     }
   }
 
