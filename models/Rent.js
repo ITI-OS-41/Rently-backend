@@ -34,6 +34,12 @@ const rentSchema = new Schema(
       trim: true,
       // required: [true, "insurance is required"],
     },
+    isPaid: {
+      type: Boolean,
+      trim: true,
+      default:false,
+      // required: [true, "rent paid status is required"],
+    },
     quantity: {
       type: Number,
       trim: true,

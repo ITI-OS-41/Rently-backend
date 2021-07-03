@@ -116,6 +116,10 @@ exports.updateOneRent = async (req, res) => {
 };
 
 exports.updateRentStatus = async (req, res) => {
+  const id = req.params.id;
+  if (validateId(id)) {
+    return res.status(404).json({ msg: "invalid rent id" });
+  }
   const updatedRentStatus = await Rent.findOne({ _id: req.params.id });
   const rentedItem = await Item.findOne({ _id: updatedRentStatus.item });
   if (updatedRentStatus) {
@@ -127,7 +131,9 @@ exports.updateRentStatus = async (req, res) => {
       if (updatedRentStatus.status === "returned") {
         return res
           .status(400)
-          .json({ msg: "bad request, status is already returned" });
+          .json({
+            msg: "rent status is already returned, you can't update a completed rent ",
+          });
       }
       if (updatedRentStatus.status === "approved") {
         if (updatedRentStatus.deliveryStatus.includes(req.user.id)) {
@@ -156,7 +162,7 @@ exports.updateRentStatus = async (req, res) => {
           }
         }
       }
-     await updatedRentStatus.save();
+      await updatedRentStatus.save();
       await Item.findOneAndUpdate(
         { _id: updatedRentStatus.item },
         { ...rentedItem, stock: rentedItem.stock },
@@ -170,6 +176,39 @@ exports.updateRentStatus = async (req, res) => {
     }
   } else {
     return res.status(404).json({ msg: "rent status not updated" });
+  }
+};
+
+exports.updateRentCheckout = async (req, res) => {
+  const id = req.params.id;
+  if (validateId(id)) {
+    return res.status(404).json({ msg: "invalid rent id" });
+  }
+const checkedoutRent = await Rent.findOneAndUpdate(
+    { _id: req.params.id },
+
+   { ...req.body,
+    isPaid:true
+  },
+
+    {
+      new: true,
+    }
+  );
+  if (checkedoutRent._id) {
+    const loggedUser = await User.findById(req.user.id);
+    if (
+      checkedoutRent.renter._id == req.user.id ||
+      loggedUser.role === "admin"
+    ) {
+      return res.status(200).send(checkedoutRent);
+    } else {
+      return res
+        .status(403)
+        .json({ msg: "you are not authorized to perform this operation" });
+    }
+  } else {
+    return res.status(404).json({ msg: "rent not updated" });
   }
 };
 
@@ -196,7 +235,7 @@ exports.deleteOneRent = async (req, res) => {
           .json({ msg: "you are not authorized to perform this operation" });
       }
     } else {
-      return res.status(404).json({ msg: "rent not found" });
+      return res.status(404).json({ msg: "rent not deleted" });
     }
   } catch (error) {
     return res.status(500).json(error);

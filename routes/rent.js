@@ -9,6 +9,7 @@ const {
   getAllRents,
   updateOneRent,
   updateRentStatus,
+  updateRentCheckout,
   deleteOneRent,
 } = require("../controllers/rent-controller");
 
@@ -26,6 +27,9 @@ router.post("/:id", auth, validateRent, updateOneRent);
 
 // * UPDATE STATUS
 router.patch("/:id", auth, updateRentStatus);
+
+// * UPDATE PAYMENT STATUS
+router.patch("/checkout/:id", auth, updateRentCheckout);
 
 // * DELETE
 router.delete("/:id", auth, deleteOneRent);
