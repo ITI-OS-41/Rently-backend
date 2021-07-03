@@ -17,6 +17,7 @@ const categorySchema = new Schema(
       type: String,
       required: true,
     },
+    subcategory: [{ type: ObjectId, ref: "SubCategory" }],
     description: {
       type: String,
       required: [true, "description is required"],
@@ -72,6 +73,7 @@ categorySchema.statics.requiredFields = function () {
 
 let autoPopulateLead = function (next) {
   this.populate("createdBy", "-email -password -createdAt -updatedAt -__v");
+  this.populate("subCategory", "-category -createdAt -updatedAt -__v");
   next();
 };
 
