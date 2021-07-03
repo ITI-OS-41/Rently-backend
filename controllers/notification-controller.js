@@ -60,7 +60,7 @@ exports.getOne = (req, res) => {
 exports.create = async (req, res) => {
   
   const notification = new Notification(
-   ...req.body
+  {...req.body}
   );
 try{
   const savedNotification = await notification.save()
