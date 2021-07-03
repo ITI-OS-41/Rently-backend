@@ -1,5 +1,6 @@
 const Rent = require("../models/Rent");
 const User = require("../models/User");
+const Item = require("../models/Item");
 const { validateId } = require("../helpers/errors");
 
 exports.createOneRent = async (req, res) => {
@@ -86,74 +87,81 @@ exports.getAllRents = async (req, res) => {
 };
 
 exports.updateOneRent = async (req, res) => {
+  const updatedRent = await Rent.findOneAndUpdate(
+    { _id: req.params.id },
 
-    const updatedRent = await Rent.findOneAndUpdate(
-      { _id: req.params.id },
-      
-        req.body,
-      
-      {
-        new: true,
-      }
-    );
-    if (updatedRent) {
-      console.log(updatedRent);
-      const loggedUser = await User.findById(req.user.id);
-      if (
-        updatedRent.renter._id == req.user.id ||
-        updatedRent.owner._id == req.user.id ||
-        loggedUser.role === "admin"
-      ) {
-        return res.status(200).send(updatedRent);
-      } else {
-        return res
-          .status(403)
-          .json({ msg: "you are not authorized to perform this operation" });
-      }
-    } else {
-      return res.status(404).json({ msg: "rent not updated" });
+    req.body,
+
+    {
+      new: true,
     }
+  );
+  if (updatedRent) {
+    console.log(updatedRent);
+    const loggedUser = await User.findById(req.user.id);
+    if (
+      updatedRent.renter._id == req.user.id ||
+      updatedRent.owner._id == req.user.id ||
+      loggedUser.role === "admin"
+    ) {
+      return res.status(200).send(updatedRent);
+    } else {
+      return res
+        .status(403)
+        .json({ msg: "you are not authorized to perform this operation" });
+    }
+  } else {
+    return res.status(404).json({ msg: "rent not updated" });
+  }
 };
 
 exports.updateRentStatus = async (req, res) => {
-  const updatedRentStatus = await Rent.findOne(
-    { _id: req.params.id },
-  );
+  const updatedRentStatus = await Rent.findOne({ _id: req.params.id });
+  const rentedItem = await Item.findOne({ _id: updatedRentStatus.item });
   if (updatedRentStatus) {
-    console.log({ updatedRentStatus });
     const loggedUser = await User.findById(req.user.id);
     if (
       updatedRentStatus.renter._id == req.user.id ||
-      updatedRentStatus.owner._id == req.user.id) {
-        if (updatedRentStatus.status==="returned"){
-          return res.status(400).json({msg:"bad request, status is already returned"})
-        }
-          if (updatedRentStatus.status === "approved") {
-            console.log(updatedRentStatus.deliveryStatus.includes(req.user.id));
-            console.log(updatedRentStatus.deliveryStatus);
-            if (updatedRentStatus.deliveryStatus.includes(req.user.id)) {
-              return res
-                .status(404)
-                .json({ msg: "you have already changed the rent status" });
-            } else {
-              updatedRentStatus.deliveryStatus.push(req.user.id);
-              if (updatedRentStatus.deliveryStatus.length == 2) {
-                updatedRentStatus.status = "delivered";
-              }
-            }
-          } else if (updatedRentStatus.status === "delivered") {
-            if (updatedRentStatus.returnedStatus.includes(req.user.id)) {
-              return res
-                .status(404)
-                .json({ msg: "you have already changed the rent status" });
-            } else {
-              updatedRentStatus.returnedStatus.push(req.user.id);
-              if (updatedRentStatus.returnedStatus.length == 2) {
-                updatedRentStatus.status = "returned";
-              }
-            }
+      updatedRentStatus.owner._id == req.user.id
+    ) {
+      if (updatedRentStatus.status === "returned") {
+        return res
+          .status(400)
+          .json({ msg: "bad request, status is already returned" });
+      }
+      if (updatedRentStatus.status === "approved") {
+        if (updatedRentStatus.deliveryStatus.includes(req.user.id)) {
+          return res
+            .status(404)
+            .json({ msg: "you have already changed the rent status" });
+        } else {
+          updatedRentStatus.deliveryStatus.push(req.user.id);
+          if (updatedRentStatus.deliveryStatus.length == 2) {
+            updatedRentStatus.status = "delivered";
+            updatedRentStatus.item.stock -= updatedRentStatus.quantity;
+            rentedItem.stock -= updatedRentStatus.quantity;
           }
-        updatedRentStatus.save();
+        }
+      } else if (updatedRentStatus.status === "delivered") {
+        if (updatedRentStatus.returnedStatus.includes(req.user.id)) {
+          return res
+            .status(404)
+            .json({ msg: "you have already changed the rent status" });
+        } else {
+          updatedRentStatus.returnedStatus.push(req.user.id);
+          if (updatedRentStatus.returnedStatus.length == 2) {
+            updatedRentStatus.status = "returned";
+            updatedRentStatus.item.stock += updatedRentStatus.quantity;
+            rentedItem.stock += updatedRentStatus.quantity;
+          }
+        }
+      }
+      updatedRentStatus.save();
+      await Item.findOneAndUpdate(
+        { _id: updatedRentStatus.item },
+        { ...rentedItem, stock: rentedItem.stock },
+        { new: true }
+      );
       return res.status(200).send(updatedRentStatus);
     } else {
       return res
@@ -164,9 +172,6 @@ exports.updateRentStatus = async (req, res) => {
     return res.status(404).json({ msg: "rent status not updated" });
   }
 };
-
-
-
 
 exports.deleteOneRent = async (req, res) => {
   const id = req.params.id;

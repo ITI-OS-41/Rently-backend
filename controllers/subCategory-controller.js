@@ -8,10 +8,6 @@ exports.createOneSubCategory = async (req, res) => {
   try {
     const savedsubCategory = await subCategory.save();
     if (savedsubCategory) {
-      await Category.updateMany(
-        { _id: savedsubCategory.category },
-        { $push: { subcategory: savedsubCategory._id } }
-      );
       return res.status(200).json(savedsubCategory);
     } else {
       return res.status(404).json({ msg: "subCategory not saved" });

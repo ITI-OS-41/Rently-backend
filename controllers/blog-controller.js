@@ -20,10 +20,6 @@ exports.createOneBlog = async (req, res) => {
   try {
     const savedBlog = await blog.save();
     if (savedBlog) {
-      await Category.updateMany(
-        { _id: savedBlog.category },
-        { $push: { blogs: savedBlog._id } }
-      );
       return res.status(200).json(savedBlog);
     } else {
       return res.status(404).json({ msg: "blog not saved" });

@@ -11,10 +11,7 @@ exports.createOneFaq = async (req, res) => {
   try {
     const savedQuestion = await question.save();
     if (savedQuestion) {
-      await Category.updateMany(
-        { _id: savedQuestion.Category },
-        { $push: { faq: savedQuestion._id } }
-      );
+    
       return res.status(200).json(savedQuestion);
     } else {
       return res.status(404).json({ msg: "question not saved" });
