@@ -11,6 +11,10 @@ const passport = require("passport");
 const cookieParser = require("cookie-parser");
 const path = require("path");
 
+
+const stripe = require('stripe')('sk_test_51J72gVH4P1CollSv1w4jIaimW26Lg65vhUB8DA8K4QU2iFaPgeze9ij7sFlTUZK7fe4bJZSD0UoqYyz9KzaKXa0a00Y8PTMbwq');
+const YOUR_DOMAIN = 'http://localhost:3000/checkout';
+
 /*
 ** MONGO DB CONNECT
 */
@@ -26,11 +30,11 @@ mongoose.connect(
     if (err) throw err;
     console.log("Connected to mongodb on atlas");
   }
-  );
-  
-  /*
-   ** ROUTES
-   */
+);
+
+/*
+ ** ROUTES
+ */
 // const auth = require("./routes/auth.js");
 const user = require("./routes/user.js");
 const category = require("./routes/category.js");
@@ -107,7 +111,58 @@ app.use("/api/itemrate", itemRate);
 app.use("/api/userrate", userRate);
 app.use("/api/conversation", conversation);
 app.use("/api/message", message);
-app.use("/api", payment);
+
+
+
+app.post("/api/checkout", async (req, res) => {
+  console.log("Request:", req.body);
+
+  let error;
+  let status;
+  try {
+    const { products, total, token } = req.body;
+
+    const customer = await stripe.customers.create({
+      email: token.email,
+      source: token.id
+    });
+
+    // const idempotency_key = uuid();
+    const idempotency_key = (Math.random() * 100000000);
+    const charge = await stripe.charges.create(
+      {
+        amount: total * 100,
+        currency: "usd",
+        customer: customer.id,
+        receipt_email: token.email,
+        description: `Purchased from Rently with ${total}$`,
+        shipping: {
+          name: token.card.name,
+          address: {
+            line1: token.card.address_line1,
+            line2: token.card.address_line2,
+            city: token.card.address_city,
+            country: token.card.address_country,
+            postal_code: token.card.address_zip
+          }
+        }
+      },
+      {
+        idempotency_key
+      }
+    );
+    console.log("Charge:", { charge });
+    status = "success";
+  } catch (error) {
+    console.error("Error:", error);
+    status = "failure";
+  }
+
+  res.json({ error, status });
+});
+
+
+
 /*
  ** RUN APP
  */
