@@ -156,7 +156,7 @@ exports.updateRentStatus = async (req, res) => {
           }
         }
       }
-      updatedRentStatus.save();
+     await updatedRentStatus.save();
       await Item.findOneAndUpdate(
         { _id: updatedRentStatus.item },
         { ...rentedItem, stock: rentedItem.stock },

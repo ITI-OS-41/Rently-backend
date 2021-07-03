@@ -48,9 +48,12 @@ const userSchema = new Schema(
     referralCode: {
       type: String,
     },
+    friendReferralCode: {
+      type: String,
+    },
     wallet: {
       type: Number,
-      default:0
+      default: 0,
     },
     dateOfBirth: {
       type: Date,

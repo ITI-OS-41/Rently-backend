@@ -9,9 +9,21 @@ exports.createOneItemRate = async (req, res) => {
   const itemRate = await new ItemRate(req.body);
   try {
     const savedItemRate = await itemRate.save();
+        const loggedUser = await User.findById(req.user.id);
+
     if (savedItemRate) {
-      return res.status(200).send(itemRate);
-    } else {
+       const user=await User.findOneAndUpdate(
+         { _id: req.user.id },
+         {
+           loggedUser,
+           wallet:loggedUser.wallet+5,
+         },
+         { new: true }
+       );
+      console.log({ user });
+
+        return res.status(200).send(itemRate);
+      } else {
       return res.status(404).json({ msg: "itemRate not saved" });
     }
   } catch (error) {

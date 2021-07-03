@@ -7,7 +7,17 @@ exports.createOneAppRate = async (req, res) => {
   const appRate = await new AppRate(req.body);
   try {
     const savedAppRate = await appRate.save();
+    const loggedUser = await User.findById(req.user.id);
     if (savedAppRate) {
+     const user = await User.findOneAndUpdate(
+        { _id: req.user.id },
+        {
+          loggedUser,
+          wallet: loggedUser.wallet + 5,
+        },
+        { new: true }
+      );
+      console.log({user})
       return res.status(200).json(savedAppRate);
     } else {
       return res.status(404).json({ msg: "appRate not saved" });

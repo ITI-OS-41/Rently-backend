@@ -28,7 +28,7 @@ const user = {
   },
   register: async (req, res) => {
     try {
-      const { username, email, password } = req.body;
+      const { friendReferralCode, username, email, password } = req.body;
 
       if (!email || !password || !username)
         return res.status(400).json({ msg: "Please fill in all fields." });
@@ -50,12 +50,18 @@ const user = {
           .json({ msg: "Password must be at least 6 characters." });
 
       const passwordHash = await bcrypt.hash(password, 12);
+      req.body.wallet = 10;
+      const referralCode =
+        (Math.random() * 10000000000000).toString(32).split(".")[0] + username;
+      console.log({ referralCode });
 
       const newUser = {
         ...req.body,
         email,
         password: passwordHash,
         username,
+        referralCode,
+        friendReferralCode,
       };
 
       const activation_token = createActivationToken(newUser);
@@ -77,19 +83,40 @@ const user = {
         process.env.ACTIVATION_TOKEN_SECRET
       );
 
-      // const { firstname, lastname, username, email, password } = user;
+      const {
+        firstname,
+        lastname,
+        friendReferralCode,
+        username,
+        email,
+        password,
+      } = user;
 
-      // const check = await User.findOne({ email });
-      // if (check)
-      //   return res.status(400).json({ msg: "This email already exists." });
+      const check = await User.findOne({ email });
+      if (check)
+        return res.status(400).json({ msg: "This email already exists." });
 
       const newUser = new User({
         ...user,
       });
 
       await newUser.save();
-
-      res.json({ msg: "Account has been activated!" });
+      console.log({ newUser });
+      const userReferred = await User.findOne({
+        referralCode: friendReferralCode,
+      });
+      console.log({ userReferred });
+      if (userReferred.email) {
+        const userWallet = await User.findOneAndUpdate(
+          { referralCode: friendReferralCode },
+          {
+            userReferred,
+            wallet: userReferred.wallet + 10,
+          },
+          { new: true }
+        );
+      }
+      return res.json({ msg: "Account has been activated!" });
     } catch (err) {
       return res.status(500).json({ msg: err.message });
     }
@@ -154,22 +181,23 @@ const user = {
       const url = `${CLIENT_URL}/user/reset/${access_token}`;
 
       sendMail(email, url, "Reset your password");
-      return res.json({ msg: "Re-send the password, please check your email." });
+      return res.json({
+        msg: "Re-send the password, please check your email.",
+      });
     } catch (err) {
       return res.status(500).json({ msg: err.message });
     }
   },
   resetPassword: async (req, res) => {
-    
     try {
-      const user = await User.findById(req.user.id );
-      const { oldPassword,password } = req.body;
+      const user = await User.findById(req.user.id);
+      const { oldPassword, password } = req.body;
       const isMatch = await bcrypt.compare(oldPassword, user.password);
       if (!isMatch)
-        return res.status(400).json({ msg: "Password is incorrect." });  
+        return res.status(400).json({ msg: "Password is incorrect." });
 
       const passwordHash = await bcrypt.hash(password, 12);
-    
+
       if (isMatch) {
         await User.findOneAndUpdate(
           { _id: req.user.id },
@@ -178,7 +206,7 @@ const user = {
           }
         );
         return res.status(200).json({ msg: "Password successfully changed!" });
-      } 
+      }
     } catch (err) {
       return res.status(500).json({ msg: err.message });
     }
@@ -302,11 +330,11 @@ const user = {
       return res.status(500).json({ msg: err.message });
     }
   },
-  contactUsForm: async (req,res) =>{
-    try{
-    const data ={...req.body};
-    sendContact(data, "Contact Us Form Received from User", res)
-    return res.json({
+  contactUsForm: async (req, res) => {
+    try {
+      const data = { ...req.body };
+      sendContact(data, "Contact Us Form Received from User", res);
+      return res.json({
         msg: "contact us sent  Successfully! Please wait for one of our customers to reach out to you",
       });
     } catch (err) {

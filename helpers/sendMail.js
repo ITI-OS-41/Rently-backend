@@ -63,7 +63,7 @@ const sendEmail = (to, url, txt) => {
       return infor;
     });
   } catch (error) {
-    console.log(error);
+    return (error);
     // ex.FailedRecipient and ex.GetBaseException() should give you enough info.
   }
 };

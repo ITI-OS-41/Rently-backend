@@ -59,7 +59,7 @@ exports.getAllItems = async (req, res) => {
     slug,
   } = req.query;
   const queryObj = {
-    ...(name && { name: new RegExp(`${name}`,'i') }),
+    ...(name && { name: new RegExp(`${name}`, "i") }),
     ...(description && { description: new RegExp(`${description}`) }),
     ...(owner && { owner }),
     ...(category && { category }),
@@ -108,9 +108,20 @@ exports.updateOneItem = async (req, res) => {
     }
   );
   if (updatedItem) {
-    console.log({updatedItem})
     const loggedUser = await User.findById(req.user.id);
+    console.log(loggedUser);
     if (updatedItem.owner == req.user.id || loggedUser.role === "admin") {
+      if (updatedItem.isPublished === true) {
+        console.log("it worked till now");
+       const user = await User.findOneAndUpdate(
+         { _id: req.user.id },
+         {
+           loggedUser,
+           wallet:loggedUser.wallet+5,
+         },
+         { new: true }
+       );
+      }
       return res.status(200).send(updatedItem);
     } else {
       return res
@@ -131,7 +142,7 @@ exports.deleteOneItem = async (req, res) => {
     const deletedItem = await Item.findById(id);
     console.log(deletedItem);
     if (deletedItem) {
-      console.log({deletedItem})
+      console.log({ deletedItem });
       const loggedUser = await User.findById(req.user.id);
       if (deletedItem.owner._id == req.user.id || loggedUser.role === "admin") {
         deletedItem.remove().then(() => {

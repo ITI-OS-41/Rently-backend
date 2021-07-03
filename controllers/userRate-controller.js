@@ -8,7 +8,18 @@ exports.createOneUserRate = async (req, res) => {
   const userRate = await new UserRate(req.body);
   try {
     const savedUserRate = await userRate.save();
+    const loggedUser = await User.findById(req.user.id);
+
     if (savedUserRate) {
+      const user =await User.findOneAndUpdate(
+        { _id: req.user.id },
+        {
+          loggedUser,
+          wallet: loggedUser.wallet + 5,
+        },
+        { new: true }
+      );
+      console.log({user})
       return res.status(200).json(savedUserRate);
     } else {
       return res.status(404).json({ msg: "userRate not saved" });
