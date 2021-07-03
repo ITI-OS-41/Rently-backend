@@ -104,7 +104,7 @@ exports.deleteOneFaq = async (req, res) => {
         return res.status(200).send(deletedFaq);
       });
     } else {
-      return res.status(404).json({ msg: "faq not found" });
+      return res.status(404).json({ msg: "faq not deleted" });
     }
   } catch (error) {
     return res.status(500).json(error);

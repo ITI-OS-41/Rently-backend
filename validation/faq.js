@@ -34,14 +34,6 @@ module.exports = async (req, res, next) => {
     ...assignEmptyErrorsToFields(data, difference),
   };
 
-  if (data["questions"]) {
-    if (!data["questions"].question || !data["questions"].answer) {
-      errors.questions = "questions field is empty";
-    }
-  } else {
-    errors.questions = "questions field is required";
-  }
-
   const idCategoryCheck = await categoryIdCheck(data.category, res);
   if (Object.keys(idCategoryCheck).length > 0) {
     errors.category = idCategoryCheck;
@@ -68,17 +60,17 @@ module.exports = async (req, res, next) => {
   if (!errors.category ) {
     const duplicationCheck = await Faq.find({
       category: data.category,
-      "questions.question": data["questions"].question,
+    question: data.question,
     });
     if (duplicationCheck.length){
       if (id) {
         if (duplicationCheck.length > 1 || duplicationCheck[0]._id != id) {
           errors.duplication =
-            "a blog with this title has been published in this category, please choose another title";
+            "this question has been answered in this category";
         }
       } else if (duplicationCheck.length) {
         errors.duplication =
-          "a blog with this title has been published in this category, please choose another title";
+          "this question has been answered in this category";
       }
   }
 }

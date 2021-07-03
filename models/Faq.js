@@ -9,7 +9,6 @@ const faqSchema = new Schema({
     ref: "User",
     required: [true, "user is required"],
   },
-  questions: {
     question: {
       type: String,
       trim: true,
@@ -20,7 +19,10 @@ const faqSchema = new Schema({
       trim: true,
       required: true,
     },
-  },
+    section:{
+      type:String,
+      trim:true,
+    },
   category: {
     type: ObjectId,
     ref: "Category",
@@ -70,6 +72,6 @@ let autoPopulateLead = function (next) {
 };
 
 faqSchema.pre("findOne", autoPopulateLead).pre("find", autoPopulateLead);
-faqSchema.index({ questions: 1, category: 1, slug: 1 }, { unique: true });
+faqSchema.index({ question: 1, category: 1, slug: 1 }, { unique: true });
 
 module.exports = mongoose.model("Faq", faqSchema);
