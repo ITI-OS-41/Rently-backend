@@ -2,6 +2,7 @@
 
 const {
   subCategoryIdCheck,
+  idCategoryCheck,
   assignEmptyErrorsToFields,
   assignErrorsToMissingFields,
   getTwoArraysDifferences,
@@ -25,6 +26,10 @@ module.exports = async (req, res, next) => {
 
   let difference = getTwoArraysDifferences(requiredFields, missingFields);
 
+  const idCategoryCheck = await categoryIdCheck(data.category, res);
+  if (Object.keys(idCategoryCheck).length > 0) {
+    errors.category = "invalid category id / category not found";
+  }
   if (!Object.keys(errors).length) {
     const duplicationCheck = await SubCategory.find({
       name: data.name,

@@ -36,12 +36,12 @@ module.exports = async (req, res, next) => {
 
   const idUserCheck = await userIdCheck(data.renter, res);
   if (Object.keys(idUserCheck).length > 0) {
-    errors.renter = idUserCheck;
+    errors.renter = "invalid renter id / renter not found";
   }
-  
+
   const idItemCheck = await itemIdCheck(data.item, res);
   if (Object.keys(idItemCheck).length > 0) {
-    errors.item = idItemCheck;
+    errors.item = "invalid item id / item not found";
   }
   if (!errors.rating) {
     if (!isNaN(data.rating)) {

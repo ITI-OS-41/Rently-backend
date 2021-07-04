@@ -40,12 +40,12 @@ module.exports = async (req, res, next) => {
 
   const idItemCheck = await itemIdCheck(data.item, res);
   if (Object.keys(idItemCheck).length > 0) {
-    errors.item = idItemCheck;
+    errors.item = "invalid item id / item not found";
   }
 
   const idOwnerCheck = await userIdCheck(data.owner, res);
   if (Object.keys(idOwnerCheck).length > 0) {
-    errors.owner = idOwnerCheck;
+    errors.owner = "invalid owner id / owner not found";
   }
   if (id) {
     if (data.owner == data.renter) {

@@ -35,7 +35,7 @@ module.exports = async (req, res, next) => {
 
   const idBlogCheck = await blogIdCheck(data.blogPost, res);
   if (Object.keys(idBlogCheck).length > 0) {
-    errors.blog=idBlogCheck
+    errors.blog="invalid blog id / blog not found"
   }
   
   if (Object.keys(errors).length > 0) {

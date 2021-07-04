@@ -36,7 +36,7 @@ module.exports = async (req, res, next) => {
 
   const idCategoryCheck = await categoryIdCheck(data.category, res);
   if (Object.keys(idCategoryCheck).length > 0) {
-    errors.category = idCategoryCheck;
+    errors.category = "invalid category id / category not found";
   } else {
     const modelCheck = await Category.findById(data.category);
     if (modelCheck) {
@@ -48,12 +48,12 @@ module.exports = async (req, res, next) => {
 
   const idSubCategoryCheck = await subCategoryIdCheck(data.subcategory, res);
   if (Object.keys(idSubCategoryCheck).length > 0) {
-    errors.subCategory = idSubCategoryCheck;
+    errors.subCategory = "invalid subcategory id / subcategory not found";
   }
 
   const idUserCheck = await userIdCheck(data.owner, res);
   if (Object.keys(idUserCheck).length > 0) {
-    errors.owner = idUserCheck;
+    errors.owner = "invalid owner id / owner not found";
   }
 
   const condition = ["perfect", "very good", "descent", "good", "fair"];

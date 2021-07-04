@@ -37,7 +37,7 @@ errors = {
 
 const idItemCheck = await itemIdCheck(data.item, res);
 if (Object.keys(idItemCheck).length > 0) {
-  errors.item = idItemCheck;
+  errors.item = "invalid item id / item not found";
 }
 
 if (!errors.rating) {

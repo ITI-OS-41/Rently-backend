@@ -38,7 +38,7 @@ module.exports = async (req, res, next) => {
   for (let i = 0; i < data.rent.length; i++) {
     const idRentCheck = await rentIdCheck(data.rent[i], res);
     if (Object.keys(idRentCheck).length > 0) {
-       (errors.rent = idRentCheck);
+       (errors.rent = "invalid rent id / rent not found");
        break;
      }
   }
